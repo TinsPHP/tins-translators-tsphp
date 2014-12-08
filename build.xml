@@ -50,7 +50,7 @@
             <arg path="${src.antlr}"/>
             <arg value="-o"/>
             <arg path="${antlr.copyLocation}"/>
-            <arg path="${src.antlr}/TSPHPTranslatorWalker.g"/>
+            <!--<arg path="${src.antlr}/TSPHPTranslatorWalker.g"/>-->
             <classpath>
                 <fileset dir="${lib}">
                     <include name="*.jar"/>
