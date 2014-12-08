@@ -1,0 +1,29 @@
+/*
+ * This file is part of the TinsPHP project published under the Apache License 2.0
+ * For the full copyright and license information, please have a look at LICENSE in the
+ * root folder or visit the project's website http://tsphp.ch/wiki/display/TINS/License
+ */
+
+/*
+ * This file is based on the file PHP54.stg from the TSPHP project.
+ * TSPHP is also published under the Apache License 2.0
+ * For more information see http://tsphp.ch/wiki/display/TSPHP/License
+ */
+
+group TSPHP;
+
+file(namespaces) ::= <<
+<namespaces; separator="\n">
+>>
+
+namespace(name, body) ::= <<
+namespace<if(name)> <name><endif><body>
+>>
+
+body(statements) ::= <<
+{<if(statements)>
+
+    <statements; separator="\n">
+
+<endif>}
+>>

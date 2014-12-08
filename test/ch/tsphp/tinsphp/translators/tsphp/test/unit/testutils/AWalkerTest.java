@@ -1,0 +1,46 @@
+/*
+ * This file is part of the TinsPHP project published under the Apache License 2.0
+ * For the full copyright and license information, please have a look at LICENSE in the
+ * root folder or visit the project's website http://tsphp.ch/wiki/display/TINS/License
+ */
+
+/*
+ * This file is based on the file AWalkerTest from the translator component of the TSPHP project.
+ * TSPHP is also published under the Apache License 2.0
+ * For more information see http://tsphp.ch/wiki/display/TSPHP/License
+ */
+
+package ch.tsphp.tinsphp.translators.tsphp.test.unit.testutils;
+
+import ch.tsphp.common.ITSPHPAst;
+import ch.tsphp.common.TSPHPAst;
+import ch.tsphp.common.TSPHPAstAdaptor;
+import ch.tsphp.tinsphp.common.translation.IPrecedenceHelper;
+import ch.tsphp.tinsphp.translators.tsphp.antlrmod.ErrorReportingTSPHPTranslatorWalker;
+import org.antlr.runtime.CommonToken;
+import org.antlr.runtime.tree.CommonTreeNodeStream;
+import org.antlr.runtime.tree.TreeNodeStream;
+import org.junit.Ignore;
+
+import static org.mockito.Mockito.mock;
+
+@Ignore
+public abstract class AWalkerTest
+{
+    protected TreeNodeStream treeNodeStream;
+    protected IPrecedenceHelper precedenceHelper;
+
+    protected ErrorReportingTSPHPTranslatorWalker createWalker(ITSPHPAst ast) {
+        treeNodeStream = createTreeNodeStream(ast);
+        precedenceHelper = mock(IPrecedenceHelper.class);
+        return new ErrorReportingTSPHPTranslatorWalker(treeNodeStream, precedenceHelper);
+    }
+
+    protected TreeNodeStream createTreeNodeStream(ITSPHPAst ast) {
+        return new CommonTreeNodeStream(new TSPHPAstAdaptor(), ast);
+    }
+
+    protected ITSPHPAst createAst(int tokenType) {
+        return new TSPHPAst(new CommonToken(tokenType));
+    }
+}

@@ -4,7 +4,7 @@
   root folder or visit the project's website http://tsphp.ch/wiki/display/TSPHP/License
   -->
 
-<project name="translators_tsphp" default="common.build" basedir=".">
+<project name="translators/tsphp" default="common.build" basedir=".">
 
     <property environment="env"/>
     <import file="${basedir}/ant/build-common.xml" as="common"/>
@@ -30,6 +30,17 @@
     </target>
 
     <!-- ================================================================== -->
+    <!-- Specialised Target: compile.properties : to include stg file -->
+    <!-- ================================================================== -->
+    <target name="compile.properties" depends="common.compile.properties">
+        <copy todir="${classes}">
+            <fileset dir="${src.antlr}">
+                <include name="**/*.stg"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <!-- ================================================================== -->
     <!-- Specialised Target: cp.QA don't copy header.txt -->
     <!-- ================================================================== -->
     <target name="cp.QA" depends="cp.QA.saveHeaderTxt, copy.cp.QA, cp.QA.restoreHeaderTxt"/>
@@ -50,7 +61,7 @@
             <arg path="${src.antlr}"/>
             <arg value="-o"/>
             <arg path="${antlr.copyLocation}"/>
-            <!--<arg path="${src.antlr}/TSPHPTranslatorWalker.g"/>-->
+            <arg path="${src.antlr}/TSPHPTranslatorWalker.g"/>
             <classpath>
                 <fileset dir="${lib}">
                     <include name="*.jar"/>
