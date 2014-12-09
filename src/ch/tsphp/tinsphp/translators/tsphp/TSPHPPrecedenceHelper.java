@@ -25,6 +25,7 @@ import java.util.Map;
 public class TSPHPPrecedenceHelper implements IPrecedenceHelper
 {
 
+    @SuppressWarnings("checkstyle:magicnumber")
     private Map<Integer, Integer> precedenceRules = new HashMap<>(50);
 
     public TSPHPPrecedenceHelper() {

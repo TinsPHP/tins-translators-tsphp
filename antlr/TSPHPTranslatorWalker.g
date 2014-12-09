@@ -21,9 +21,9 @@ options {
 
 @header{
 /*
- * This file is part of the TSPHP project published under the Apache License 2.0
+ * This file is part of the TinsPHP project published under the Apache License 2.0
  * For the full copyright and license information, please have a look at LICENSE in the
- * root folder or visit the project's website http://tsphp.ch/wiki/display/TSPHP/License
+ * root folder or visit the project's website http://tsphp.ch/wiki/display/TINS/License
  */
 
 package ch.tsphp.tinsphp.translators.tsphp.antlr;
@@ -70,26 +70,22 @@ namespaceBody
     ;
 
 statement
-        //TODO rstoll TINS-266 translator procedural - use definition
-    :   //useDeclarationList -> {$useDeclarationList.st}
+    :   useDeclarationList -> {$useDeclarationList.st}
         //TODO rstoll TINS-253 translator procedural - definitions
     //|   definition -> {$definition.st}
     //|   instruction -> {$instruction.st}
     //TODO rstoll, remove as soon as above alternatives are uncommented
-    Plus -> {%{""}}
     ;
 
-//TODO rstoll TINS-266 translator procedural - use definition    
-/*useDeclarationList
-    :   ^('use' useDeclaration+)
-        -> useDeclarationList(useDeclarations={$useDeclaration.st})
+useDeclarationList
+    :   ^('use' declarations+=useDeclaration+)
+        -> useDeclarationList(useDeclarations={$declarations})
     ;
 
 useDeclaration
     :   ^(USE_DECLARATION TYPE_NAME Identifier)
         -> useDeclaration(type={$TYPE_NAME}, alias={$Identifier})
     ;
-*/
 
  //TODO rstoll TINS-253 translator procedural - definitions
  /*

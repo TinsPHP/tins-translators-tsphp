@@ -1,4 +1,4 @@
-// $ANTLR 3.5.2-including-157 D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g 2014-12-08 23:47:31
+// $ANTLR 3.5.2-including-157 D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g 2014-12-09 15:29:37
 
 /*
  * This file is part of the TSPHP project published under the Apache License 2.0
@@ -58,7 +58,8 @@ public class TSPHPTranslatorWalker extends TreeParser {
 		"TYPE_NAME", "Throw", "Try", "TypeAliasBool", "TypeAliasFloat", "TypeAliasFloat2", 
 		"TypeAliasInt", "TypeBool", "TypeFloat", "TypeInt", "TypeMixed", "TypeObject", 
 		"TypeResource", "TypeString", "USE_DECLARATION", "Use", "VARIABLE_DECLARATION", 
-		"VARIABLE_DECLARATION_LIST", "VariableId", "Void", "While", "Whitespace"
+		"VARIABLE_DECLARATION_LIST", "VariableId", "Void", "While", "Whitespace", 
+		"PhpEnd", "PhpStart"
 	};
 	public static final int EOF=-1;
 	public static final int LogicXorWeak=4;
@@ -235,6 +236,8 @@ public class TSPHPTranslatorWalker extends TreeParser {
 	public static final int Void=175;
 	public static final int While=176;
 	public static final int Whitespace=177;
+	public static final int PhpEnd=178;
+	public static final int PhpStart=179;
 
 	// delegates
 	public TreeParser[] getDelegates() {
@@ -514,7 +517,7 @@ public class TSPHPTranslatorWalker extends TreeParser {
 						while (true) {
 							int alt3=2;
 							int LA3_0 = input.LA(1);
-							if ( (LA3_0==Plus) ) {
+							if ( (LA3_0==Use) ) {
 								alt3=1;
 							}
 
@@ -586,20 +589,25 @@ public class TSPHPTranslatorWalker extends TreeParser {
 
 
 	// $ANTLR start "statement"
-	// D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:72:1: statement : Plus -> {%{\"\"}};
+	// D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:72:1: statement : useDeclarationList -> {$useDeclarationList.st};
 	public final TSPHPTranslatorWalker.statement_return statement() throws RecognitionException {
 		TSPHPTranslatorWalker.statement_return retval = new TSPHPTranslatorWalker.statement_return();
 		retval.start = input.LT(1);
 
+		TreeRuleReturnScope useDeclarationList2 =null;
+
 		try {
-			// D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:74:5: ( Plus -> {%{\"\"}})
-			// D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:79:5: Plus
+			// D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:73:5: ( useDeclarationList -> {$useDeclarationList.st})
+			// D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:73:9: useDeclarationList
 			{
-			match(input,Plus,FOLLOW_Plus_in_statement277); 
+			pushFollow(FOLLOW_useDeclarationList_in_statement239);
+			useDeclarationList2=useDeclarationList();
+			state._fsp--;
+
 			// TEMPLATE REWRITE
-			// 79:10: -> {%{\"\"}}
+			// 73:28: -> {$useDeclarationList.st}
 			{
-				retval.st = new StringTemplate(templateLib,"");
+				retval.st = (useDeclarationList2!=null?((StringTemplate)useDeclarationList2.getTemplate()):null);
 			}
 
 
@@ -618,6 +626,132 @@ public class TSPHPTranslatorWalker extends TreeParser {
 	}
 	// $ANTLR end "statement"
 
+
+	public static class useDeclarationList_return extends TreeRuleReturnScope {
+		public StringTemplate st;
+		public Object getTemplate() { return st; }
+		public String toString() { return st==null?null:st.toString(); }
+	};
+
+
+	// $ANTLR start "useDeclarationList"
+	// D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:80:1: useDeclarationList : ^( 'use' (declarations+= useDeclaration )+ ) -> useDeclarationList(useDeclarations=$declarations);
+	public final TSPHPTranslatorWalker.useDeclarationList_return useDeclarationList() throws RecognitionException {
+		TSPHPTranslatorWalker.useDeclarationList_return retval = new TSPHPTranslatorWalker.useDeclarationList_return();
+		retval.start = input.LT(1);
+
+		List<Object> list_declarations=null;
+		RuleReturnScope declarations = null;
+		try {
+			// D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:81:5: ( ^( 'use' (declarations+= useDeclaration )+ ) -> useDeclarationList(useDeclarations=$declarations))
+			// D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:81:9: ^( 'use' (declarations+= useDeclaration )+ )
+			{
+			match(input,Use,FOLLOW_Use_in_useDeclarationList287); 
+			match(input, Token.DOWN, null); 
+			// D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:81:29: (declarations+= useDeclaration )+
+			int cnt5=0;
+			loop5:
+			while (true) {
+				int alt5=2;
+				int LA5_0 = input.LA(1);
+				if ( (LA5_0==USE_DECLARATION) ) {
+					alt5=1;
+				}
+
+				switch (alt5) {
+				case 1 :
+					// D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:81:29: declarations+= useDeclaration
+					{
+					pushFollow(FOLLOW_useDeclaration_in_useDeclarationList291);
+					declarations=useDeclaration();
+					state._fsp--;
+
+					if (list_declarations==null) list_declarations=new ArrayList<Object>();
+					list_declarations.add(declarations.getTemplate());
+					}
+					break;
+
+				default :
+					if ( cnt5 >= 1 ) break loop5;
+					EarlyExitException eee = new EarlyExitException(5, input);
+					throw eee;
+				}
+				cnt5++;
+			}
+
+			match(input, Token.UP, null); 
+
+			// TEMPLATE REWRITE
+			// 82:9: -> useDeclarationList(useDeclarations=$declarations)
+			{
+				retval.st = templateLib.getInstanceOf("useDeclarationList",new STAttrMap().put("useDeclarations", list_declarations));
+			}
+
+
+
+			}
+
+		}
+		catch (RecognitionException re) {
+			reportError(re);
+			recover(input,re);
+		}
+		finally {
+			// do for sure before leaving
+		}
+		return retval;
+	}
+	// $ANTLR end "useDeclarationList"
+
+
+	public static class useDeclaration_return extends TreeRuleReturnScope {
+		public StringTemplate st;
+		public Object getTemplate() { return st; }
+		public String toString() { return st==null?null:st.toString(); }
+	};
+
+
+	// $ANTLR start "useDeclaration"
+	// D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:85:1: useDeclaration : ^( USE_DECLARATION TYPE_NAME Identifier ) -> useDeclaration(type=$TYPE_NAMEalias=$Identifier);
+	public final TSPHPTranslatorWalker.useDeclaration_return useDeclaration() throws RecognitionException {
+		TSPHPTranslatorWalker.useDeclaration_return retval = new TSPHPTranslatorWalker.useDeclaration_return();
+		retval.start = input.LT(1);
+
+		ITSPHPAst TYPE_NAME3=null;
+		ITSPHPAst Identifier4=null;
+
+		try {
+			// D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:86:5: ( ^( USE_DECLARATION TYPE_NAME Identifier ) -> useDeclaration(type=$TYPE_NAMEalias=$Identifier))
+			// D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:86:9: ^( USE_DECLARATION TYPE_NAME Identifier )
+			{
+			match(input,USE_DECLARATION,FOLLOW_USE_DECLARATION_in_useDeclaration330); 
+			match(input, Token.DOWN, null); 
+			TYPE_NAME3=(ITSPHPAst)match(input,TYPE_NAME,FOLLOW_TYPE_NAME_in_useDeclaration332); 
+			Identifier4=(ITSPHPAst)match(input,Identifier,FOLLOW_Identifier_in_useDeclaration334); 
+			match(input, Token.UP, null); 
+
+			// TEMPLATE REWRITE
+			// 87:9: -> useDeclaration(type=$TYPE_NAMEalias=$Identifier)
+			{
+				retval.st = templateLib.getInstanceOf("useDeclaration",new STAttrMap().put("type", TYPE_NAME3).put("alias", Identifier4));
+			}
+
+
+
+			}
+
+		}
+		catch (RecognitionException re) {
+			reportError(re);
+			recover(input,re);
+		}
+		finally {
+			// do for sure before leaving
+		}
+		return retval;
+	}
+	// $ANTLR end "useDeclaration"
+
 	// Delegated rules
 
 
@@ -628,7 +762,12 @@ public class TSPHPTranslatorWalker extends TreeParser {
 	public static final BitSet FOLLOW_DEFAULT_NAMESPACE_in_namespace126 = new BitSet(new long[]{0x0000000000000000L,0x8000000000000000L});
 	public static final BitSet FOLLOW_namespaceBody_in_namespace129 = new BitSet(new long[]{0x0000000000000008L});
 	public static final BitSet FOLLOW_NAMESPACE_BODY_in_namespaceBody186 = new BitSet(new long[]{0x0000000000000004L});
-	public static final BitSet FOLLOW_statement_in_namespaceBody190 = new BitSet(new long[]{0x0000002000000008L});
+	public static final BitSet FOLLOW_statement_in_namespaceBody190 = new BitSet(new long[]{0x0000000000000008L,0x0000000000000000L,0x0000080000000000L});
 	public static final BitSet FOLLOW_NAMESPACE_BODY_in_namespaceBody211 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_Plus_in_statement277 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_useDeclarationList_in_statement239 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_Use_in_useDeclarationList287 = new BitSet(new long[]{0x0000000000000004L});
+	public static final BitSet FOLLOW_useDeclaration_in_useDeclarationList291 = new BitSet(new long[]{0x0000000000000008L,0x0000000000000000L,0x0000040000000000L});
+	public static final BitSet FOLLOW_USE_DECLARATION_in_useDeclaration330 = new BitSet(new long[]{0x0000000000000004L});
+	public static final BitSet FOLLOW_TYPE_NAME_in_useDeclaration332 = new BitSet(new long[]{0x0000000000000000L,0x0020000000000000L});
+	public static final BitSet FOLLOW_Identifier_in_useDeclaration334 = new BitSet(new long[]{0x0000000000000008L});
 }

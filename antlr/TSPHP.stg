@@ -27,3 +27,11 @@ body(statements) ::= <<
 
 <endif>}
 >>
+
+useDeclarationList(useDeclarations) ::= <<
+use <useDeclarations; separator=", ">;
+>>
+
+useDeclaration(type, alias) ::= <<
+<type> as <alias>
+>>

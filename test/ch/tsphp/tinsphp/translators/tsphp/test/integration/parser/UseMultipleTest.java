@@ -5,12 +5,13 @@
  */
 
 /*
- * This file is based on the file NamespaceTest from the translator component of the TSPHP project.
+ * This file is based on the file UseTest from the translator component of the TSPHP project.
  * TSPHP is also published under the Apache License 2.0
  * For more information see http://tsphp.ch/wiki/display/TSPHP/License
  */
 
 package ch.tsphp.tinsphp.translators.tsphp.test.integration.parser;
+
 
 import ch.tsphp.tinsphp.parser.antlr.TinsPHPParser;
 import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorParserTest;
@@ -25,10 +26,10 @@ import java.util.Arrays;
 import java.util.Collection;
 
 @RunWith(Parameterized.class)
-public class NamespaceTest extends ATranslatorParserTest
+public class UseMultipleTest extends ATranslatorParserTest
 {
 
-    public NamespaceTest(String testString, String expectedResult) {
+    public UseMultipleTest(String testString, String expectedResult) {
         super(testString, expectedResult);
     }
 
@@ -37,35 +38,29 @@ public class NamespaceTest extends ATranslatorParserTest
         translate();
     }
 
-    @Override
-    public ParserRuleReturnScope parserRun(TinsPHPParser parser) throws RecognitionException {
+    protected ParserRuleReturnScope parserRun(TinsPHPParser parser) throws RecognitionException {
         return parser.compilationUnit();
     }
 
-    @Override
-    public void run() throws RecognitionException {
+    protected void run() throws RecognitionException {
         result = translator.compilationUnit();
     }
 
     @Parameterized.Parameters
     public static Collection<Object[]> testStrings() {
         return Arrays.asList(new Object[][]{
-                {"<?php namespace a; ?>", "namespace a{}"},
-                {"<?php namespace a\\a\\c; ?>", "namespace a\\a\\c{}"},
-                {"<?php namespace{} ?>", "namespace{}"},
-                {"<?php namespace  {} ?>", "namespace{}"},
-                {"<?php namespace a{} ?>", "namespace a{}"},
-                {"<?php namespace a\\b{} ?>", "namespace a\\b{}"},
-                {"<?php namespace a\\b{} namespace{} ?>", "namespace a\\b{}\nnamespace{}"},
                 {
-                        "<?php namespace{} namespace a\\b{}  namespace{}  namespace a{} ?>",
-                        "namespace{}\nnamespace a\\b{}\nnamespace{}\nnamespace a{}"
+                        "<?php use \\a, \\b; ?>",
+                        "namespace{\n    use \\a as a, \\b as b;\n}"
                 },
-                //without namespace and empty statement
-                //TODO rstoll TINS-255 translator procedural - expressions
-//                {"<?php ; ?>","namespace{}"},
-                //without namespace, statement and ?>
-                {"<?php ", "namespace{}"},
+                {
+                        "<?php use \\a\\a, \\b\\b, \\c as c; ?>",
+                        "namespace{\n    use \\a\\a as a, \\b\\b as b, \\c as c;\n}"
+                },
+                {
+                        "<?php use \\a, \\a\\b as c, \\a\\d; ?>",
+                        "namespace{\n    use \\a as a, \\a\\b as c, \\a\\d as d;\n}"
+                }
         });
     }
 }
