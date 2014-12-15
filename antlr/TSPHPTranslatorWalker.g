@@ -71,10 +71,9 @@ namespaceBody
 
 statement
     :   useDeclarationList -> {$useDeclarationList.st}
-        //TODO rstoll TINS-253 translator procedural - definitions
-    //|   definition -> {$definition.st}
+    |   definition -> {$definition.st}
+    //TODO rstoll TINS-270 translator procedural - instructions
     //|   instruction -> {$instruction.st}
-    //TODO rstoll, remove as soon as above alternatives are uncommented
     ;
 
 useDeclarationList
@@ -87,18 +86,16 @@ useDeclaration
         -> useDeclaration(type={$TYPE_NAME}, alias={$Identifier})
     ;
 
- //TODO rstoll TINS-253 translator procedural - definitions
- /*
 definition
     :   //TODO rstoll TINS-267 translator OOP - classes
         //classDeclaration        -> {$classDeclaration.st}
         //TODO rstoll TINS-268 translator OOP - interfaces
     //|   interfaceDeclaration    -> {$interfaceDeclaration.st}
-    
-    |   functionDeclaration     -> {$functionDeclaration.st}
-    |   constDeclarationList    -> {$constDeclarationList.st}
+    //TODO TINS-253 translator procedural - definitions
+    //|    functionDeclaration     -> {$functionDeclaration.st}
+       constDeclarationList    -> {$constDeclarationList.st}
     ;
-*/
+
 
 //TODO rstoll TINS-267 translator OOP - classes
 /*    
@@ -150,14 +147,12 @@ classBodyDefinition
     ;
 */    
 
-//TODO rstoll TINS-253 translator procedural - definitions
-/*
 constDeclarationList
     :   ^(CONSTANT_DECLARATION_LIST
-            ^(TYPE ^(TYPE_MODIFIER Public Static Final) scalarTypes)
+            ^(TYPE ^(TYPE_MODIFIER Public Static Final) scalarTypesOrUnknown)
             identifiers+=constDeclaration+
         ) 
-        -> const(identifiers={$identifiers})
+        -> const(type={$scalarTypesOrUnknown.st}, identifiers={$identifiers})
     ;
     
 constDeclaration
@@ -166,16 +161,18 @@ constDeclaration
     ;
     
 unaryPrimitiveAtom
+@init{
+    String unary="";
+}
     :   primitiveAtomWithConstant
         -> {$primitiveAtomWithConstant.st}
 
-    |   ^(  (    unary=UNARY_MINUS
-            |    unary=UNARY_PLUS
+    |   ^(  (    UNARY_MINUS {unary="-";}
+            |    UNARY_PLUS {unary="+";}
             ) primitiveAtomWithConstant
         ) 
-        -> unaryPostOperator(operator = {$unary.text}, expression = {$primitiveAtomWithConstant.st})
+        -> unaryPreOperator(operator = {unary}, expression = {$primitiveAtomWithConstant.st})
     ;
-*/
 
 //TODO rstoll TINS-267 translator OOP - classes
 /*
@@ -247,6 +244,11 @@ localVariableDeclaration[StringTemplate modifier]
         -> localVariableDeclaration(modifier={modifier}, variableId={$VariableId.text}, initValue={null})
     ;
 
+allTypesOrUnknown
+    :   allTypes -> {allTypes.st}
+    |   '?'      -> {%{"?"}}
+    ;
+
 allTypes
     :   primitiveTypes
     |   TYPE_NAME
@@ -258,20 +260,25 @@ primitiveTypes
     |   TypeResource
     |   TypeMixed
     ;
-    
+
 primitiveTypesWithoutArray
     :   scalarTypes     -> {$scalarTypes.st}
     |   TypeResource    -> {%{$TypeResource.text}}
     |   TypeMixed       -> {%{$TypeMixed.text}}
     ;
-    
+*/
+scalarTypesOrUnknown
+    :   scalarTypes -> {$scalarTypes.st}
+    |   '?'         -> {%{"?"}}
+    ;
+
 scalarTypes
     :   TypeBool    -> {%{$TypeBool.text}}
     |   TypeInt     -> {%{$TypeInt.text}}
     |   TypeFloat   -> {%{$TypeFloat.text}}
     |   TypeString  -> {%{$TypeString.text}}
     ;
-*/
+
 
 //TODO rstoll TINS-267 translator OOP - classes
 /*    
@@ -506,6 +513,7 @@ functionDeclaration
         )
     ;
 */
+
 //TODO rstoll TINS-270 translator procedural - instructions
 /*
 instruction
@@ -620,10 +628,11 @@ catchBlock
     ;
 */
 
- //TODO rstoll TINS-255 translator procedural - expressions
- /*
+
 expression
     :   atom                    -> {$atom.st}
+    //TODO rstoll TINS-255 translator procedural - expressions
+    /*
     |   operator                -> {$operator.st}
     |   functionCall            -> {$functionCall.st}
     |   methodCall              -> {$methodCall.st}
@@ -632,14 +641,19 @@ expression
     |   classStaticAccess       -> {$classStaticAccess.st}
     |   postFixExpression       -> {$postFixExpression.st}
     |   exit                    -> {$exit.st}
+    */
     ;
   
 atom
     :   primitiveAtomWithConstant   -> {$primitiveAtomWithConstant.st}
+     //TODO rstoll TINS-255 translator procedural - expressions
+    /*
     |   VariableId                  -> {%{$VariableId.text}}
-    |   This                        -> {%{$This.text}}
+    //TODO rstoll TINS-271 - translator OOP - expressions 
+    //|   This                        -> {%{$This.text}}
+    */
     ;
-        
+           
 primitiveAtomWithConstant
     :   Bool                                        -> {%{$Bool.text}}
     |   Int                                         -> {%{$Int.text}}
@@ -648,12 +662,12 @@ primitiveAtomWithConstant
     |   Null                                        -> {%{$Null.text}}
     |   ^(TypeArray keyValuePairs+=arrayKeyValue*)  -> array(content ={$keyValuePairs})
     |   CONSTANT                                    -> {%{$CONSTANT.text.substring(0,$CONSTANT.text.length()-1)}}
-
-    |   ^(CLASS_STATIC_ACCESS staticAccess CONSTANT)
-        -> fieldAccessStatic(
-            accessor={$staticAccess.st},
-            identifier={$CONSTANT.text.substring(0,$CONSTANT.text.length()-1)}
-        )
+    //TODO rstoll TINS-271 - translator OOP - expressions 
+    //|   ^(CLASS_STATIC_ACCESS staticAccess CONSTANT)
+    //    -> fieldAccessStatic(
+    //        accessor={$staticAccess.st},
+    //        identifier={$CONSTANT.text.substring(0,$CONSTANT.text.length()-1)}
+    //    )
     ;
 
 arrayKeyValue
@@ -661,6 +675,8 @@ arrayKeyValue
     |   expression -> {$expression.st}
     ;
     
+ //TODO rstoll TINS-255 translator procedural - expressions
+ /*    
 staticAccess
     :   TYPE_NAME   -> {%{$TYPE_NAME.text}}
     |   Self        -> {%{$Self.text}}

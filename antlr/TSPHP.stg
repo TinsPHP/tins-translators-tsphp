@@ -35,3 +35,27 @@ use <useDeclarations; separator=", ">;
 useDeclaration(type, alias) ::= <<
 <type> as <alias>
 >>
+
+const(type, identifiers) ::=<<
+const <type> <identifiers; separator=", ">;
+>>
+
+assign(id,value) ::=<<
+<id> = <value>
+>>
+
+unaryPreOperator(operator, expression) ::= <<
+<operator><expression>
+>>
+
+variableDeclarationList(modifier,identifiers) ::=<<
+<if(modifier)><modifier> <endif><identifiers; separator=", ">;
+>>
+
+array(content) ::= <<
+[<content; separator=", ">]
+>>
+
+keyValue(key, value) ::= <<
+<key> => <value>
+>>
