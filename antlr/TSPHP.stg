@@ -59,3 +59,30 @@ array(content) ::= <<
 keyValue(key, value) ::= <<
 <key> => <value>
 >>
+
+method(modifier, returnType, identifier, params, body) ::=<<
+<if(modifier)><modifier> <endif>function <returnType> <identifier>(<if(params)><params><endif>) {<if(body)>
+
+    <body; separator="\n">
+
+<else>
+
+
+<endif>}
+>>
+
+modifier(modifiers) ::=<<
+<modifiers; separator=" ">
+>>
+
+type(prefixModifiers, type, suffixModifiers) ::= <<
+<if(prefixModifiers)><prefixModifiers> <endif><type><if(suffixModifiers)><suffixModifiers><endif>
+>>
+
+parameterList(declarations) ::= <<
+<declarations; separator=", ">
+>>
+
+parameter(type, variableId, defaultValue) ::=<<
+<type> <variableId><if(defaultValue)> = <defaultValue><endif>
+>>

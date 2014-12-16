@@ -28,9 +28,12 @@ options {
 
 package ch.tsphp.tinsphp.translators.tsphp.antlr;
 
+import java.util.Set;
+import java.util.HashSet;
 import ch.tsphp.common.ITSPHPAst;
 import ch.tsphp.common.symbols.ITypeSymbol;
 import ch.tsphp.tinsphp.common.translation.IPrecedenceHelper;
+import ch.tsphp.tinsphp.translators.tsphp.antlrmod.ParameterDto;
 
 }
 
@@ -91,9 +94,8 @@ definition
         //classDeclaration        -> {$classDeclaration.st}
         //TODO rstoll TINS-268 translator OOP - interfaces
     //|   interfaceDeclaration    -> {$interfaceDeclaration.st}
-    //TODO TINS-253 translator procedural - definitions
-    //|    functionDeclaration     -> {$functionDeclaration.st}
-       constDeclarationList    -> {$constDeclarationList.st}
+        functionDeclaration     -> {$functionDeclaration.st}
+    |   constDeclarationList    -> {$constDeclarationList.st}
     ;
 
 
@@ -197,40 +199,23 @@ localVariableDeclarationList
         )
         -> localVariableDeclarationList(variables={$variables})
     ;
+*/    
     
-typeModifier returns[boolean isCast,boolean isFalseable, boolean isNullable]
-    :   ^(TYPE_MODIFIER cast='cast'? falseable='!'? nullable='?'? variableModifier?)
-        {
-            $isCast=cast!=null; 
-            $isNullable=nullable!=null;
-            $isFalseable=falseable!=null;
-        } 
-        -> {$variableModifier.st}
-
+typeModifier returns[Set<String> prefixModifiers, Set<String> suffixModifiers]
+@init{
+    $prefixModifiers = new HashSet<String>();
+    $suffixModifiers = new HashSet<String>();
+}
+    :   ^(TYPE_MODIFIER
+            ('cast' {$prefixModifiers.add("cast");})?
+            ('!'    {$suffixModifiers.add("!");})? 
+            ('?'    {$suffixModifiers.add("?");})?
+        )
     |   TYPE_MODIFIER
-        -> {null}
-    ;
-    
-variableModifier
-    :   list+=staticToken list+=accessModifier  -> modifier(modifiers={$list})
-    |   list+=accessModifier list+=staticToken  -> modifier(modifiers={$list})
-    |   accessModifier                          -> {$accessModifier.st}
-    ;
-    
-staticToken
-    :   Static -> {%{$Static.text}}
     ;
 
-accessModifierWithoutPrivate
-    :   Protected   -> {%{$Protected.text}}
-    |   Public      -> {%{$Public.text}}
-    ;    
-    
-accessModifier
-    :   accessModifierWithoutPrivate -> {$accessModifierWithoutPrivate.st}
-    |   Private                      -> {%{$Private.text}}
-    ;
-
+//TODO rstoll TINS-253 translator procedural - definitions
+/*
 variableDeclaration
     :   ^(VariableId expression)    -> assign(id={$VariableId},value={$expression.st})
     |   VariableId                  -> {%{$VariableId.text}}
@@ -243,24 +228,30 @@ localVariableDeclaration[StringTemplate modifier]
     |   VariableId
         -> localVariableDeclaration(modifier={modifier}, variableId={$VariableId.text}, initValue={null})
     ;
-
+*/
+returnTypesOrUnknown
+    :   allTypesOrUnknown -> {$allTypesOrUnknown.st}
+    //not yet supported by PHP
+    //|   Void
+    ;
+    
 allTypesOrUnknown
-    :   allTypes -> {allTypes.st}
+    :   allTypes -> {$allTypes.st}
     |   '?'      -> {%{"?"}}
     ;
 
 allTypes
-    :   primitiveTypes
-    |   TYPE_NAME
+    :   primitiveTypes -> {$primitiveTypes.st} 
+    |   TYPE_NAME      -> {%{$TYPE_NAME.text}}
     ;
     
 primitiveTypes
-    :   scalarTypes
-    |   TypeArray
-    |   TypeResource
-    |   TypeMixed
+    :   scalarTypes  -> {$scalarTypes.st}
+    |   TypeArray    -> {%{$TypeArray.text}}
+    |   TypeResource -> {%{$TypeResource.text}}
+    |   TypeMixed    -> {%{$TypeMixed.text}}
     ;
-
+/*
 primitiveTypesWithoutArray
     :   scalarTypes     -> {$scalarTypes.st}
     |   TypeResource    -> {%{$TypeResource.text}}
@@ -384,60 +375,44 @@ methodModifier
 finalToken
     :   Final -> {%{$Final.text}}
     ;
-    
-returnTypes
-    :   allTypes
-    |   Void
-    ;
-    
+*/    
 formalParameters
-    :   ^(PARAMETER_LIST params+=paramDeclaration+) -> parameterList(declarations={$params})
+@init{
+    List<ParameterDto> parameterDtos = new ArrayList<>();
+    List<StringTemplate> declarations = new ArrayList<>();
+}
+    :   ^(PARAMETER_LIST (param=paramDeclaration {parameterDtos.add($param.parameterDto);})+) 
+    	{
+
+    	   boolean canBeDefaultValue = true;
+    	   for(int i=parameterDtos.size()-1; i >= 0; --i){    	
+    	       ParameterDto dto = parameterDtos.get(i);   	
+    	       String defaultValue = canBeDefaultValue ? dto.defaultValue : null;
+    	       canBeDefaultValue &= defaultValue != null; 
+    	       if(!canBeDefaultValue && !dto.suffixModifiers.contains("?") && dto.defaultValue != null && dto.defaultValue.toLowerCase().equals("null")){
+    	           dto.suffixModifiers.add("?");
+    	       }
+    	       StringTemplate type = %type(
+    	               prefixModifiers={dto.prefixModifiers}, 
+    	               type={dto.type},
+    	               suffixModifiers={dto.suffixModifiers}
+    	       );
+    	       declarations.add(0, %parameter(
+    	           type={type},
+    	           variableId={dto.variableId}, 
+    	           defaultValue={defaultValue}
+    	       ));
+    	   }
+    	}
+    	-> parameterList(declarations={declarations})
     |   PARAMETER_LIST -> {null}
     ;
 
-paramDeclaration
-@init{String defaultValue =null;}
-    :   ^(PARAMETER_DECLARATION
-            ^(TYPE typeModifier
-                (   scalarAndResource
-                |   typeName=arrayType
-                |   TypeMixed
-                |   typeName=classInterfaceType
-                )
-            )
-            parameterNormalOrOptional
-        )
-        {
-            defaultValue = $typeModifier.isNullable && typeName!=null
-                ? "null"
-                : $parameterNormalOrOptional.defaultValue;
-        }
-        -> parameter(type={$typeName.text}, variableId={$parameterNormalOrOptional.variableId}, defaultValue={defaultValue})
-    ;
-
-arrayType
-    :   TypeArray -> {%{$TypeArray.text}}
-    ;
-
-classInterfaceType
-    :   TYPE_NAME -> {%{$TYPE_NAME.text}}
-    ;
-
-scalarAndResource
-    :   scalarTypes -> {$scalarTypes.st}
-    |   TypeResource -> {%{$TypeResource.text}}
-    ;
-
-parameterNormalOrOptional returns[String variableId,String defaultValue]
-    :   VariableId {$variableId=$VariableId.text;}
-    |   ^(VariableId v=unaryPrimitiveAtom) {$variableId=$VariableId.text; $defaultValue=$v.text;}
-    ;
 
 block returns[List<Object> instructions]
-    :   ^(BLOCK instr+=instruction*) {$instructions=$instr;}
+    :   ^(BLOCK instr+=instruction+) {$instructions=$instr;}
     |   BLOCK
     ;
-*/
 
 //TODO rstoll TINS-268 translator OOP - interfaces
 /*
@@ -495,27 +470,45 @@ interfaceMethodDeclaration
         )
     ;
 */
-//TODO rstoll TINS-253 translator procedural - definitions
-/*
+
+paramDeclaration returns[ParameterDto parameterDto]
+    :   ^(PARAMETER_DECLARATION
+            ^(TYPE typeModifier allTypesOrUnknown)
+            (   varId=VariableId
+            |   ^(varId=VariableId defaultValue=unaryPrimitiveAtom)
+            )
+        )
+        {
+            $parameterDto = new ParameterDto(
+                $typeModifier.prefixModifiers,
+                $allTypesOrUnknown.st,
+                $typeModifier.suffixModifiers,
+                $varId.text,
+                $defaultValue.text);
+        }
+    ;
+
 functionDeclaration
     :   ^('function'
             FUNCTION_MODIFIER
-            ^(TYPE typeModifier returnTypes)
+            ^(TYPE typeModifier returnTypesOrUnknown)
             Identifier
             formalParameters
             block
         )    
         -> method(
             modifier={null},
+            returnType={%type(
+                prefixModifiers={$typeModifier.prefixModifiers},
+                type={$returnTypesOrUnknown.st},
+                suffixModifiers={$typeModifier.suffixModifiers}
+            )},
             identifier={getMethodName($Identifier.text)},
             params={$formalParameters.st},
             body={$block.instructions}
         )
     ;
-*/
 
-//TODO rstoll TINS-270 translator procedural - instructions
-/*
 instruction
         //TINS-253 translator procedural - definitions
     :   //localVariableDeclarationList    -> {$localVariableDeclarationList.st}
@@ -527,17 +520,16 @@ instruction
     //|   whileLoop                       -> {$whileLoop.st}
     //|   doWhileLoop                     -> {$doWhileLoop.st}
     //|   tryCatch                        -> {$tryCatch.st}
-    //TODO rstoll TINS-255 translator procedural - expressions
-    //|   ^(EXPRESSION expression?)       -> expression(expression={$expression.st})
-    |   ^('return' expression?)         -> return(expression = {$expression.st})
-    |   ^('throw' expression)           -> throw(expression = {$expression.st})
-    |   ^('echo' exprs+=expression+)    -> echo(expressions = {$exprs})
-    |   ^('break' index=Int)            -> break(index={$index.text})
-    |   'break'                         -> break(index={null})
-    |   ^('continue' index=Int)         -> continue(index={$index.text})
-    |   'continue'                      -> continue(index={null})
+       ^(EXPRESSION expression?)       -> expression(expression={$expression.st})
+    //TODO rstoll TINS-270 translator procedural - instructions
+    //|   ^('return' expression?)         -> return(expression = {$expression.st})
+    //|   ^('throw' expression)           -> throw(expression = {$expression.st})
+    //|   ^('echo' exprs+=expression+)    -> echo(expressions = {$exprs})
+    //|   ^('break' index=Int)            -> break(index={$index.text})
+    //|   'break'                         -> break(index={null})
+    //|   ^('continue' index=Int)         -> continue(index={$index.text})
+    //|   'continue'                      -> continue(index={null})
     ;
-*/
 
 //TODO rstoll TINS-254 translator procedural - control structures
 /*

@@ -33,45 +33,8 @@ public class ParameterListHelper
         prefixExpected += "(";
         appendix = ")" + appendix;
         appendixExpected = ")" + appendixExpected;
-        String[] types = TypeHelper.getScalarTypes();
-        for (String type : types) {
-            collection.add(new Object[]{
-                    prefix + type + " $a" + appendix,
-                    prefixExpected + "$a" + appendixExpected
-            });
-            collection.add(new Object[]{
-                    prefix + type + " $a," + type + " $b" + appendix,
-                    prefixExpected + "$a, $b" + appendixExpected
-            });
-            collection.add(new Object[]{
-                    prefix + "cast " + type + " $a" + appendix,
-                    prefixExpected + "$a" + appendixExpected
-            });
-            collection.add(new Object[]{
-                    prefix + "cast " + type + " $a, cast " + type + " $b" + appendix,
-                    prefixExpected + "$a, $b" + appendixExpected
-            });
-            collection.add(new Object[]{
-                    prefix + type + "? $a" + appendix,
-                    prefixExpected + "$a" + appendixExpected
-            });
-            collection.add(new Object[]{
-                    prefix + type + "? $a, " + type + "? $b" + appendix,
-                    prefixExpected + "$a, $b" + appendixExpected
-            });
 
-            collection.add(new Object[]{
-                    prefix + "cast " + type + "? $a" + appendix,
-                    prefixExpected + "$a" + appendixExpected
-            });
-            collection.add(new Object[]{
-                    prefix + "cast " + type + "? $a, cast " + type + "? $b" + appendix,
-                    prefixExpected + "$a, $b" + appendixExpected
-            });
-        }
-        types = TypeHelper.getClassInterfaceTypes();
-
-        //class / interfaceType can also have the ? modifier
+        String[] types = TypeHelper.getClassInterfaceTypes();
         for (String type : types) {
             collection.add(new Object[]{
                     prefix + type + " $a" + appendix,
@@ -81,81 +44,20 @@ public class ParameterListHelper
                     prefix + type + " $a, " + type + " $b" + appendix,
                     prefixExpected + type + " $a, " + type + " $b" + appendixExpected
             });
-            collection.add(new Object[]{
-                    prefix + "cast " + type + " $a" + appendix,
-                    prefixExpected + type + " $a" + appendixExpected
-            });
-            collection.add(new Object[]{
-                    prefix + "cast " + type + " $a, cast " + type + " $b" + appendix,
-                    prefixExpected + type + " $a, " + type + " $b" + appendixExpected
-            });
-            collection.add(new Object[]{
-                    prefix + type + "? $a" + appendix,
-                    prefixExpected + type + " $a = null" + appendixExpected
-            });
-            collection.add(new Object[]{
-                    prefix + type + "? $a, " + type + "? $b" + appendix,
-                    prefixExpected + type + " $a = null, " + type + " $b = null" + appendixExpected
-            });
-            collection.add(new Object[]{
-                    prefix + "cast " + type + "? $a" + appendix,
-                    prefixExpected + type + " $a = null" + appendixExpected
-            });
-            collection.add(new Object[]{
-                    prefix + "cast " + type + "? $a, cast " + type + "? $b" + appendix,
-                    prefixExpected + type + " $a = null, " + type + " $b = null" + appendixExpected
-            });
         }
         collection.add(new Object[]{
                 prefix + "array $a" + appendix,
                 prefixExpected + "array $a" + appendixExpected
         });
         collection.add(new Object[]{
-                prefix + "cast array $a" + appendix,
-                prefixExpected + "array $a" + appendixExpected
-        });
-        collection.add(new Object[]{
-                prefix + "array? $a" + appendix,
-                prefixExpected + "array $a = null" + appendixExpected
-        });
-        collection.add(new Object[]{
-                prefix + "cast array $a" + appendix,
-                prefixExpected + "array $a" + appendixExpected
-        });
-
-        collection.add(new Object[]{
-                prefix + "resource $a" + appendix,
-                prefixExpected + "$a" + appendixExpected
-        });
-        collection.add(new Object[]{
-                prefix + "resource? $a" + appendix,
-                prefixExpected + "$a" + appendixExpected
-        });
-        collection.add(new Object[]{
-                prefix + "mixed $a" + appendix,
-                prefixExpected + "$a" + appendixExpected
-        });
-        collection.add(new Object[]{
-                prefix + "mixed? $a" + appendix,
-                prefixExpected + "$a" + appendixExpected
+                prefix + "array $a, $b, \\Exception $e" + appendix,
+                prefixExpected + "array $a, ? $b, \\Exception $e" + appendixExpected
         });
 
         //normal
         addVariations(
-                prefix, "int", appendix,
-                prefixExpected, "", "", appendixExpected);
-        //cast
-        addVariations(
-                prefix, "cast array", appendix,
-                prefixExpected, "array ", "", appendixExpected);
-        //?
-        addVariations(
-                prefix, "\\Exception?", appendix,
-                prefixExpected, "\\Exception ", " = null", appendixExpected);
-        //cast and ? mixed
-        addVariations(
-                prefix, "cast int?", appendix,
-                prefixExpected, "", "", appendixExpected);
+                prefix, "\\Exception", appendix,
+                prefixExpected, "\\Exception ", "", appendixExpected);
 
         addVariationsForOptional(prefix, appendix, prefixExpected, appendixExpected);
 
@@ -168,9 +70,9 @@ public class ParameterListHelper
             String prefixExpected, String typeExpectedPrefix, String typeExpectedAppendix, String appendixExpected) {
 
 
-        String paramStat1 = "int $x";
+        String paramStat1 = "$x";
         String paramStat2 = "array $y";
-        String paramStat1Expected = "$x";
+        String paramStat1Expected = "? $x";
         String paramStat2Expected = "array $y";
 
         collection.addAll(Arrays.asList(new Object[][]{
@@ -240,47 +142,51 @@ public class ParameterListHelper
         collection.addAll(Arrays.asList(new Object[][]{
                 //optional parameter
                 {
-                        prefix + "int $i = 10" + appendix,
-                        prefixExpect + "$i = 10" + appendixExpect
+                        prefix + "$i = 10" + appendix,
+                        prefixExpect + "? $i = 10" + appendixExpect
                 },
                 {
-                        prefix + "int $a, int $b='hallo'" + appendix,
-                        prefixExpect + "$a, $b = 'hallo'" + appendixExpect
+                        prefix + "$a, $b='hallo'" + appendix,
+                        prefixExpect + "? $a, ? $b = 'hallo'" + appendixExpect
                 },
                 {
-                        prefix + "int $a, int? $i, int $b=+1" + appendix,
-                        prefixExpect + "$a, $i, $b = +1" + appendixExpect
+                        prefix + "$a, $i, $b=+1" + appendix,
+                        prefixExpect + "? $a, ? $i, ? $b = +1" + appendixExpect
                 },
                 {
-                        prefix + "int $a,cast int? $i = null, int $b=-10, int $d=2.0" + appendix,
-                        prefixExpect + "$a, $i = null, $b = -10, $d = 2.0" + appendixExpect
+                        prefix + "$a=null, $b=true, $c=E_ALL" + appendix,
+                        prefixExpect + "? $a = null, ? $b = true, ? $c = E_ALL" + appendixExpect
                 },
                 {
-                        prefix + "int? $a=null,int? $b=true, int $c=E_ALL" + appendix,
-                        prefixExpect + "$a = null, $b = true, $c = E_ALL" + appendixExpect
+                        prefix + "$a, $b=false, $d=null" + appendix,
+                        prefixExpect + "? $a, ? $b = false, ? $d = null" + appendixExpect
+                },
+                //pseudo optional parameters are allowed in PHP but not in TSPHP
+                {
+                        prefix + "$a=true, $b, $d=true" + appendix,
+                        prefixExpect + "? $a, ? $b, ? $d = true" + appendixExpect
                 },
                 {
-                        prefix + "int $a, int $b=false, int $d=null" + appendix,
-                        prefixExpect + "$a, $b = false, $d = null" + appendixExpect
+                        prefix + "$a=1, $b=2, $d" + appendix,
+                        prefixExpect + "? $a, ? $b, ? $d" + appendixExpect
                 },
                 {
-                        prefix + "int $a, int $b, int $d=true" + appendix,
-                        prefixExpect + "$a, $b, $d = true" + appendixExpect
+                        prefix + "$a, array $i = null, $b, $d=2.0" + appendix,
+                        prefixExpect + "? $a, array? $i, ? $b, ? $d = 2.0" + appendixExpect
                 },
                 {
-                        prefix + "cast int $a=1, int? $b=2, cast int $d=3" + appendix,
-                        prefixExpect + "$a = 1, $b = 2, $d = 3" + appendixExpect
-                }
+                        prefix + "$a=null, $b, $d=2.0" + appendix,
+                        prefixExpect + "?? $a, ? $b, ? $d = 2.0" + appendixExpect
+                },
         }));
 
-
-        String[] types = TypeHelper.getClassInterfaceTypes();
-
-        for (String type : types) {
-            collection.add(new Object[]{
-                    prefix + "int $a=" + type + "::a" + appendix,
-                    prefixExpect + "$a = " + type + "::a" + appendixExpect
-            });
-        }
+        //TODO rstoll TINS-271 - translator OOP - expressions
+//        String[] types = TypeHelper.getClassInterfaceTypes();
+//        for (String type : types) {
+//            collection.add(new Object[]{
+//                    prefix + "$a=" + type + "::a" + appendix,
+//                    prefixExpect + "? $a = " + type + "::a" + appendixExpect
+//            });
+//        }
     }
 }
