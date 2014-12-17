@@ -48,8 +48,12 @@ unaryPreOperator(operator, expression) ::= <<
 <operator><expression>
 >>
 
-variableDeclarationList(modifier,identifiers) ::=<<
-<if(modifier)><modifier> <endif><identifiers; separator=", ">;
+localVariableDeclarationList(type, variables) ::=<<
+<type> <variables; separator=",">;
+>>
+
+expression(expression) ::= <<
+<if(expression)><expression>;<endif>
 >>
 
 array(content) ::= <<
@@ -58,6 +62,12 @@ array(content) ::= <<
 
 keyValue(key, value) ::= <<
 <key> => <value>
+>>
+
+operator(o) ::= "<o>"
+
+binaryOperator(operator, left, right, needParentheses) ::= <<
+<if(needParentheses)>(<endif><left> <operator> <right><if(needParentheses)>)<endif>
 >>
 
 method(modifier, returnType, identifier, params, body) ::=<<

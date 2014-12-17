@@ -1,4 +1,4 @@
-// $ANTLR 3.5.2-including-157 D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g 2014-12-16 21:00:05
+// $ANTLR 3.5.2-including-157 D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g 2014-12-17 10:32:27
 
 /*
  * This file is part of the TinsPHP project published under the Apache License 2.0
@@ -30,7 +30,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 @SuppressWarnings("all")
 public class TSPHPTranslatorWalker extends TreeParser {
 	public static final String[] tokenNames = new String[] {
@@ -326,7 +325,7 @@ public class TSPHPTranslatorWalker extends TreeParser {
                     int cnt1 = 0;
                     loop1:
                     while (true) {
-                        int alt1=2;
+                        int alt1 = 2;
 				int LA1_0 = input.LA(1);
 				if ( (LA1_0==Namespace) ) {
 					alt1=1;
@@ -386,8 +385,7 @@ public class TSPHPTranslatorWalker extends TreeParser {
 
 
 	// $ANTLR start "namespace"
-    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:58:1: namespace : ^( 'namespace' (name= TYPE_NAME |
-    // DEFAULT_NAMESPACE ) namespaceBody ) -> namespace(name=namespaceNamebody=$namespaceBody.st);
+    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:58:1: namespace : ^( 'namespace' (name= TYPE_NAME | DEFAULT_NAMESPACE ) namespaceBody ) -> namespace(name=namespaceNamebody=$namespaceBody.st);
     public final TSPHPTranslatorWalker.namespace_return namespace() throws RecognitionException {
         TSPHPTranslatorWalker.namespace_return retval = new TSPHPTranslatorWalker.namespace_return();
         retval.start = input.LT(1);
@@ -399,8 +397,7 @@ public class TSPHPTranslatorWalker extends TreeParser {
 		try {
             // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:60:5: ( ^( 'namespace' (name= TYPE_NAME |
             // DEFAULT_NAMESPACE ) namespaceBody ) -> namespace(name=namespaceNamebody=$namespaceBody.st))
-            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:60:9: ^( 'namespace' (name= TYPE_NAME |
-            // DEFAULT_NAMESPACE ) namespaceBody )
+            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:60:9: ^( 'namespace' (name= TYPE_NAME | DEFAULT_NAMESPACE ) namespaceBody )
             {
                 match(input, Namespace, FOLLOW_Namespace_in_namespace119);
                 match(input, Token.DOWN, null);
@@ -409,7 +406,7 @@ public class TSPHPTranslatorWalker extends TreeParser {
                 int alt2 = 2;
                 int LA2_0 = input.LA(1);
                 if ((LA2_0 == TYPE_NAME)) {
-                    alt2=1;
+                    alt2 = 1;
 			}
 			else if ( (LA2_0==DEFAULT_NAMESPACE) ) {
 				alt2=2;
@@ -481,8 +478,7 @@ public class TSPHPTranslatorWalker extends TreeParser {
 
 
 	// $ANTLR start "namespaceBody"
-    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:70:1: namespaceBody : ( ^( NAMESPACE_BODY
-    // (statements+= statement )* ) -> body(statements=$statements)| NAMESPACE_BODY -> body(statements=null));
+    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:70:1: namespaceBody : ( ^( NAMESPACE_BODY (statements+= statement )* ) -> body(statements=$statements)| NAMESPACE_BODY -> body(statements=null));
     public final TSPHPTranslatorWalker.namespaceBody_return namespaceBody() throws RecognitionException {
         TSPHPTranslatorWalker.namespaceBody_return retval = new TSPHPTranslatorWalker.namespaceBody_return();
         retval.start = input.LT(1);
@@ -525,8 +521,7 @@ public class TSPHPTranslatorWalker extends TreeParser {
 
 			switch (alt4) {
 				case 1 :
-                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:71:9: ^( NAMESPACE_BODY
-                    // (statements+= statement )* )
+                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:71:9: ^( NAMESPACE_BODY (statements+= statement )* )
                 {
                     match(input, NAMESPACE_BODY, FOLLOW_NAMESPACE_BODY_in_namespaceBody186);
                     if (input.LA(1) == Token.DOWN) {
@@ -536,14 +531,14 @@ public class TSPHPTranslatorWalker extends TreeParser {
                         while (true) {
                             int alt3 = 2;
                             int LA3_0 = input.LA(1);
-                            if ((LA3_0 == CONSTANT_DECLARATION_LIST || LA3_0 == Function || LA3_0 == Use)) {
+                            if ((LA3_0 == CONSTANT_DECLARATION_LIST || LA3_0 == EXPRESSION || LA3_0 == Function ||
+                                    LA3_0 == Use || LA3_0 == VARIABLE_DECLARATION_LIST)) {
                                 alt3 = 1;
                             }
 
 							switch (alt3) {
 							case 1 :
-                                // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:71:36: statements+=
-                                // statement
+                                // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:71:36: statements+= statement
                             {
                                 pushFollow(FOLLOW_statement_in_namespaceBody190);
                                 statements = statement();
@@ -565,8 +560,7 @@ public class TSPHPTranslatorWalker extends TreeParser {
 					// TEMPLATE REWRITE
                     // 71:50: -> body(statements=$statements)
                     {
-                        retval.st = templateLib.getInstanceOf("body", new STAttrMap().put("statements",
-                                list_statements));
+                        retval.st = templateLib.getInstanceOf("body", new STAttrMap().put("statements", list_statements));
                     }
 
 
@@ -611,31 +605,39 @@ public class TSPHPTranslatorWalker extends TreeParser {
 
 	// $ANTLR start "statement"
     // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:75:1: statement : ( useDeclarationList ->
-    // {$useDeclarationList.st}| definition -> {$definition.st});
+    // {$useDeclarationList.st}| definition -> {$definition.st}| instruction -> {$instruction.st});
     public final TSPHPTranslatorWalker.statement_return statement() throws RecognitionException {
         TSPHPTranslatorWalker.statement_return retval = new TSPHPTranslatorWalker.statement_return();
         retval.start = input.LT(1);
 
 		TreeRuleReturnScope useDeclarationList2 =null;
 		TreeRuleReturnScope definition3 =null;
+        TreeRuleReturnScope instruction4 = null;
 
 		try {
             // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:76:5: ( useDeclarationList ->
-            // {$useDeclarationList.st}| definition -> {$definition.st})
-            int alt5 = 2;
-            int LA5_0 = input.LA(1);
-            if ((LA5_0 == Use)) {
-                alt5=1;
-            } else if ((LA5_0 == CONSTANT_DECLARATION_LIST || LA5_0 == Function)) {
-                alt5 = 2;
-            }
-
-			else {
+            // {$useDeclarationList.st}| definition -> {$definition.st}| instruction -> {$instruction.st})
+            int alt5 = 3;
+            switch (input.LA(1)) {
+                case Use: {
+                    alt5 = 1;
+                }
+                break;
+                case CONSTANT_DECLARATION_LIST:
+                case Function: {
+                    alt5 = 2;
+                }
+                break;
+                case EXPRESSION:
+                case VARIABLE_DECLARATION_LIST: {
+                    alt5 = 3;
+                }
+                break;
+                default:
 				NoViableAltException nvae =
 					new NoViableAltException("", 5, 0, input);
 				throw nvae;
 			}
-
 			switch (alt5) {
 				case 1 :
                     // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:76:9: useDeclarationList
@@ -647,8 +649,8 @@ public class TSPHPTranslatorWalker extends TreeParser {
 					// TEMPLATE REWRITE
                     // 76:28: -> {$useDeclarationList.st}
                     {
-                        retval.st = (useDeclarationList2 != null ? ((StringTemplate) useDeclarationList2.getTemplate())
-                                : null);
+                        retval.st = (useDeclarationList2 != null ? ((StringTemplate) useDeclarationList2.getTemplate
+                                ()) : null);
                     }
 
 
@@ -672,6 +674,22 @@ public class TSPHPTranslatorWalker extends TreeParser {
 
 					}
 					break;
+                case 3:
+                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:78:9: instruction
+                {
+                    pushFollow(FOLLOW_instruction_in_statement267);
+                    instruction4 = instruction();
+                    state._fsp--;
+
+                    // TEMPLATE REWRITE
+                    // 78:21: -> {$instruction.st}
+                    {
+                        retval.st = (instruction4 != null ? ((StringTemplate) instruction4.getTemplate()) : null);
+                    }
+
+
+                }
+                break;
 
 			}
 		}
@@ -695,8 +713,7 @@ public class TSPHPTranslatorWalker extends TreeParser {
 
 
 	// $ANTLR start "useDeclarationList"
-    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:82:1: useDeclarationList : ^( 'use' (declarations+=
-    // useDeclaration )+ ) -> useDeclarationList(useDeclarations=$declarations);
+    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:81:1: useDeclarationList : ^( 'use' (declarations+= useDeclaration )+ ) -> useDeclarationList(useDeclarations=$declarations);
     public final TSPHPTranslatorWalker.useDeclarationList_return useDeclarationList() throws RecognitionException {
         TSPHPTranslatorWalker.useDeclarationList_return retval = new TSPHPTranslatorWalker.useDeclarationList_return();
         retval.start = input.LT(1);
@@ -704,18 +721,17 @@ public class TSPHPTranslatorWalker extends TreeParser {
 		List<Object> list_declarations=null;
 		RuleReturnScope declarations = null;
 		try {
-            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:83:5: ( ^( 'use' (declarations+=
-            // useDeclaration )+ ) -> useDeclarationList(useDeclarations=$declarations))
-            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:83:9: ^( 'use' (declarations+=
+            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:82:5: ( ^( 'use' (declarations+= useDeclaration )+ ) -> useDeclarationList(useDeclarations=$declarations))
+            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:82:9: ^( 'use' (declarations+=
             // useDeclaration )+ )
             {
-                match(input, Use, FOLLOW_Use_in_useDeclarationList287);
+                match(input, Use, FOLLOW_Use_in_useDeclarationList291);
                 match(input, Token.DOWN, null);
-                // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:83:29: (declarations+= useDeclaration )+
+                // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:82:29: (declarations+= useDeclaration )+
                 int cnt6 = 0;
                 loop6:
                 while (true) {
-                    int alt6=2;
+                    int alt6 = 2;
 				int LA6_0 = input.LA(1);
 				if ( (LA6_0==USE_DECLARATION) ) {
 					alt6=1;
@@ -723,9 +739,9 @@ public class TSPHPTranslatorWalker extends TreeParser {
 
 				switch (alt6) {
 				case 1 :
-                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:83:29: declarations+= useDeclaration
+                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:82:29: declarations+= useDeclaration
                 {
-                    pushFollow(FOLLOW_useDeclaration_in_useDeclarationList291);
+                    pushFollow(FOLLOW_useDeclaration_in_useDeclarationList295);
                     declarations = useDeclaration();
                     state._fsp--;
 
@@ -745,10 +761,10 @@ public class TSPHPTranslatorWalker extends TreeParser {
 			match(input, Token.UP, null); 
 
 			// TEMPLATE REWRITE
-                // 84:9: -> useDeclarationList(useDeclarations=$declarations)
+                // 83:9: -> useDeclarationList(useDeclarations=$declarations)
                 {
-                    retval.st = templateLib.getInstanceOf("useDeclarationList", new STAttrMap().put("useDeclarations",
-                            list_declarations));
+                    retval.st = templateLib.getInstanceOf("useDeclarationList",
+                            new STAttrMap().put("useDeclarations", list_declarations));
                 }
 
 
@@ -776,32 +792,31 @@ public class TSPHPTranslatorWalker extends TreeParser {
 
 
 	// $ANTLR start "useDeclaration"
-    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:87:1: useDeclaration : ^( USE_DECLARATION TYPE_NAME
+    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:86:1: useDeclaration : ^( USE_DECLARATION TYPE_NAME
     // Identifier ) -> useDeclaration(type=$TYPE_NAMEalias=$Identifier);
     public final TSPHPTranslatorWalker.useDeclaration_return useDeclaration() throws RecognitionException {
         TSPHPTranslatorWalker.useDeclaration_return retval = new TSPHPTranslatorWalker.useDeclaration_return();
         retval.start = input.LT(1);
 
-		ITSPHPAst TYPE_NAME4=null;
-		ITSPHPAst Identifier5=null;
+        ITSPHPAst TYPE_NAME5 = null;
+        ITSPHPAst Identifier6 = null;
 
 		try {
-            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:88:5: ( ^( USE_DECLARATION TYPE_NAME
+            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:87:5: ( ^( USE_DECLARATION TYPE_NAME
             // Identifier ) -> useDeclaration(type=$TYPE_NAMEalias=$Identifier))
-            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:88:9: ^( USE_DECLARATION TYPE_NAME
+            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:87:9: ^( USE_DECLARATION TYPE_NAME
             // Identifier )
             {
-                match(input, USE_DECLARATION, FOLLOW_USE_DECLARATION_in_useDeclaration330);
+                match(input, USE_DECLARATION, FOLLOW_USE_DECLARATION_in_useDeclaration334);
                 match(input, Token.DOWN, null);
-                TYPE_NAME4=(ITSPHPAst)match(input,TYPE_NAME,FOLLOW_TYPE_NAME_in_useDeclaration332);
-			Identifier5=(ITSPHPAst)match(input,Identifier,FOLLOW_Identifier_in_useDeclaration334); 
+                TYPE_NAME5 = (ITSPHPAst) match(input, TYPE_NAME, FOLLOW_TYPE_NAME_in_useDeclaration336);
+                Identifier6 = (ITSPHPAst) match(input, Identifier, FOLLOW_Identifier_in_useDeclaration338); 
 			match(input, Token.UP, null); 
 
 			// TEMPLATE REWRITE
-                // 89:9: -> useDeclaration(type=$TYPE_NAMEalias=$Identifier)
+                // 88:9: -> useDeclaration(type=$TYPE_NAMEalias=$Identifier)
                 {
-                    retval.st = templateLib.getInstanceOf("useDeclaration", new STAttrMap().put("type",
-                            TYPE_NAME4).put("alias", Identifier5));
+                    retval.st = templateLib.getInstanceOf("useDeclaration", new STAttrMap().put("type", TYPE_NAME5).put("alias", Identifier6));
                 }
 
 
@@ -829,17 +844,17 @@ public class TSPHPTranslatorWalker extends TreeParser {
 
 
 	// $ANTLR start "definition"
-    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:92:1: definition : ( functionDeclaration ->
+    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:91:1: definition : ( functionDeclaration ->
     // {$functionDeclaration.st}| constDeclarationList -> {$constDeclarationList.st});
     public final TSPHPTranslatorWalker.definition_return definition() throws RecognitionException {
         TSPHPTranslatorWalker.definition_return retval = new TSPHPTranslatorWalker.definition_return();
         retval.start = input.LT(1);
 
-        TreeRuleReturnScope functionDeclaration6 = null;
-        TreeRuleReturnScope constDeclarationList7 = null;
+        TreeRuleReturnScope functionDeclaration7 = null;
+        TreeRuleReturnScope constDeclarationList8 = null;
 
 		try {
-            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:93:5: ( functionDeclaration ->
+            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:92:5: ( functionDeclaration ->
             // {$functionDeclaration.st}| constDeclarationList -> {$constDeclarationList.st})
             int alt7 = 2;
             int LA7_0 = input.LA(1);
@@ -855,16 +870,16 @@ public class TSPHPTranslatorWalker extends TreeParser {
 
             switch (alt7) {
                 case 1:
-                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:97:9: functionDeclaration
+                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:96:9: functionDeclaration
                 {
-                    pushFollow(FOLLOW_functionDeclaration_in_definition408);
-                    functionDeclaration6 = functionDeclaration();
+                    pushFollow(FOLLOW_functionDeclaration_in_definition412);
+                    functionDeclaration7 = functionDeclaration();
                     state._fsp--;
 
                     // TEMPLATE REWRITE
-                    // 97:33: -> {$functionDeclaration.st}
+                    // 96:33: -> {$functionDeclaration.st}
                     {
-                        retval.st = (functionDeclaration6 != null ? ((StringTemplate) functionDeclaration6
+                        retval.st = (functionDeclaration7 != null ? ((StringTemplate) functionDeclaration7
                                 .getTemplate()) : null);
                     }
 
@@ -872,17 +887,16 @@ public class TSPHPTranslatorWalker extends TreeParser {
                 }
                 break;
                 case 2:
-                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:98:9: constDeclarationList
+                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:97:9: constDeclarationList
                 {
-                    pushFollow(FOLLOW_constDeclarationList_in_definition426);
-                    constDeclarationList7 = constDeclarationList();
+                    pushFollow(FOLLOW_constDeclarationList_in_definition430);
+                    constDeclarationList8 = constDeclarationList();
                     state._fsp--;
 
                     // TEMPLATE REWRITE
-                    // 98:33: -> {$constDeclarationList.st}
+                    // 97:33: -> {$constDeclarationList.st}
                     {
-                        retval.st = (constDeclarationList7 != null ? ((StringTemplate) constDeclarationList7
-                                .getTemplate()) : null);
+                        retval.st = (constDeclarationList8 != null ? ((StringTemplate) constDeclarationList8.getTemplate()) : null);
                     }
 
 
@@ -890,10 +904,10 @@ public class TSPHPTranslatorWalker extends TreeParser {
                 break;
 
             }
-        } catch (RecognitionException re) {
+		} catch (RecognitionException re) {
             reportError(re);
-            recover(input,re);
-		}
+            recover(input, re);
+        }
 		finally {
 			// do for sure before leaving
 		}
@@ -910,43 +924,40 @@ public class TSPHPTranslatorWalker extends TreeParser {
 
 
 	// $ANTLR start "constDeclarationList"
-    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:152:1: constDeclarationList : ^(
-    // CONSTANT_DECLARATION_LIST ^( TYPE ^( TYPE_MODIFIER Public Static Final ) scalarTypesOrUnknown ) (identifiers+=
-    // constDeclaration )+ ) -> const(type=$scalarTypesOrUnknown.stidentifiers=$identifiers);
-
+    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:151:1: constDeclarationList : ^( CONSTANT_DECLARATION_LIST ^( TYPE ^( TYPE_MODIFIER Public Static Final ) scalarTypesOrUnknown ) (identifiers+= constDeclaration )+ ) -> const(type=$scalarTypesOrUnknown.stidentifiers=$identifiers);
     public final TSPHPTranslatorWalker.constDeclarationList_return constDeclarationList() throws RecognitionException {
         TSPHPTranslatorWalker.constDeclarationList_return retval = new TSPHPTranslatorWalker
                 .constDeclarationList_return();
         retval.start = input.LT(1);
 
 		List<Object> list_identifiers=null;
-        TreeRuleReturnScope scalarTypesOrUnknown8 = null;
+        TreeRuleReturnScope scalarTypesOrUnknown9 = null;
         RuleReturnScope identifiers = null;
         try {
-            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:153:5: ( ^( CONSTANT_DECLARATION_LIST ^(
+            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:152:5: ( ^( CONSTANT_DECLARATION_LIST ^(
             // TYPE ^( TYPE_MODIFIER Public Static Final ) scalarTypesOrUnknown ) (identifiers+= constDeclaration )+
             // ) -> const(type=$scalarTypesOrUnknown.stidentifiers=$identifiers))
-            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:153:9: ^( CONSTANT_DECLARATION_LIST ^( TYPE
+            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:152:9: ^( CONSTANT_DECLARATION_LIST ^( TYPE
             // ^( TYPE_MODIFIER Public Static Final ) scalarTypesOrUnknown ) (identifiers+= constDeclaration )+ )
             {
-                match(input, CONSTANT_DECLARATION_LIST, FOLLOW_CONSTANT_DECLARATION_LIST_in_constDeclarationList462);
+                match(input, CONSTANT_DECLARATION_LIST, FOLLOW_CONSTANT_DECLARATION_LIST_in_constDeclarationList466);
                 match(input, Token.DOWN, null);
-                match(input, TYPE, FOLLOW_TYPE_in_constDeclarationList477);
+                match(input, TYPE, FOLLOW_TYPE_in_constDeclarationList481);
                 match(input, Token.DOWN, null);
-                match(input, TYPE_MODIFIER, FOLLOW_TYPE_MODIFIER_in_constDeclarationList480);
+                match(input, TYPE_MODIFIER, FOLLOW_TYPE_MODIFIER_in_constDeclarationList484);
                 match(input, Token.DOWN, null);
-                match(input, Public, FOLLOW_Public_in_constDeclarationList482);
-                match(input, Static, FOLLOW_Static_in_constDeclarationList484);
-                match(input, Final, FOLLOW_Final_in_constDeclarationList486);
+                match(input, Public, FOLLOW_Public_in_constDeclarationList486);
+                match(input, Static, FOLLOW_Static_in_constDeclarationList488);
+                match(input, Final, FOLLOW_Final_in_constDeclarationList490);
                 match(input, Token.UP, null);
 
-                pushFollow(FOLLOW_scalarTypesOrUnknown_in_constDeclarationList489);
-                scalarTypesOrUnknown8 = scalarTypesOrUnknown();
+                pushFollow(FOLLOW_scalarTypesOrUnknown_in_constDeclarationList493);
+                scalarTypesOrUnknown9 = scalarTypesOrUnknown();
                 state._fsp--;
 
                 match(input, Token.UP, null);
 
-                // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:155:24: (identifiers+= constDeclaration )+
+                // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:154:24: (identifiers+= constDeclaration )+
                 int cnt8 = 0;
                 loop8:
                 while (true) {
@@ -958,10 +969,9 @@ public class TSPHPTranslatorWalker extends TreeParser {
 
                     switch (alt8) {
                         case 1:
-                            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:155:24: identifiers+=
-                            // constDeclaration
+                            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:154:24: identifiers+= constDeclaration
                         {
-                            pushFollow(FOLLOW_constDeclaration_in_constDeclarationList506);
+                            pushFollow(FOLLOW_constDeclaration_in_constDeclarationList510);
                             identifiers = constDeclaration();
                             state._fsp--;
 
@@ -971,9 +981,7 @@ public class TSPHPTranslatorWalker extends TreeParser {
 					break;
 
 				default :
-                    if (cnt8 >= 1) {
-                        break loop8;
-                    }
+                    if (cnt8 >= 1) break loop8;
                     EarlyExitException eee = new EarlyExitException(8, input);
                     throw eee;
                     }
@@ -983,10 +991,10 @@ public class TSPHPTranslatorWalker extends TreeParser {
 			match(input, Token.UP, null); 
 
 			// TEMPLATE REWRITE
-                // 157:9: -> const(type=$scalarTypesOrUnknown.stidentifiers=$identifiers)
+                // 156:9: -> const(type=$scalarTypesOrUnknown.stidentifiers=$identifiers)
                 {
                     retval.st = templateLib.getInstanceOf("const", new STAttrMap().put("type",
-                            (scalarTypesOrUnknown8 != null ? ((StringTemplate) scalarTypesOrUnknown8.getTemplate()) :
+                            (scalarTypesOrUnknown9 != null ? ((StringTemplate) scalarTypesOrUnknown9.getTemplate()) :
                                     null)).put("identifiers", list_identifiers));
                 }
 
@@ -1015,37 +1023,36 @@ public class TSPHPTranslatorWalker extends TreeParser {
 
 
 	// $ANTLR start "constDeclaration"
-    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:160:1: constDeclaration : ^( Identifier
+    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:159:1: constDeclaration : ^( Identifier
     // unaryPrimitiveAtom ) -> assign(id=$Identifier.text.substring(0,$Identifier.text.length()-1)
     // value=$unaryPrimitiveAtom.st);
     public final TSPHPTranslatorWalker.constDeclaration_return constDeclaration() throws RecognitionException {
         TSPHPTranslatorWalker.constDeclaration_return retval = new TSPHPTranslatorWalker.constDeclaration_return();
         retval.start = input.LT(1);
 
-        ITSPHPAst Identifier9 = null;
-        TreeRuleReturnScope unaryPrimitiveAtom10 = null;
+        ITSPHPAst Identifier10 = null;
+        TreeRuleReturnScope unaryPrimitiveAtom11 = null;
 
 		try {
-            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:161:5: ( ^( Identifier unaryPrimitiveAtom )
+            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:160:5: ( ^( Identifier unaryPrimitiveAtom )
             // -> assign(id=$Identifier.text.substring(0,$Identifier.text.length()-1)value=$unaryPrimitiveAtom.st))
-            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:161:9: ^( Identifier unaryPrimitiveAtom )
+            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:160:9: ^( Identifier unaryPrimitiveAtom )
             {
-                Identifier9 = (ITSPHPAst) match(input, Identifier, FOLLOW_Identifier_in_constDeclaration564);
+                Identifier10 = (ITSPHPAst) match(input, Identifier, FOLLOW_Identifier_in_constDeclaration568);
                 match(input, Token.DOWN, null);
-                pushFollow(FOLLOW_unaryPrimitiveAtom_in_constDeclaration566);
-                unaryPrimitiveAtom10 = unaryPrimitiveAtom();
+                pushFollow(FOLLOW_unaryPrimitiveAtom_in_constDeclaration570);
+                unaryPrimitiveAtom11 = unaryPrimitiveAtom();
                 state._fsp--;
 
 			match(input, Token.UP, null); 
 
 			// TEMPLATE REWRITE
-                // 162:9: -> assign(id=$Identifier.text.substring(0,$Identifier.text.length()-1)
-                // value=$unaryPrimitiveAtom.st)
+                // 161:9: -> assign(id=$Identifier.text.substring(0,$Identifier.text.length()-1)value=$unaryPrimitiveAtom.st)
                 {
-                    retval.st = templateLib.getInstanceOf("assign", new STAttrMap().put("id",
-                            (Identifier9 != null ? Identifier9.getText() : null).substring(0,
-                                    (Identifier9 != null ? Identifier9.getText() : null).length() - 1)).put("value",
-                            (unaryPrimitiveAtom10 != null ? ((StringTemplate) unaryPrimitiveAtom10.getTemplate()) : null)));
+                    retval.st = templateLib.getInstanceOf("assign", new STAttrMap().put("id", (Identifier10 != null ?
+                            Identifier10.getText() : null).substring(0, (Identifier10 != null ? Identifier10.getText
+                            () : null).length() - 1)).put("value", (unaryPrimitiveAtom11 != null ? ((StringTemplate)
+                            unaryPrimitiveAtom11.getTemplate()) : null)));
                 }
 
 
@@ -1073,21 +1080,21 @@ public class TSPHPTranslatorWalker extends TreeParser {
 
 
 	// $ANTLR start "unaryPrimitiveAtom"
-    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:165:1: unaryPrimitiveAtom : (
+    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:164:1: unaryPrimitiveAtom : (
     // primitiveAtomWithConstant -> {$primitiveAtomWithConstant.st}| ^( ( UNARY_MINUS | UNARY_PLUS )
     // primitiveAtomWithConstant ) -> unaryPreOperator(operator=unaryexpression=$primitiveAtomWithConstant.st));
     public final TSPHPTranslatorWalker.unaryPrimitiveAtom_return unaryPrimitiveAtom() throws RecognitionException {
         TSPHPTranslatorWalker.unaryPrimitiveAtom_return retval = new TSPHPTranslatorWalker.unaryPrimitiveAtom_return();
         retval.start = input.LT(1);
 
-		TreeRuleReturnScope primitiveAtomWithConstant11 =null;
         TreeRuleReturnScope primitiveAtomWithConstant12 = null;
+        TreeRuleReturnScope primitiveAtomWithConstant13 = null;
 
 
 		    String unary="";
 
 		try {
-            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:169:5: ( primitiveAtomWithConstant ->
+            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:168:5: ( primitiveAtomWithConstant ->
             // {$primitiveAtomWithConstant.st}| ^( ( UNARY_MINUS | UNARY_PLUS ) primitiveAtomWithConstant ) ->
             // unaryPreOperator(operator=unaryexpression=$primitiveAtomWithConstant.st))
             int alt10 = 2;
@@ -1106,17 +1113,17 @@ public class TSPHPTranslatorWalker extends TreeParser {
 
             switch (alt10) {
                 case 1:
-                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:169:9: primitiveAtomWithConstant
+                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:168:9: primitiveAtomWithConstant
                 {
-                    pushFollow(FOLLOW_primitiveAtomWithConstant_in_unaryPrimitiveAtom616);
-                    primitiveAtomWithConstant11 = primitiveAtomWithConstant();
+                    pushFollow(FOLLOW_primitiveAtomWithConstant_in_unaryPrimitiveAtom620);
+                    primitiveAtomWithConstant12 = primitiveAtomWithConstant();
                     state._fsp--;
 
 					// TEMPLATE REWRITE
-                    // 170:9: -> {$primitiveAtomWithConstant.st}
+                    // 169:9: -> {$primitiveAtomWithConstant.st}
                     {
-                        retval.st = (primitiveAtomWithConstant11 != null ? ((StringTemplate)
-                                primitiveAtomWithConstant11.getTemplate()) : null);
+                        retval.st = (primitiveAtomWithConstant12 != null ? ((StringTemplate)
+                                primitiveAtomWithConstant12.getTemplate()) : null);
                     }
 
 
@@ -1124,11 +1131,9 @@ public class TSPHPTranslatorWalker extends TreeParser {
 					}
 					break;
 				case 2 :
-                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:172:9: ^( ( UNARY_MINUS |
-                    // UNARY_PLUS ) primitiveAtomWithConstant )
+                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:171:9: ^( ( UNARY_MINUS | UNARY_PLUS ) primitiveAtomWithConstant )
                 {
-                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:172:13: ( UNARY_MINUS |
-                    // UNARY_PLUS )
+                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:171:13: ( UNARY_MINUS | UNARY_PLUS )
                     int alt9 = 2;
                     int LA9_0 = input.LA(1);
                     if ((LA9_0 == UNARY_MINUS)) {
@@ -1145,16 +1150,16 @@ public class TSPHPTranslatorWalker extends TreeParser {
 
                     switch (alt9) {
                         case 1:
-                            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:172:18: UNARY_MINUS
+                            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:171:18: UNARY_MINUS
                         {
-                            match(input, UNARY_MINUS, FOLLOW_UNARY_MINUS_in_unaryPrimitiveAtom647);
+                            match(input, UNARY_MINUS, FOLLOW_UNARY_MINUS_in_unaryPrimitiveAtom651);
                             unary = "-";
                         }
                         break;
-                        case 2 :
-                            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:173:18: UNARY_PLUS
+                        case 2:
+                            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:172:18: UNARY_PLUS
                         {
-                            match(input, UNARY_PLUS, FOLLOW_UNARY_PLUS_in_unaryPrimitiveAtom668);
+                            match(input, UNARY_PLUS, FOLLOW_UNARY_PLUS_in_unaryPrimitiveAtom672);
                             unary = "+";
                         }
                         break;
@@ -1162,18 +1167,18 @@ public class TSPHPTranslatorWalker extends TreeParser {
 					}
 
                     match(input, Token.DOWN, null);
-                    pushFollow(FOLLOW_primitiveAtomWithConstant_in_unaryPrimitiveAtom686);
-                    primitiveAtomWithConstant12 = primitiveAtomWithConstant();
+                    pushFollow(FOLLOW_primitiveAtomWithConstant_in_unaryPrimitiveAtom690);
+                    primitiveAtomWithConstant13 = primitiveAtomWithConstant();
                     state._fsp--;
 
 					match(input, Token.UP, null); 
 
 					// TEMPLATE REWRITE
-                    // 176:9: -> unaryPreOperator(operator=unaryexpression=$primitiveAtomWithConstant.st)
+                    // 175:9: -> unaryPreOperator(operator=unaryexpression=$primitiveAtomWithConstant.st)
                     {
                         retval.st = templateLib.getInstanceOf("unaryPreOperator", new STAttrMap().put("operator",
-                                unary).put("expression", (primitiveAtomWithConstant12 != null ? ((StringTemplate)
-                                primitiveAtomWithConstant12.getTemplate()) : null)));
+                                unary).put("expression", (primitiveAtomWithConstant13 != null ? ((StringTemplate)
+                                primitiveAtomWithConstant13.getTemplate()) : null)));
                     }
 
 
@@ -1195,6 +1200,238 @@ public class TSPHPTranslatorWalker extends TreeParser {
 	// $ANTLR end "unaryPrimitiveAtom"
 
 
+    public static class localVariableDeclarationList_return extends TreeRuleReturnScope
+    {
+        public StringTemplate st;
+
+        public Object getTemplate() {
+            return st;
+        }
+
+        public String toString() {
+            return st == null ? null : st.toString();
+        }
+    }
+
+    ;
+
+
+    // $ANTLR start "localVariableDeclarationList"
+    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:197:1: localVariableDeclarationList : ^(
+    // VARIABLE_DECLARATION_LIST ^( TYPE typeModifier allTypesOrUnknown ) (variables+= localVariableDeclaration )+ )
+    // -> localVariableDeclarationList(type=%type(\r\n prefixModifiers={$typeModifier.prefixModifiers},
+    // \r\n type={$allTypesOrUnknown.st},\r\n suffixModifiers={$typeModifier.suffixModifiers}\r\n )
+    // variables=$variables);
+    public final TSPHPTranslatorWalker.localVariableDeclarationList_return localVariableDeclarationList() throws
+            RecognitionException {
+        TSPHPTranslatorWalker.localVariableDeclarationList_return retval = new TSPHPTranslatorWalker
+                .localVariableDeclarationList_return();
+        retval.start = input.LT(1);
+
+        List<Object> list_variables = null;
+        TreeRuleReturnScope typeModifier14 = null;
+        TreeRuleReturnScope allTypesOrUnknown15 = null;
+        RuleReturnScope variables = null;
+        try {
+            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:198:5: ( ^( VARIABLE_DECLARATION_LIST ^(
+            // TYPE typeModifier allTypesOrUnknown ) (variables+= localVariableDeclaration )+ ) ->
+            // localVariableDeclarationList(type=%type(\r\n prefixModifiers={$typeModifier.prefixModifiers},
+            // \r\n type={$allTypesOrUnknown.st},\r\n suffixModifiers={$typeModifier.suffixModifiers}\r\n )
+            // variables=$variables))
+            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:198:9: ^( VARIABLE_DECLARATION_LIST ^( TYPE
+            // typeModifier allTypesOrUnknown ) (variables+= localVariableDeclaration )+ )
+            {
+                match(input, VARIABLE_DECLARATION_LIST,
+                        FOLLOW_VARIABLE_DECLARATION_LIST_in_localVariableDeclarationList755);
+                match(input, Token.DOWN, null);
+                match(input, TYPE, FOLLOW_TYPE_in_localVariableDeclarationList770);
+                match(input, Token.DOWN, null);
+                pushFollow(FOLLOW_typeModifier_in_localVariableDeclarationList772);
+                typeModifier14 = typeModifier();
+                state._fsp--;
+
+                pushFollow(FOLLOW_allTypesOrUnknown_in_localVariableDeclarationList774);
+                allTypesOrUnknown15 = allTypesOrUnknown();
+                state._fsp--;
+
+                match(input, Token.UP, null);
+
+                // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:200:22: (variables+=
+                // localVariableDeclaration )+
+                int cnt11 = 0;
+                loop11:
+                while (true) {
+                    int alt11 = 2;
+                    int LA11_0 = input.LA(1);
+                    if ((LA11_0 == VariableId)) {
+                        alt11 = 1;
+                    }
+
+                    switch (alt11) {
+                        case 1:
+                            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:200:22: variables+= localVariableDeclaration
+                        {
+                            pushFollow(FOLLOW_localVariableDeclaration_in_localVariableDeclarationList791);
+                            variables = localVariableDeclaration();
+                            state._fsp--;
+
+                            if (list_variables == null) list_variables = new ArrayList<Object>();
+                            list_variables.add(variables.getTemplate());
+                        }
+                        break;
+
+                        default:
+                            if (cnt11 >= 1) break loop11;
+                            EarlyExitException eee = new EarlyExitException(11, input);
+                            throw eee;
+                    }
+                    cnt11++;
+                }
+
+                match(input, Token.UP, null);
+
+                // TEMPLATE REWRITE
+                // 202:9: -> localVariableDeclarationList(type=%type(\r\n prefixModifiers={$typeModifier
+                // .prefixModifiers},\r\n type={$allTypesOrUnknown.st},\r\n suffixModifiers={$typeModifier
+                // .suffixModifiers}\r\n )variables=$variables)
+                {
+                    retval.st = templateLib.getInstanceOf("localVariableDeclarationList", new STAttrMap().put("type",
+                            templateLib.getInstanceOf("type", new STAttrMap().put("prefixModifiers",
+                                    (typeModifier14 != null ? ((TSPHPTranslatorWalker.typeModifier_return)
+                                            typeModifier14).prefixModifiers : null)).put("type",
+                                    (allTypesOrUnknown15 != null ? ((StringTemplate) allTypesOrUnknown15.getTemplate
+                                            ()) : null)).put("suffixModifiers",
+                                    (typeModifier14 != null ? ((TSPHPTranslatorWalker.typeModifier_return)
+                                            typeModifier14).suffixModifiers : null)))).put("variables",
+                            list_variables));
+                }
+
+
+            }
+
+        } catch (RecognitionException re) {
+            reportError(re);
+            recover(input, re);
+        } finally {
+            // do for sure before leaving
+        }
+        return retval;
+    }
+    // $ANTLR end "localVariableDeclarationList"
+
+
+    public static class localVariableDeclaration_return extends TreeRuleReturnScope
+    {
+        public StringTemplate st;
+
+        public Object getTemplate() {
+            return st;
+        }
+
+        public String toString() {
+            return st == null ? null : st.toString();
+        }
+    }
+
+    ;
+
+
+    // $ANTLR start "localVariableDeclaration"
+    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:211:1: localVariableDeclaration : ( VariableId ->
+    // {%{$VariableId.text}}| ^( VariableId defaultValue= unaryPrimitiveAtom ) -> assign(id=$VariableId
+    // .textvalue=$unaryPrimitiveAtom.st));
+    public final TSPHPTranslatorWalker.localVariableDeclaration_return localVariableDeclaration() throws
+            RecognitionException {
+        TSPHPTranslatorWalker.localVariableDeclaration_return retval = new TSPHPTranslatorWalker
+                .localVariableDeclaration_return();
+        retval.start = input.LT(1);
+
+        ITSPHPAst VariableId16 = null;
+        ITSPHPAst VariableId17 = null;
+        TreeRuleReturnScope defaultValue = null;
+
+        try {
+            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:212:5: ( VariableId -> {%{$VariableId
+            // .text}}| ^( VariableId defaultValue= unaryPrimitiveAtom ) -> assign(id=$VariableId
+            // .textvalue=$unaryPrimitiveAtom.st))
+            int alt12 = 2;
+            int LA12_0 = input.LA(1);
+            if ((LA12_0 == VariableId)) {
+                int LA12_1 = input.LA(2);
+                if ((LA12_1 == DOWN)) {
+                    alt12 = 2;
+                } else if ((LA12_1 == UP || LA12_1 == VariableId)) {
+                    alt12 = 1;
+                } else {
+                    int nvaeMark = input.mark();
+                    try {
+                        input.consume();
+                        NoViableAltException nvae =
+                                new NoViableAltException("", 12, 1, input);
+                        throw nvae;
+                    } finally {
+                        input.rewind(nvaeMark);
+                    }
+                }
+
+            } else {
+                NoViableAltException nvae =
+                        new NoViableAltException("", 12, 0, input);
+                throw nvae;
+            }
+
+            switch (alt12) {
+                case 1:
+                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:212:9: VariableId
+                {
+                    VariableId16 = (ITSPHPAst) match(input, VariableId, FOLLOW_VariableId_in_localVariableDeclaration870);
+                    // TEMPLATE REWRITE
+                    // 213:9: -> {%{$VariableId.text}}
+                    {
+                        retval.st = new StringTemplate(templateLib, (VariableId16 != null ? VariableId16.getText() :
+                                null));
+                    }
+
+
+                }
+                break;
+                case 2:
+                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:214:9: ^( VariableId defaultValue=
+                    // unaryPrimitiveAtom )
+                {
+                    VariableId17 = (ITSPHPAst) match(input, VariableId,
+                            FOLLOW_VariableId_in_localVariableDeclaration893);
+                    match(input, Token.DOWN, null);
+                    pushFollow(FOLLOW_unaryPrimitiveAtom_in_localVariableDeclaration897);
+                    defaultValue = unaryPrimitiveAtom();
+                    state._fsp--;
+
+                    match(input, Token.UP, null);
+
+                    // TEMPLATE REWRITE
+                    // 215:10: -> assign(id=$VariableId.textvalue=$unaryPrimitiveAtom.st)
+                    {
+                        retval.st = templateLib.getInstanceOf("assign", new STAttrMap().put("id", (VariableId17 !=
+                                null ? VariableId17.getText() : null)).put("value",
+                                (defaultValue != null ? ((StringTemplate) defaultValue.getTemplate()) : null)));
+                    }
+
+
+                }
+                break;
+
+            }
+        } catch (RecognitionException re) {
+            reportError(re);
+            recover(input, re);
+        } finally {
+            // do for sure before leaving
+        }
+        return retval;
+    }
+    // $ANTLR end "localVariableDeclaration"
+
+
     public static class typeModifier_return extends TreeRuleReturnScope
     {
         public Set<String> prefixModifiers;
@@ -1214,7 +1451,7 @@ public class TSPHPTranslatorWalker extends TreeParser {
 
 
     // $ANTLR start "typeModifier"
-    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:204:1: typeModifier returns [Set<String>
+    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:218:1: typeModifier returns [Set<String>
     // prefixModifiers, Set<String> suffixModifiers] : ( ^( TYPE_MODIFIER ( 'cast' )? ( '!' )? ( '?' )? ) |
     // TYPE_MODIFIER );
     public final TSPHPTranslatorWalker.typeModifier_return typeModifier() throws RecognitionException {
@@ -1226,23 +1463,23 @@ public class TSPHPTranslatorWalker extends TreeParser {
         retval.suffixModifiers = new HashSet<String>();
 
         try {
-            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:209:5: ( ^( TYPE_MODIFIER ( 'cast' )? ( '!'
+            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:223:5: ( ^( TYPE_MODIFIER ( 'cast' )? ( '!'
             // )? ( '?' )? ) | TYPE_MODIFIER )
-            int alt14 = 2;
-            int LA14_0 = input.LA(1);
-            if ((LA14_0 == TYPE_MODIFIER)) {
-                int LA14_1 = input.LA(2);
-                if ((LA14_1 == DOWN)) {
-                    alt14 = 1;
-                } else if ((LA14_1 == QuestionMark || LA14_1 == TypeArray || LA14_1 == TYPE_NAME || (LA14_1 >=
-                        TypeBool && LA14_1 <= TypeMixed) || (LA14_1 >= TypeResource && LA14_1 <= TypeString))) {
-                    alt14 = 2;
+            int alt16 = 2;
+            int LA16_0 = input.LA(1);
+            if ((LA16_0 == TYPE_MODIFIER)) {
+                int LA16_1 = input.LA(2);
+                if ((LA16_1 == DOWN)) {
+                    alt16 = 1;
+                } else if ((LA16_1 == QuestionMark || LA16_1 == TypeArray || LA16_1 == TYPE_NAME || (LA16_1 >=
+                        TypeBool && LA16_1 <= TypeMixed) || (LA16_1 >= TypeResource && LA16_1 <= TypeString))) {
+                    alt16 = 2;
                 } else {
                     int nvaeMark = input.mark();
                     try {
                         input.consume();
                         NoViableAltException nvae =
-                                new NoViableAltException("", 14, 1, input);
+                                new NoViableAltException("", 16, 1, input);
                         throw nvae;
                     } finally {
                         input.rewind(nvaeMark);
@@ -1251,63 +1488,63 @@ public class TSPHPTranslatorWalker extends TreeParser {
 
             } else {
                 NoViableAltException nvae =
-                        new NoViableAltException("", 14, 0, input);
+                        new NoViableAltException("", 16, 0, input);
                 throw nvae;
             }
 
-            switch (alt14) {
+            switch (alt16) {
                 case 1:
-                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:209:9: ^( TYPE_MODIFIER ( 'cast' )?
+                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:223:9: ^( TYPE_MODIFIER ( 'cast' )?
                     // ( '!' )? ( '?' )? )
                 {
-                    match(input, TYPE_MODIFIER, FOLLOW_TYPE_MODIFIER_in_typeModifier769);
+                    match(input, TYPE_MODIFIER, FOLLOW_TYPE_MODIFIER_in_typeModifier952);
                     if (input.LA(1) == Token.DOWN) {
                         match(input, Token.DOWN, null);
-                        // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:210:13: ( 'cast' )?
-                        int alt11 = 2;
-                        int LA11_0 = input.LA(1);
-                        if ((LA11_0 == Cast)) {
-                            alt11 = 1;
+                        // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:224:13: ( 'cast' )?
+                        int alt13 = 2;
+                        int LA13_0 = input.LA(1);
+                        if ((LA13_0 == Cast)) {
+                            alt13 = 1;
                         }
-                        switch (alt11) {
+                        switch (alt13) {
                             case 1:
-                                // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:210:14: 'cast'
+                                // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:224:14: 'cast'
                             {
-                                match(input, Cast, FOLLOW_Cast_in_typeModifier784);
+                                match(input, Cast, FOLLOW_Cast_in_typeModifier967);
                                 retval.prefixModifiers.add("cast");
                             }
                             break;
 
                         }
 
-                        // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:211:13: ( '!' )?
-                        int alt12 = 2;
-                        int LA12_0 = input.LA(1);
-                        if ((LA12_0 == LogicNot)) {
-                            alt12 = 1;
+                        // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:225:13: ( '!' )?
+                        int alt14 = 2;
+                        int LA14_0 = input.LA(1);
+                        if ((LA14_0 == LogicNot)) {
+                            alt14 = 1;
                         }
-                        switch (alt12) {
+                        switch (alt14) {
                             case 1:
-                                // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:211:14: '!'
+                                // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:225:14: '!'
                             {
-                                match(input, LogicNot, FOLLOW_LogicNot_in_typeModifier803);
+                                match(input, LogicNot, FOLLOW_LogicNot_in_typeModifier986);
                                 retval.suffixModifiers.add("!");
                             }
                             break;
 
                         }
 
-                        // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:212:13: ( '?' )?
-                        int alt13 = 2;
-                        int LA13_0 = input.LA(1);
-                        if ((LA13_0 == QuestionMark)) {
-                            alt13 = 1;
+                        // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:226:13: ( '?' )?
+                        int alt15 = 2;
+                        int LA15_0 = input.LA(1);
+                        if ((LA15_0 == QuestionMark)) {
+                            alt15 = 1;
                         }
-                        switch (alt13) {
+                        switch (alt15) {
                             case 1:
-                                // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:212:14: '?'
+                                // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:226:14: '?'
                             {
-                                match(input, QuestionMark, FOLLOW_QuestionMark_in_typeModifier826);
+                                match(input, QuestionMark, FOLLOW_QuestionMark_in_typeModifier1009);
                                 retval.suffixModifiers.add("?");
                             }
                             break;
@@ -1320,9 +1557,9 @@ public class TSPHPTranslatorWalker extends TreeParser {
                 }
                 break;
                 case 2:
-                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:214:9: TYPE_MODIFIER
+                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:228:9: TYPE_MODIFIER
                 {
-                    match(input, TYPE_MODIFIER, FOLLOW_TYPE_MODIFIER_in_typeModifier853);
+                    match(input, TYPE_MODIFIER, FOLLOW_TYPE_MODIFIER_in_typeModifier1036);
                 }
                 break;
 
@@ -1355,28 +1592,27 @@ public class TSPHPTranslatorWalker extends TreeParser {
 
 
     // $ANTLR start "returnTypesOrUnknown"
-    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:232:1: returnTypesOrUnknown : allTypesOrUnknown ->
+    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:231:1: returnTypesOrUnknown : allTypesOrUnknown ->
     // {$allTypesOrUnknown.st};
     public final TSPHPTranslatorWalker.returnTypesOrUnknown_return returnTypesOrUnknown() throws RecognitionException {
-        TSPHPTranslatorWalker.returnTypesOrUnknown_return retval = new TSPHPTranslatorWalker
-                .returnTypesOrUnknown_return();
+        TSPHPTranslatorWalker.returnTypesOrUnknown_return retval = new TSPHPTranslatorWalker.returnTypesOrUnknown_return();
         retval.start = input.LT(1);
 
-        TreeRuleReturnScope allTypesOrUnknown13 = null;
+        TreeRuleReturnScope allTypesOrUnknown18 = null;
 
         try {
-            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:233:5: ( allTypesOrUnknown ->
+            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:232:5: ( allTypesOrUnknown ->
             // {$allTypesOrUnknown.st})
-            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:233:9: allTypesOrUnknown
+            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:232:9: allTypesOrUnknown
             {
-                pushFollow(FOLLOW_allTypesOrUnknown_in_returnTypesOrUnknown875);
-                allTypesOrUnknown13 = allTypesOrUnknown();
+                pushFollow(FOLLOW_allTypesOrUnknown_in_returnTypesOrUnknown1057);
+                allTypesOrUnknown18 = allTypesOrUnknown();
                 state._fsp--;
 
                 // TEMPLATE REWRITE
-                // 233:27: -> {$allTypesOrUnknown.st}
+                // 232:27: -> {$allTypesOrUnknown.st}
                 {
-                    retval.st = (allTypesOrUnknown13 != null ? ((StringTemplate) allTypesOrUnknown13.getTemplate()) :
+                    retval.st = (allTypesOrUnknown18 != null ? ((StringTemplate) allTypesOrUnknown18.getTemplate()) :
                             null);
                 }
 
@@ -1411,53 +1647,53 @@ public class TSPHPTranslatorWalker extends TreeParser {
 
 
     // $ANTLR start "allTypesOrUnknown"
-    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:238:1: allTypesOrUnknown : ( allTypes -> {$allTypes
+    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:237:1: allTypesOrUnknown : ( allTypes -> {$allTypes
     // .st}| '?' -> {%{\"?\"}});
     public final TSPHPTranslatorWalker.allTypesOrUnknown_return allTypesOrUnknown() throws RecognitionException {
         TSPHPTranslatorWalker.allTypesOrUnknown_return retval = new TSPHPTranslatorWalker.allTypesOrUnknown_return();
         retval.start = input.LT(1);
 
-        TreeRuleReturnScope allTypes14 = null;
+        TreeRuleReturnScope allTypes19 = null;
 
         try {
-            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:239:5: ( allTypes -> {$allTypes.st}| '?' ->
+            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:238:5: ( allTypes -> {$allTypes.st}| '?' ->
             // {%{\"?\"}})
-            int alt15 = 2;
-            int LA15_0 = input.LA(1);
-            if ((LA15_0 == TypeArray || LA15_0 == TYPE_NAME || (LA15_0 >= TypeBool && LA15_0 <= TypeMixed) || (LA15_0
-                    >= TypeResource && LA15_0 <= TypeString))) {
-                alt15 = 1;
-            } else if ((LA15_0 == QuestionMark)) {
-                alt15 = 2;
+            int alt17 = 2;
+            int LA17_0 = input.LA(1);
+            if ((LA17_0 == TypeArray || LA17_0 == TYPE_NAME || (LA17_0 >= TypeBool && LA17_0 <= TypeMixed) || (LA17_0
+                    >= TypeResource && LA17_0 <= TypeString))) {
+                alt17 = 1;
+            } else if ((LA17_0 == QuestionMark)) {
+                alt17 = 2;
             } else {
                 NoViableAltException nvae =
-                        new NoViableAltException("", 15, 0, input);
+                        new NoViableAltException("", 17, 0, input);
                 throw nvae;
             }
 
-            switch (alt15) {
+            switch (alt17) {
                 case 1:
-                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:239:9: allTypes
+                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:238:9: allTypes
                 {
-                    pushFollow(FOLLOW_allTypes_in_allTypesOrUnknown912);
-                    allTypes14 = allTypes();
+                    pushFollow(FOLLOW_allTypes_in_allTypesOrUnknown1094);
+                    allTypes19 = allTypes();
                     state._fsp--;
 
                     // TEMPLATE REWRITE
-                    // 239:18: -> {$allTypes.st}
+                    // 238:18: -> {$allTypes.st}
                     {
-                        retval.st = (allTypes14 != null ? ((StringTemplate) allTypes14.getTemplate()) : null);
+                        retval.st = (allTypes19 != null ? ((StringTemplate) allTypes19.getTemplate()) : null);
                     }
 
 
                 }
                 break;
                 case 2:
-                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:240:9: '?'
+                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:239:9: '?'
                 {
-                    match(input, QuestionMark, FOLLOW_QuestionMark_in_allTypesOrUnknown926);
+                    match(input, QuestionMark, FOLLOW_QuestionMark_in_allTypesOrUnknown1108);
                     // TEMPLATE REWRITE
-                    // 240:18: -> {%{\"?\"}}
+                    // 239:18: -> {%{\"?\"}}
                     {
                         retval.st = new StringTemplate(templateLib, "?");
                     }
@@ -1495,43 +1731,43 @@ public class TSPHPTranslatorWalker extends TreeParser {
 
 
     // $ANTLR start "allTypes"
-    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:243:1: allTypes : ( primitiveTypes ->
+    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:242:1: allTypes : ( primitiveTypes ->
     // {$primitiveTypes.st}| TYPE_NAME -> {%{$TYPE_NAME.text}});
     public final TSPHPTranslatorWalker.allTypes_return allTypes() throws RecognitionException {
         TSPHPTranslatorWalker.allTypes_return retval = new TSPHPTranslatorWalker.allTypes_return();
         retval.start = input.LT(1);
 
-        ITSPHPAst TYPE_NAME16 = null;
-        TreeRuleReturnScope primitiveTypes15 = null;
+        ITSPHPAst TYPE_NAME21 = null;
+        TreeRuleReturnScope primitiveTypes20 = null;
 
         try {
-            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:244:5: ( primitiveTypes -> {$primitiveTypes
+            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:243:5: ( primitiveTypes -> {$primitiveTypes
             // .st}| TYPE_NAME -> {%{$TYPE_NAME.text}})
-            int alt16 = 2;
-            int LA16_0 = input.LA(1);
-            if ((LA16_0 == TypeArray || (LA16_0 >= TypeBool && LA16_0 <= TypeMixed) || (LA16_0 >= TypeResource &&
-                    LA16_0 <= TypeString))) {
-                alt16 = 1;
-            } else if ((LA16_0 == TYPE_NAME)) {
-                alt16 = 2;
+            int alt18 = 2;
+            int LA18_0 = input.LA(1);
+            if ((LA18_0 == TypeArray || (LA18_0 >= TypeBool && LA18_0 <= TypeMixed) || (LA18_0 >= TypeResource &&
+                    LA18_0 <= TypeString))) {
+                alt18 = 1;
+            } else if ((LA18_0 == TYPE_NAME)) {
+                alt18 = 2;
             } else {
                 NoViableAltException nvae =
-                        new NoViableAltException("", 16, 0, input);
+                        new NoViableAltException("", 18, 0, input);
                 throw nvae;
             }
 
-            switch (alt16) {
+            switch (alt18) {
                 case 1:
-                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:244:9: primitiveTypes
+                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:243:9: primitiveTypes
                 {
-                    pushFollow(FOLLOW_primitiveTypes_in_allTypes954);
-                    primitiveTypes15 = primitiveTypes();
+                    pushFollow(FOLLOW_primitiveTypes_in_allTypes1136);
+                    primitiveTypes20 = primitiveTypes();
                     state._fsp--;
 
                     // TEMPLATE REWRITE
-                    // 244:24: -> {$primitiveTypes.st}
+                    // 243:24: -> {$primitiveTypes.st}
                     {
-                        retval.st = (primitiveTypes15 != null ? ((StringTemplate) primitiveTypes15.getTemplate()) :
+                        retval.st = (primitiveTypes20 != null ? ((StringTemplate) primitiveTypes20.getTemplate()) :
                                 null);
                     }
 
@@ -1539,13 +1775,13 @@ public class TSPHPTranslatorWalker extends TreeParser {
                 }
                 break;
                 case 2:
-                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:245:9: TYPE_NAME
+                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:244:9: TYPE_NAME
                 {
-                    TYPE_NAME16 = (ITSPHPAst) match(input, TYPE_NAME, FOLLOW_TYPE_NAME_in_allTypes969);
+                    TYPE_NAME21 = (ITSPHPAst) match(input, TYPE_NAME, FOLLOW_TYPE_NAME_in_allTypes1151);
                     // TEMPLATE REWRITE
-                    // 245:24: -> {%{$TYPE_NAME.text}}
+                    // 244:24: -> {%{$TYPE_NAME.text}}
                     {
-                        retval.st = new StringTemplate(templateLib, (TYPE_NAME16 != null ? TYPE_NAME16.getText() :
+                        retval.st = new StringTemplate(templateLib, (TYPE_NAME21 != null ? TYPE_NAME21.getText() :
                                 null));
                     }
 
@@ -1582,73 +1818,73 @@ public class TSPHPTranslatorWalker extends TreeParser {
 
 
     // $ANTLR start "primitiveTypes"
-    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:248:1: primitiveTypes : ( scalarTypes ->
+    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:247:1: primitiveTypes : ( scalarTypes ->
     // {$scalarTypes.st}| TypeArray -> {%{$TypeArray.text}}| TypeResource -> {%{$TypeResource.text}}| TypeMixed ->
     // {%{$TypeMixed.text}});
     public final TSPHPTranslatorWalker.primitiveTypes_return primitiveTypes() throws RecognitionException {
         TSPHPTranslatorWalker.primitiveTypes_return retval = new TSPHPTranslatorWalker.primitiveTypes_return();
         retval.start = input.LT(1);
 
-        ITSPHPAst TypeArray18 = null;
-        ITSPHPAst TypeResource19 = null;
-        ITSPHPAst TypeMixed20 = null;
-        TreeRuleReturnScope scalarTypes17 = null;
+        ITSPHPAst TypeArray23 = null;
+        ITSPHPAst TypeResource24 = null;
+        ITSPHPAst TypeMixed25 = null;
+        TreeRuleReturnScope scalarTypes22 = null;
 
         try {
-            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:249:5: ( scalarTypes -> {$scalarTypes.st}|
+            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:248:5: ( scalarTypes -> {$scalarTypes.st}|
             // TypeArray -> {%{$TypeArray.text}}| TypeResource -> {%{$TypeResource.text}}| TypeMixed -> {%{$TypeMixed
             // .text}})
-            int alt17 = 4;
+            int alt19 = 4;
             switch (input.LA(1)) {
                 case TypeBool:
                 case TypeFloat:
                 case TypeInt:
                 case TypeString: {
-                    alt17 = 1;
+                    alt19 = 1;
                 }
                 break;
                 case TypeArray: {
-                    alt17 = 2;
+                    alt19 = 2;
                 }
                 break;
                 case TypeResource: {
-                    alt17 = 3;
+                    alt19 = 3;
                 }
                 break;
                 case TypeMixed: {
-                    alt17 = 4;
+                    alt19 = 4;
                 }
                 break;
                 default:
                     NoViableAltException nvae =
-                            new NoViableAltException("", 17, 0, input);
+                            new NoViableAltException("", 19, 0, input);
                     throw nvae;
             }
-            switch (alt17) {
+            switch (alt19) {
                 case 1:
-                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:249:9: scalarTypes
+                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:248:9: scalarTypes
                 {
-                    pushFollow(FOLLOW_scalarTypes_in_primitiveTypes1001);
-                    scalarTypes17 = scalarTypes();
+                    pushFollow(FOLLOW_scalarTypes_in_primitiveTypes1183);
+                    scalarTypes22 = scalarTypes();
                     state._fsp--;
 
                     // TEMPLATE REWRITE
-                    // 249:22: -> {$scalarTypes.st}
+                    // 248:22: -> {$scalarTypes.st}
                     {
-                        retval.st = (scalarTypes17 != null ? ((StringTemplate) scalarTypes17.getTemplate()) : null);
+                        retval.st = (scalarTypes22 != null ? ((StringTemplate) scalarTypes22.getTemplate()) : null);
                     }
 
 
                 }
                 break;
                 case 2:
-                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:250:9: TypeArray
+                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:249:9: TypeArray
                 {
-                    TypeArray18 = (ITSPHPAst) match(input, TypeArray, FOLLOW_TypeArray_in_primitiveTypes1016);
+                    TypeArray23 = (ITSPHPAst) match(input, TypeArray, FOLLOW_TypeArray_in_primitiveTypes1198);
                     // TEMPLATE REWRITE
-                    // 250:22: -> {%{$TypeArray.text}}
+                    // 249:22: -> {%{$TypeArray.text}}
                     {
-                        retval.st = new StringTemplate(templateLib, (TypeArray18 != null ? TypeArray18.getText() :
+                        retval.st = new StringTemplate(templateLib, (TypeArray23 != null ? TypeArray23.getText() :
                                 null));
                     }
 
@@ -1656,13 +1892,13 @@ public class TSPHPTranslatorWalker extends TreeParser {
                 }
                 break;
                 case 3:
-                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:251:9: TypeResource
+                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:250:9: TypeResource
                 {
-                    TypeResource19 = (ITSPHPAst) match(input, TypeResource, FOLLOW_TypeResource_in_primitiveTypes1033);
+                    TypeResource24 = (ITSPHPAst) match(input, TypeResource, FOLLOW_TypeResource_in_primitiveTypes1215);
                     // TEMPLATE REWRITE
-                    // 251:22: -> {%{$TypeResource.text}}
+                    // 250:22: -> {%{$TypeResource.text}}
                     {
-                        retval.st = new StringTemplate(templateLib, (TypeResource19 != null ? TypeResource19.getText
+                        retval.st = new StringTemplate(templateLib, (TypeResource24 != null ? TypeResource24.getText
                                 () : null));
                     }
 
@@ -1670,13 +1906,13 @@ public class TSPHPTranslatorWalker extends TreeParser {
                 }
                 break;
                 case 4:
-                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:252:9: TypeMixed
+                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:251:9: TypeMixed
                 {
-                    TypeMixed20 = (ITSPHPAst) match(input, TypeMixed, FOLLOW_TypeMixed_in_primitiveTypes1047);
+                    TypeMixed25 = (ITSPHPAst) match(input, TypeMixed, FOLLOW_TypeMixed_in_primitiveTypes1229);
                     // TEMPLATE REWRITE
-                    // 252:22: -> {%{$TypeMixed.text}}
+                    // 251:22: -> {%{$TypeMixed.text}}
                     {
-                        retval.st = new StringTemplate(templateLib, (TypeMixed20 != null ? TypeMixed20.getText() :
+                        retval.st = new StringTemplate(templateLib, (TypeMixed25 != null ? TypeMixed25.getText() :
                                 null));
                     }
 
@@ -1704,44 +1940,44 @@ public class TSPHPTranslatorWalker extends TreeParser {
 
 
 	// $ANTLR start "scalarTypesOrUnknown"
-    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:261:1: scalarTypesOrUnknown : ( scalarTypes ->
+    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:260:1: scalarTypesOrUnknown : ( scalarTypes ->
     // {$scalarTypes.st}| '?' -> {%{\"?\"}});
     public final TSPHPTranslatorWalker.scalarTypesOrUnknown_return scalarTypesOrUnknown() throws RecognitionException {
         TSPHPTranslatorWalker.scalarTypesOrUnknown_return retval = new TSPHPTranslatorWalker
                 .scalarTypesOrUnknown_return();
         retval.start = input.LT(1);
 
-        TreeRuleReturnScope scalarTypes21 = null;
+        TreeRuleReturnScope scalarTypes26 = null;
 
 		try {
-            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:262:5: ( scalarTypes -> {$scalarTypes.st}|
+            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:261:5: ( scalarTypes -> {$scalarTypes.st}|
             // '?' -> {%{\"?\"}})
-            int alt18 = 2;
-            int LA18_0 = input.LA(1);
-            if (((LA18_0 >= TypeBool && LA18_0 <= TypeInt) || LA18_0 == TypeString)) {
-                alt18 = 1;
-            } else if ((LA18_0 == QuestionMark)) {
-                alt18 = 2;
+            int alt20 = 2;
+            int LA20_0 = input.LA(1);
+            if (((LA20_0 >= TypeBool && LA20_0 <= TypeInt) || LA20_0 == TypeString)) {
+                alt20 = 1;
+            } else if ((LA20_0 == QuestionMark)) {
+                alt20 = 2;
             }
 
 			else {
 				NoViableAltException nvae =
-                        new NoViableAltException("", 18, 0, input);
+                        new NoViableAltException("", 20, 0, input);
                 throw nvae;
             }
 
-            switch (alt18) {
+            switch (alt20) {
                 case 1:
-                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:262:9: scalarTypes
+                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:261:9: scalarTypes
                 {
-                    pushFollow(FOLLOW_scalarTypes_in_scalarTypesOrUnknown1074);
-                    scalarTypes21 = scalarTypes();
+                    pushFollow(FOLLOW_scalarTypes_in_scalarTypesOrUnknown1256);
+                    scalarTypes26 = scalarTypes();
                     state._fsp--;
 
 					// TEMPLATE REWRITE
-                    // 262:21: -> {$scalarTypes.st}
+                    // 261:21: -> {$scalarTypes.st}
                     {
-                        retval.st = (scalarTypes21 != null ? ((StringTemplate) scalarTypes21.getTemplate()) : null);
+                        retval.st = (scalarTypes26 != null ? ((StringTemplate) scalarTypes26.getTemplate()) : null);
                     }
 
 
@@ -1749,11 +1985,11 @@ public class TSPHPTranslatorWalker extends TreeParser {
 					}
 					break;
 				case 2 :
-                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:263:9: '?'
+                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:262:9: '?'
                 {
-                    match(input, QuestionMark, FOLLOW_QuestionMark_in_scalarTypesOrUnknown1088);
+                    match(input, QuestionMark, FOLLOW_QuestionMark_in_scalarTypesOrUnknown1270);
                     // TEMPLATE REWRITE
-                    // 263:21: -> {%{\"?\"}}
+                    // 262:21: -> {%{\"?\"}}
                     {
                         retval.st = new StringTemplate(templateLib, "?");
                     }
@@ -1785,52 +2021,52 @@ public class TSPHPTranslatorWalker extends TreeParser {
 
 
 	// $ANTLR start "scalarTypes"
-    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:266:1: scalarTypes : ( TypeBool -> {%{$TypeBool
+    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:265:1: scalarTypes : ( TypeBool -> {%{$TypeBool
     // .text}}| TypeInt -> {%{$TypeInt.text}}| TypeFloat -> {%{$TypeFloat.text}}| TypeString -> {%{$TypeString.text}});
     public final TSPHPTranslatorWalker.scalarTypes_return scalarTypes() throws RecognitionException {
         TSPHPTranslatorWalker.scalarTypes_return retval = new TSPHPTranslatorWalker.scalarTypes_return();
         retval.start = input.LT(1);
 
-        ITSPHPAst TypeBool22 = null;
-        ITSPHPAst TypeInt23 = null;
-        ITSPHPAst TypeFloat24 = null;
-        ITSPHPAst TypeString25 = null;
+        ITSPHPAst TypeBool27 = null;
+        ITSPHPAst TypeInt28 = null;
+        ITSPHPAst TypeFloat29 = null;
+        ITSPHPAst TypeString30 = null;
 
 		try {
-            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:267:5: ( TypeBool -> {%{$TypeBool.text}}|
+            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:266:5: ( TypeBool -> {%{$TypeBool.text}}|
             // TypeInt -> {%{$TypeInt.text}}| TypeFloat -> {%{$TypeFloat.text}}| TypeString -> {%{$TypeString.text}})
-            int alt19 = 4;
+            int alt21 = 4;
             switch (input.LA(1)) {
                 case TypeBool: {
-                    alt19 = 1;
+                    alt21 = 1;
                 }
                 break;
                 case TypeInt: {
-                    alt19 = 2;
+                    alt21 = 2;
                 }
                 break;
                 case TypeFloat: {
-                    alt19 = 3;
+                    alt21 = 3;
                 }
                 break;
                 case TypeString: {
-                    alt19 = 4;
+                    alt21 = 4;
                 }
                 break;
                 default:
                     NoViableAltException nvae =
-                        new NoViableAltException("", 19, 0, input);
+                            new NoViableAltException("", 21, 0, input);
                     throw nvae;
             }
-            switch (alt19) {
+            switch (alt21) {
                 case 1:
-                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:267:9: TypeBool
+                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:266:9: TypeBool
                 {
-                    TypeBool22 = (ITSPHPAst) match(input, TypeBool, FOLLOW_TypeBool_in_scalarTypes1119);
+                    TypeBool27 = (ITSPHPAst) match(input, TypeBool, FOLLOW_TypeBool_in_scalarTypes1301);
                     // TEMPLATE REWRITE
-                    // 267:21: -> {%{$TypeBool.text}}
+                    // 266:21: -> {%{$TypeBool.text}}
                     {
-                        retval.st = new StringTemplate(templateLib, (TypeBool22 != null ? TypeBool22.getText() : null));
+                        retval.st = new StringTemplate(templateLib, (TypeBool27 != null ? TypeBool27.getText() : null));
                     }
 
 
@@ -1838,13 +2074,13 @@ public class TSPHPTranslatorWalker extends TreeParser {
 					}
 					break;
 				case 2 :
-                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:268:9: TypeInt
+                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:267:9: TypeInt
                 {
-                    TypeInt23 = (ITSPHPAst) match(input, TypeInt, FOLLOW_TypeInt_in_scalarTypes1136);
+                    TypeInt28 = (ITSPHPAst) match(input, TypeInt, FOLLOW_TypeInt_in_scalarTypes1318);
                     // TEMPLATE REWRITE
-                    // 268:21: -> {%{$TypeInt.text}}
+                    // 267:21: -> {%{$TypeInt.text}}
                     {
-                        retval.st = new StringTemplate(templateLib, (TypeInt23 != null ? TypeInt23.getText() : null));
+                        retval.st = new StringTemplate(templateLib, (TypeInt28 != null ? TypeInt28.getText() : null));
                     }
 
 
@@ -1852,13 +2088,13 @@ public class TSPHPTranslatorWalker extends TreeParser {
 					}
 					break;
 				case 3 :
-                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:269:9: TypeFloat
+                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:268:9: TypeFloat
                 {
-                    TypeFloat24 = (ITSPHPAst) match(input, TypeFloat, FOLLOW_TypeFloat_in_scalarTypes1154);
+                    TypeFloat29 = (ITSPHPAst) match(input, TypeFloat, FOLLOW_TypeFloat_in_scalarTypes1336);
                     // TEMPLATE REWRITE
-                    // 269:21: -> {%{$TypeFloat.text}}
+                    // 268:21: -> {%{$TypeFloat.text}}
                     {
-                        retval.st = new StringTemplate(templateLib, (TypeFloat24 != null ? TypeFloat24.getText() :
+                        retval.st = new StringTemplate(templateLib, (TypeFloat29 != null ? TypeFloat29.getText() :
                                 null));
                     }
 
@@ -1867,14 +2103,13 @@ public class TSPHPTranslatorWalker extends TreeParser {
 					}
 					break;
 				case 4 :
-                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:270:9: TypeString
+                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:269:9: TypeString
                 {
-                    TypeString25 = (ITSPHPAst) match(input, TypeString, FOLLOW_TypeString_in_scalarTypes1170);
+                    TypeString30 = (ITSPHPAst) match(input, TypeString, FOLLOW_TypeString_in_scalarTypes1352);
                     // TEMPLATE REWRITE
-                    // 270:21: -> {%{$TypeString.text}}
+                    // 269:21: -> {%{$TypeString.text}}
                     {
-                        retval.st = new StringTemplate(templateLib, (TypeString25 != null ? TypeString25.getText() :
-                                null));
+                        retval.st = new StringTemplate(templateLib, (TypeString30 != null ? TypeString30.getText() : null));
                     }
 
 
@@ -1913,7 +2148,7 @@ public class TSPHPTranslatorWalker extends TreeParser {
 
 
     // $ANTLR start "formalParameters"
-    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:379:1: formalParameters : ( ^( PARAMETER_LIST
+    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:378:1: formalParameters : ( ^( PARAMETER_LIST
     // (param= paramDeclaration )+ ) -> parameterList(declarations=declarations)| PARAMETER_LIST -> {null});
     public final TSPHPTranslatorWalker.formalParameters_return formalParameters() throws RecognitionException {
         TSPHPTranslatorWalker.formalParameters_return retval = new TSPHPTranslatorWalker.formalParameters_return();
@@ -1926,22 +2161,22 @@ public class TSPHPTranslatorWalker extends TreeParser {
         List<StringTemplate> declarations = new ArrayList<>();
 
         try {
-            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:384:5: ( ^( PARAMETER_LIST (param=
+            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:383:5: ( ^( PARAMETER_LIST (param=
             // paramDeclaration )+ ) -> parameterList(declarations=declarations)| PARAMETER_LIST -> {null})
-            int alt21 = 2;
-            int LA21_0 = input.LA(1);
-            if ((LA21_0 == PARAMETER_LIST)) {
-                int LA21_1 = input.LA(2);
-                if ((LA21_1 == DOWN)) {
-                    alt21 = 1;
-                } else if ((LA21_1 == BLOCK)) {
-                    alt21 = 2;
+            int alt23 = 2;
+            int LA23_0 = input.LA(1);
+            if ((LA23_0 == PARAMETER_LIST)) {
+                int LA23_1 = input.LA(2);
+                if ((LA23_1 == DOWN)) {
+                    alt23 = 1;
+                } else if ((LA23_1 == BLOCK)) {
+                    alt23 = 2;
                 } else {
                     int nvaeMark = input.mark();
                     try {
                         input.consume();
                         NoViableAltException nvae =
-                                new NoViableAltException("", 21, 1, input);
+                                new NoViableAltException("", 23, 1, input);
                         throw nvae;
                     } finally {
                         input.rewind(nvaeMark);
@@ -1950,33 +2185,33 @@ public class TSPHPTranslatorWalker extends TreeParser {
 
             } else {
                 NoViableAltException nvae =
-                        new NoViableAltException("", 21, 0, input);
+                        new NoViableAltException("", 23, 0, input);
                 throw nvae;
             }
 
-            switch (alt21) {
+            switch (alt23) {
                 case 1:
-                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:384:9: ^( PARAMETER_LIST (param=
+                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:383:9: ^( PARAMETER_LIST (param=
                     // paramDeclaration )+ )
                 {
-                    match(input, PARAMETER_LIST, FOLLOW_PARAMETER_LIST_in_formalParameters1207);
+                    match(input, PARAMETER_LIST, FOLLOW_PARAMETER_LIST_in_formalParameters1389);
                     match(input, Token.DOWN, null);
-                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:384:26: (param= paramDeclaration )+
-                    int cnt20 = 0;
-                    loop20:
+                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:383:26: (param= paramDeclaration )+
+                    int cnt22 = 0;
+                    loop22:
                     while (true) {
-                        int alt20 = 2;
-                        int LA20_0 = input.LA(1);
-                        if ((LA20_0 == PARAMETER_DECLARATION)) {
-                            alt20 = 1;
+                        int alt22 = 2;
+                        int LA22_0 = input.LA(1);
+                        if ((LA22_0 == PARAMETER_DECLARATION)) {
+                            alt22 = 1;
                         }
 
-                        switch (alt20) {
+                        switch (alt22) {
                             case 1:
-                                // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:384:27: param=
+                                // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:383:27: param=
                                 // paramDeclaration
                             {
-                                pushFollow(FOLLOW_paramDeclaration_in_formalParameters1212);
+                                pushFollow(FOLLOW_paramDeclaration_in_formalParameters1394);
                                 param = paramDeclaration();
                                 state._fsp--;
 
@@ -1986,13 +2221,11 @@ public class TSPHPTranslatorWalker extends TreeParser {
                             break;
 
                             default:
-                                if (cnt20 >= 1) {
-                                    break loop20;
-                                }
-                                EarlyExitException eee = new EarlyExitException(20, input);
+                                if (cnt22 >= 1) break loop22;
+                                EarlyExitException eee = new EarlyExitException(22, input);
                                 throw eee;
                         }
-                        cnt20++;
+                        cnt22++;
                     }
 
                     match(input, Token.UP, null);
@@ -2003,8 +2236,7 @@ public class TSPHPTranslatorWalker extends TreeParser {
                         ParameterDto dto = parameterDtos.get(i);
                         String defaultValue = canBeDefaultValue ? dto.defaultValue : null;
                         canBeDefaultValue &= defaultValue != null;
-                        if (!canBeDefaultValue && !dto.suffixModifiers.contains("?") && dto.defaultValue != null &&
-                                dto.defaultValue.toLowerCase().equals("null")) {
+                        if (!canBeDefaultValue && !dto.suffixModifiers.contains("?") && dto.defaultValue != null && dto.defaultValue.toLowerCase().equals("null")) {
                             dto.suffixModifiers.add("?");
                         }
                         StringTemplate type = templateLib.getInstanceOf("type",
@@ -2015,7 +2247,7 @@ public class TSPHPTranslatorWalker extends TreeParser {
                     }
 
                     // TEMPLATE REWRITE
-                    // 407:6: -> parameterList(declarations=declarations)
+                    // 406:6: -> parameterList(declarations=declarations)
                     {
                         retval.st = templateLib.getInstanceOf("parameterList", new STAttrMap().put("declarations",
                                 declarations));
@@ -2025,11 +2257,11 @@ public class TSPHPTranslatorWalker extends TreeParser {
                 }
                 break;
                 case 2:
-                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:408:9: PARAMETER_LIST
+                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:407:9: PARAMETER_LIST
                 {
-                    match(input, PARAMETER_LIST, FOLLOW_PARAMETER_LIST_in_formalParameters1249);
+                    match(input, PARAMETER_LIST, FOLLOW_PARAMETER_LIST_in_formalParameters1431);
                     // TEMPLATE REWRITE
-                    // 408:24: -> {null}
+                    // 407:24: -> {null}
                     {
                         retval.st = null;
                     }
@@ -2068,7 +2300,7 @@ public class TSPHPTranslatorWalker extends TreeParser {
 
 
     // $ANTLR start "block"
-    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:412:1: block returns [List<Object> instructions] :
+    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:411:1: block returns [List<Object> instructions] :
     // ( ^( BLOCK (instr+= instruction )+ ) | BLOCK );
     public final TSPHPTranslatorWalker.block_return block() throws RecognitionException {
         TSPHPTranslatorWalker.block_return retval = new TSPHPTranslatorWalker.block_return();
@@ -2077,22 +2309,22 @@ public class TSPHPTranslatorWalker extends TreeParser {
         List<Object> list_instr = null;
         RuleReturnScope instr = null;
         try {
-            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:413:5: ( ^( BLOCK (instr+= instruction )+ )
+            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:412:5: ( ^( BLOCK (instr+= instruction )+ )
             // | BLOCK )
-            int alt23 = 2;
-            int LA23_0 = input.LA(1);
-            if ((LA23_0 == BLOCK)) {
-                int LA23_1 = input.LA(2);
-                if ((LA23_1 == DOWN)) {
-                    alt23 = 1;
-                } else if ((LA23_1 == UP)) {
-                    alt23 = 2;
+            int alt25 = 2;
+            int LA25_0 = input.LA(1);
+            if ((LA25_0 == BLOCK)) {
+                int LA25_1 = input.LA(2);
+                if ((LA25_1 == DOWN)) {
+                    alt25 = 1;
+                } else if ((LA25_1 == UP)) {
+                    alt25 = 2;
                 } else {
                     int nvaeMark = input.mark();
                     try {
                         input.consume();
                         NoViableAltException nvae =
-                                new NoViableAltException("", 23, 1, input);
+                                new NoViableAltException("", 25, 1, input);
                         throw nvae;
                     } finally {
                         input.rewind(nvaeMark);
@@ -2101,51 +2333,47 @@ public class TSPHPTranslatorWalker extends TreeParser {
 
             } else {
                 NoViableAltException nvae =
-                        new NoViableAltException("", 23, 0, input);
+                        new NoViableAltException("", 25, 0, input);
                 throw nvae;
             }
 
-            switch (alt23) {
+            switch (alt25) {
                 case 1:
-                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:413:9: ^( BLOCK (instr+=
+                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:412:9: ^( BLOCK (instr+=
                     // instruction )+ )
                 {
-                    match(input, BLOCK, FOLLOW_BLOCK_in_block1277);
+                    match(input, BLOCK, FOLLOW_BLOCK_in_block1459);
                     match(input, Token.DOWN, null);
-                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:413:22: (instr+= instruction )+
-                    int cnt22 = 0;
-                    loop22:
+                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:412:22: (instr+= instruction )+
+                    int cnt24 = 0;
+                    loop24:
                     while (true) {
-                        int alt22 = 2;
-                        int LA22_0 = input.LA(1);
-                        if ((LA22_0 == EXPRESSION)) {
-                            alt22 = 1;
+                        int alt24 = 2;
+                        int LA24_0 = input.LA(1);
+                        if ((LA24_0 == EXPRESSION || LA24_0 == VARIABLE_DECLARATION_LIST)) {
+                            alt24 = 1;
                         }
 
-                        switch (alt22) {
+                        switch (alt24) {
                             case 1:
-                                // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:413:22: instr+=
+                                // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:412:22: instr+=
                                 // instruction
                             {
-                                pushFollow(FOLLOW_instruction_in_block1281);
+                                pushFollow(FOLLOW_instruction_in_block1463);
                                 instr = instruction();
                                 state._fsp--;
 
-                                if (list_instr == null) {
-                                    list_instr = new ArrayList<Object>();
-                                }
+                                if (list_instr == null) list_instr = new ArrayList<Object>();
                                 list_instr.add(instr.getTemplate());
                             }
                             break;
 
                             default:
-                                if (cnt22 >= 1) {
-                                    break loop22;
-                                }
-                                EarlyExitException eee = new EarlyExitException(22, input);
+                                if (cnt24 >= 1) break loop24;
+                                EarlyExitException eee = new EarlyExitException(24, input);
                                 throw eee;
                         }
-                        cnt22++;
+                        cnt24++;
                     }
 
                     match(input, Token.UP, null);
@@ -2154,9 +2382,9 @@ public class TSPHPTranslatorWalker extends TreeParser {
                 }
                 break;
                 case 2:
-                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:414:9: BLOCK
+                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:413:9: BLOCK
                 {
-                    match(input, BLOCK, FOLLOW_BLOCK_in_block1295);
+                    match(input, BLOCK, FOLLOW_BLOCK_in_block1477);
                 }
                 break;
 
@@ -2190,7 +2418,7 @@ public class TSPHPTranslatorWalker extends TreeParser {
 
 
     // $ANTLR start "paramDeclaration"
-    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:474:1: paramDeclaration returns [ParameterDto
+    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:473:1: paramDeclaration returns [ParameterDto
     // parameterDto] : ^( PARAMETER_DECLARATION ^( TYPE typeModifier allTypesOrUnknown ) (varId= VariableId | ^
     // (varId= VariableId defaultValue= unaryPrimitiveAtom ) ) ) ;
     public final TSPHPTranslatorWalker.paramDeclaration_return paramDeclaration() throws RecognitionException {
@@ -2199,47 +2427,47 @@ public class TSPHPTranslatorWalker extends TreeParser {
 
         ITSPHPAst varId = null;
         TreeRuleReturnScope defaultValue = null;
-        TreeRuleReturnScope typeModifier26 = null;
-        TreeRuleReturnScope allTypesOrUnknown27 = null;
+        TreeRuleReturnScope typeModifier31 = null;
+        TreeRuleReturnScope allTypesOrUnknown32 = null;
 
         try {
-            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:475:5: ( ^( PARAMETER_DECLARATION ^( TYPE
+            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:474:5: ( ^( PARAMETER_DECLARATION ^( TYPE
             // typeModifier allTypesOrUnknown ) (varId= VariableId | ^(varId= VariableId defaultValue=
             // unaryPrimitiveAtom ) ) ) )
-            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:475:9: ^( PARAMETER_DECLARATION ^( TYPE
+            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:474:9: ^( PARAMETER_DECLARATION ^( TYPE
             // typeModifier allTypesOrUnknown ) (varId= VariableId | ^(varId= VariableId defaultValue=
             // unaryPrimitiveAtom ) ) )
             {
-                match(input, PARAMETER_DECLARATION, FOLLOW_PARAMETER_DECLARATION_in_paramDeclaration1322);
+                match(input, PARAMETER_DECLARATION, FOLLOW_PARAMETER_DECLARATION_in_paramDeclaration1504);
                 match(input, Token.DOWN, null);
-                match(input, TYPE, FOLLOW_TYPE_in_paramDeclaration1337);
+                match(input, TYPE, FOLLOW_TYPE_in_paramDeclaration1519);
                 match(input, Token.DOWN, null);
-                pushFollow(FOLLOW_typeModifier_in_paramDeclaration1339);
-                typeModifier26 = typeModifier();
+                pushFollow(FOLLOW_typeModifier_in_paramDeclaration1521);
+                typeModifier31 = typeModifier();
                 state._fsp--;
 
-                pushFollow(FOLLOW_allTypesOrUnknown_in_paramDeclaration1341);
-                allTypesOrUnknown27 = allTypesOrUnknown();
+                pushFollow(FOLLOW_allTypesOrUnknown_in_paramDeclaration1523);
+                allTypesOrUnknown32 = allTypesOrUnknown();
                 state._fsp--;
 
                 match(input, Token.UP, null);
 
-                // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:477:13: (varId= VariableId | ^(varId=
+                // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:476:13: (varId= VariableId | ^(varId=
                 // VariableId defaultValue= unaryPrimitiveAtom ) )
-                int alt24 = 2;
-                int LA24_0 = input.LA(1);
-                if ((LA24_0 == VariableId)) {
-                    int LA24_1 = input.LA(2);
-                    if ((LA24_1 == DOWN)) {
-                        alt24 = 2;
-                    } else if ((LA24_1 == UP)) {
-                        alt24 = 1;
+                int alt26 = 2;
+                int LA26_0 = input.LA(1);
+                if ((LA26_0 == VariableId)) {
+                    int LA26_1 = input.LA(2);
+                    if ((LA26_1 == DOWN)) {
+                        alt26 = 2;
+                    } else if ((LA26_1 == UP)) {
+                        alt26 = 1;
                     } else {
                         int nvaeMark = input.mark();
                         try {
                             input.consume();
                             NoViableAltException nvae =
-                                    new NoViableAltException("", 24, 1, input);
+                                    new NoViableAltException("", 26, 1, input);
                             throw nvae;
                         } finally {
                             input.rewind(nvaeMark);
@@ -2248,24 +2476,23 @@ public class TSPHPTranslatorWalker extends TreeParser {
 
                 } else {
                     NoViableAltException nvae =
-                            new NoViableAltException("", 24, 0, input);
+                            new NoViableAltException("", 26, 0, input);
                     throw nvae;
                 }
 
-                switch (alt24) {
+                switch (alt26) {
                     case 1:
-                        // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:477:17: varId= VariableId
+                        // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:476:17: varId= VariableId
                     {
-                        varId = (ITSPHPAst) match(input, VariableId, FOLLOW_VariableId_in_paramDeclaration1362);
+                        varId = (ITSPHPAst) match(input, VariableId, FOLLOW_VariableId_in_paramDeclaration1544);
                     }
                     break;
                     case 2:
-                        // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:478:17: ^(varId= VariableId
-                        // defaultValue= unaryPrimitiveAtom )
+                        // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:477:17: ^(varId= VariableId defaultValue= unaryPrimitiveAtom )
                     {
-                        varId = (ITSPHPAst) match(input, VariableId, FOLLOW_VariableId_in_paramDeclaration1383);
+                        varId = (ITSPHPAst) match(input, VariableId, FOLLOW_VariableId_in_paramDeclaration1565);
                         match(input, Token.DOWN, null);
-                        pushFollow(FOLLOW_unaryPrimitiveAtom_in_paramDeclaration1387);
+                        pushFollow(FOLLOW_unaryPrimitiveAtom_in_paramDeclaration1569);
                         defaultValue = unaryPrimitiveAtom();
                         state._fsp--;
 
@@ -2280,11 +2507,10 @@ public class TSPHPTranslatorWalker extends TreeParser {
 
 
                 retval.parameterDto = new ParameterDto(
-                        (typeModifier26 != null ? ((TSPHPTranslatorWalker.typeModifier_return) typeModifier26)
+                        (typeModifier31 != null ? ((TSPHPTranslatorWalker.typeModifier_return) typeModifier31)
                                 .prefixModifiers : null),
-                        (allTypesOrUnknown27 != null ? ((StringTemplate) allTypesOrUnknown27.getTemplate()) : null),
-                        (typeModifier26 != null ? ((TSPHPTranslatorWalker.typeModifier_return) typeModifier26)
-                                .suffixModifiers : null),
+                        (allTypesOrUnknown32 != null ? ((StringTemplate) allTypesOrUnknown32.getTemplate()) : null),
+                        (typeModifier31 != null ? ((TSPHPTranslatorWalker.typeModifier_return) typeModifier31).suffixModifiers : null),
                         (varId != null ? varId.getText() : null),
                         (defaultValue != null ? (input.getTokenStream().toString(input.getTreeAdaptor()
                                 .getTokenStartIndex(defaultValue.start), input.getTreeAdaptor().getTokenStopIndex
@@ -2320,74 +2546,73 @@ public class TSPHPTranslatorWalker extends TreeParser {
 
 
     // $ANTLR start "functionDeclaration"
-    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:491:1: functionDeclaration : ^( 'function'
+    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:490:1: functionDeclaration : ^( 'function'
     // FUNCTION_MODIFIER ^( TYPE typeModifier returnTypesOrUnknown ) Identifier formalParameters block ) -> method
-    // (modifier=nullreturnType=%type(\r\n prefixModifiers={$typeModifier.prefixModifiers},\r\n
-    // type={$returnTypesOrUnknown.st},\r\n suffixModifiers={$typeModifier.suffixModifiers}\r\n )
+    // (modifier=nullreturnType=%type(\r\n prefixModifiers={$typeModifier.prefixModifiers},
+    // \r\n type={$returnTypesOrUnknown.st},\r\n suffixModifiers={$typeModifier.suffixModifiers}\r\n )
     // identifier=getMethodName($Identifier.text)params=$formalParameters.stbody=$block.instructions);
     public final TSPHPTranslatorWalker.functionDeclaration_return functionDeclaration() throws RecognitionException {
-        TSPHPTranslatorWalker.functionDeclaration_return retval = new TSPHPTranslatorWalker
-                .functionDeclaration_return();
+        TSPHPTranslatorWalker.functionDeclaration_return retval = new TSPHPTranslatorWalker.functionDeclaration_return();
         retval.start = input.LT(1);
 
-        ITSPHPAst Identifier30 = null;
-        TreeRuleReturnScope typeModifier28 = null;
-        TreeRuleReturnScope returnTypesOrUnknown29 = null;
-        TreeRuleReturnScope formalParameters31 = null;
-        TreeRuleReturnScope block32 = null;
+        ITSPHPAst Identifier35 = null;
+        TreeRuleReturnScope typeModifier33 = null;
+        TreeRuleReturnScope returnTypesOrUnknown34 = null;
+        TreeRuleReturnScope formalParameters36 = null;
+        TreeRuleReturnScope block37 = null;
 
         try {
-            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:492:5: ( ^( 'function' FUNCTION_MODIFIER ^(
+            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:491:5: ( ^( 'function' FUNCTION_MODIFIER ^(
             // TYPE typeModifier returnTypesOrUnknown ) Identifier formalParameters block ) -> method
             // (modifier=nullreturnType=%type(\r\n prefixModifiers={$typeModifier.prefixModifiers},
             // \r\n type={$returnTypesOrUnknown.st},\r\n suffixModifiers={$typeModifier.suffixModifiers}\r\n )
             // identifier=getMethodName($Identifier.text)params=$formalParameters.stbody=$block.instructions))
-            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:492:9: ^( 'function' FUNCTION_MODIFIER ^(
+            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:491:9: ^( 'function' FUNCTION_MODIFIER ^(
             // TYPE typeModifier returnTypesOrUnknown ) Identifier formalParameters block )
             {
-                match(input, Function, FOLLOW_Function_in_functionDeclaration1442);
+                match(input, Function, FOLLOW_Function_in_functionDeclaration1624);
                 match(input, Token.DOWN, null);
-                match(input, FUNCTION_MODIFIER, FOLLOW_FUNCTION_MODIFIER_in_functionDeclaration1456);
-                match(input, TYPE, FOLLOW_TYPE_in_functionDeclaration1471);
+                match(input, FUNCTION_MODIFIER, FOLLOW_FUNCTION_MODIFIER_in_functionDeclaration1638);
+                match(input, TYPE, FOLLOW_TYPE_in_functionDeclaration1653);
                 match(input, Token.DOWN, null);
-                pushFollow(FOLLOW_typeModifier_in_functionDeclaration1473);
-                typeModifier28 = typeModifier();
+                pushFollow(FOLLOW_typeModifier_in_functionDeclaration1655);
+                typeModifier33 = typeModifier();
                 state._fsp--;
 
-                pushFollow(FOLLOW_returnTypesOrUnknown_in_functionDeclaration1475);
-                returnTypesOrUnknown29 = returnTypesOrUnknown();
+                pushFollow(FOLLOW_returnTypesOrUnknown_in_functionDeclaration1657);
+                returnTypesOrUnknown34 = returnTypesOrUnknown();
                 state._fsp--;
 
                 match(input, Token.UP, null);
 
-                Identifier30 = (ITSPHPAst) match(input, Identifier, FOLLOW_Identifier_in_functionDeclaration1490);
-                pushFollow(FOLLOW_formalParameters_in_functionDeclaration1504);
-                formalParameters31 = formalParameters();
+                Identifier35 = (ITSPHPAst) match(input, Identifier, FOLLOW_Identifier_in_functionDeclaration1672);
+                pushFollow(FOLLOW_formalParameters_in_functionDeclaration1686);
+                formalParameters36 = formalParameters();
                 state._fsp--;
 
-                pushFollow(FOLLOW_block_in_functionDeclaration1518);
-                block32 = block();
+                pushFollow(FOLLOW_block_in_functionDeclaration1700);
+                block37 = block();
                 state._fsp--;
 
                 match(input, Token.UP, null);
 
                 // TEMPLATE REWRITE
-                // 499:9: -> method(modifier=nullreturnType=%type(\r\n prefixModifiers={$typeModifier
+                // 498:9: -> method(modifier=nullreturnType=%type(\r\n prefixModifiers={$typeModifier
                 // .prefixModifiers},\r\n type={$returnTypesOrUnknown.st},\r\n suffixModifiers={$typeModifier
                 // .suffixModifiers}\r\n )identifier=getMethodName($Identifier.text)params=$formalParameters
                 // .stbody=$block.instructions)
                 {
                     retval.st = templateLib.getInstanceOf("method", new STAttrMap().put("modifier",
                             null).put("returnType", templateLib.getInstanceOf("type",
-                            new STAttrMap().put("prefixModifiers", (typeModifier28 != null ? ((TSPHPTranslatorWalker
-                                    .typeModifier_return) typeModifier28).prefixModifiers : null)).put("type",
-                                    (returnTypesOrUnknown29 != null ? ((StringTemplate) returnTypesOrUnknown29
+                            new STAttrMap().put("prefixModifiers", (typeModifier33 != null ? ((TSPHPTranslatorWalker
+                                    .typeModifier_return) typeModifier33).prefixModifiers : null)).put("type",
+                                    (returnTypesOrUnknown34 != null ? ((StringTemplate) returnTypesOrUnknown34
                                             .getTemplate()) : null)).put("suffixModifiers",
-                                    (typeModifier28 != null ? ((TSPHPTranslatorWalker.typeModifier_return)
-                                            typeModifier28).suffixModifiers : null)))).put("identifier",
-                            getMethodName((Identifier30 != null ? Identifier30.getText() : null))).put("params",
-                            (formalParameters31 != null ? ((StringTemplate) formalParameters31.getTemplate()) : null)
-                    ).put("body", (block32 != null ? ((TSPHPTranslatorWalker.block_return) block32).instructions :
+                                    (typeModifier33 != null ? ((TSPHPTranslatorWalker.typeModifier_return)
+                                            typeModifier33).suffixModifiers : null)))).put("identifier",
+                            getMethodName((Identifier35 != null ? Identifier35.getText() : null))).put("params",
+                            (formalParameters36 != null ? ((StringTemplate) formalParameters36.getTemplate()) : null)
+                    ).put("body", (block37 != null ? ((TSPHPTranslatorWalker.block_return) block37).instructions :
                             null)));
                 }
 
@@ -2422,54 +2647,90 @@ public class TSPHPTranslatorWalker extends TreeParser {
 
 
     // $ANTLR start "instruction"
-    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:512:1: instruction : ^( EXPRESSION ( expression )?
-    // ) -> expression(expression=$expression.st);
+    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:511:1: instruction : ( localVariableDeclarationList
+    // -> {$localVariableDeclarationList.st}| ^( EXPRESSION ( expression )? ) -> expression(expression=$expression.st));
     public final TSPHPTranslatorWalker.instruction_return instruction() throws RecognitionException {
         TSPHPTranslatorWalker.instruction_return retval = new TSPHPTranslatorWalker.instruction_return();
         retval.start = input.LT(1);
 
-        TreeRuleReturnScope expression33 = null;
+        TreeRuleReturnScope localVariableDeclarationList38 = null;
+        TreeRuleReturnScope expression39 = null;
 
         try {
-            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:514:5: ( ^( EXPRESSION ( expression )? ) ->
-            // expression(expression=$expression.st))
-            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:523:8: ^( EXPRESSION ( expression )? )
-            {
-                match(input, EXPRESSION, FOLLOW_EXPRESSION_in_instruction1720);
-                if (input.LA(1) == Token.DOWN) {
-                    match(input, Token.DOWN, null);
-                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:523:21: ( expression )?
-                    int alt25 = 2;
-                    int LA25_0 = input.LA(1);
-                    if (((LA25_0 >= Bool && LA25_0 <= Null) || LA25_0 == CONSTANT)) {
-                        alt25 = 1;
-                    }
-                    switch (alt25) {
-                        case 1:
-                            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:523:21: expression
-                        {
-                            pushFollow(FOLLOW_expression_in_instruction1722);
-                            expression33 = expression();
-                            state._fsp--;
-
-                        }
-                        break;
-
-                    }
-
-                    match(input, Token.UP, null);
-                }
-
-                // TEMPLATE REWRITE
-                // 523:40: -> expression(expression=$expression.st)
-                {
-                    retval.st = templateLib.getInstanceOf("expression", new STAttrMap().put("expression",
-                            (expression33 != null ? ((StringTemplate) expression33.getTemplate()) : null)));
-                }
-
-
+            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:512:5: ( localVariableDeclarationList ->
+            // {$localVariableDeclarationList.st}| ^( EXPRESSION ( expression )? ) -> expression
+            // (expression=$expression.st))
+            int alt28 = 2;
+            int LA28_0 = input.LA(1);
+            if ((LA28_0 == VARIABLE_DECLARATION_LIST)) {
+                alt28 = 1;
+            } else if ((LA28_0 == EXPRESSION)) {
+                alt28 = 2;
+            } else {
+                NoViableAltException nvae =
+                        new NoViableAltException("", 28, 0, input);
+                throw nvae;
             }
 
+            switch (alt28) {
+                case 1:
+                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:512:9: localVariableDeclarationList
+                {
+                    pushFollow(FOLLOW_localVariableDeclarationList_in_instruction1840);
+                    localVariableDeclarationList38 = localVariableDeclarationList();
+                    state._fsp--;
+
+                    // TEMPLATE REWRITE
+                    // 512:41: -> {$localVariableDeclarationList.st}
+                    {
+                        retval.st = (localVariableDeclarationList38 != null ? ((StringTemplate)
+                                localVariableDeclarationList38.getTemplate()) : null);
+                    }
+
+
+                }
+                break;
+                case 2:
+                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:521:9: ^( EXPRESSION ( expression )? )
+                {
+                    match(input, EXPRESSION, FOLLOW_EXPRESSION_in_instruction1902);
+                    if (input.LA(1) == Token.DOWN) {
+                        match(input, Token.DOWN, null);
+                        // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:521:22: ( expression )?
+                        int alt27 = 2;
+                        int LA27_0 = input.LA(1);
+                        if ((LA27_0 == Assign || (LA27_0 >= Bool && LA27_0 <= Null) || LA27_0 == CONSTANT || LA27_0
+                                == VariableId)) {
+                            alt27 = 1;
+                        }
+                        switch (alt27) {
+                            case 1:
+                                // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:521:22: expression
+                            {
+                                pushFollow(FOLLOW_expression_in_instruction1904);
+                                expression39 = expression();
+                                state._fsp--;
+
+                            }
+                            break;
+
+                        }
+
+                        match(input, Token.UP, null);
+                    }
+
+                    // TEMPLATE REWRITE
+                    // 521:41: -> expression(expression=$expression.st)
+                    {
+                        retval.st = templateLib.getInstanceOf("expression", new STAttrMap().put("expression",
+                                (expression39 != null ? ((StringTemplate) expression39.getTemplate()) : null)));
+                    }
+
+
+                }
+                break;
+
+            }
         } catch (RecognitionException re) {
             reportError(re);
             recover(input, re);
@@ -2489,31 +2750,65 @@ public class TSPHPTranslatorWalker extends TreeParser {
 
 
 	// $ANTLR start "expression"
-    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:624:1: expression : atom -> {$atom.st};
+    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:622:1: expression : ( atom -> {$atom.st}| operator
+    // -> {$operator.st});
     public final TSPHPTranslatorWalker.expression_return expression() throws RecognitionException {
         TSPHPTranslatorWalker.expression_return retval = new TSPHPTranslatorWalker.expression_return();
         retval.start = input.LT(1);
 
-        TreeRuleReturnScope atom34 = null;
+        TreeRuleReturnScope atom40 = null;
+        TreeRuleReturnScope operator41 = null;
 
 		try {
-            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:625:5: ( atom -> {$atom.st})
-            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:625:9: atom
-            {
-                pushFollow(FOLLOW_atom_in_expression1803);
-                atom34 = atom();
-                state._fsp--;
+            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:623:5: ( atom -> {$atom.st}| operator ->
+            // {$operator.st})
+            int alt29 = 2;
+            int LA29_0 = input.LA(1);
+            if (((LA29_0 >= Bool && LA29_0 <= Null) || LA29_0 == CONSTANT || LA29_0 == VariableId)) {
+                alt29 = 1;
+            } else if ((LA29_0 == Assign)) {
+                alt29 = 2;
+            } else {
+                NoViableAltException nvae =
+                        new NoViableAltException("", 29, 0, input);
+                throw nvae;
+            }
 
-			// TEMPLATE REWRITE
-                // 625:33: -> {$atom.st}
+            switch (alt29) {
+                case 1:
+                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:623:9: atom
                 {
-                    retval.st = (atom34 != null ? ((StringTemplate) atom34.getTemplate()) : null);
+                    pushFollow(FOLLOW_atom_in_expression1985);
+                    atom40 = atom();
+                    state._fsp--;
+
+                    // TEMPLATE REWRITE
+                    // 623:33: -> {$atom.st}
+                    {
+                        retval.st = (atom40 != null ? ((StringTemplate) atom40.getTemplate()) : null);
+                    }
+
+
                 }
+                break;
+                case 2:
+                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:624:9: operator
+                {
+                    pushFollow(FOLLOW_operator_in_expression2018);
+                    operator41 = operator();
+                    state._fsp--;
+
+                    // TEMPLATE REWRITE
+                    // 624:33: -> {$operator.st}
+                    {
+                        retval.st = (operator41 != null ? ((StringTemplate) operator41.getTemplate()) : null);
+                    }
 
 
+                }
+                break;
 
-			}
-
+            }
 		}
 		catch (RecognitionException re) {
 			reportError(re);
@@ -2535,34 +2830,64 @@ public class TSPHPTranslatorWalker extends TreeParser {
 
 
 	// $ANTLR start "atom"
-    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:639:1: atom : primitiveAtomWithConstant ->
-    // {$primitiveAtomWithConstant.st};
+    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:637:1: atom : ( primitiveAtomWithConstant ->
+    // {$primitiveAtomWithConstant.st}| VariableId -> {%{$VariableId.text}});
     public final TSPHPTranslatorWalker.atom_return atom() throws RecognitionException {
         TSPHPTranslatorWalker.atom_return retval = new TSPHPTranslatorWalker.atom_return();
         retval.start = input.LT(1);
 
-        TreeRuleReturnScope primitiveAtomWithConstant35 = null;
+        ITSPHPAst VariableId43 = null;
+        TreeRuleReturnScope primitiveAtomWithConstant42 = null;
 
 		try {
-            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:640:5: ( primitiveAtomWithConstant ->
-            // {$primitiveAtomWithConstant.st})
-            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:640:9: primitiveAtomWithConstant
-            {
-                pushFollow(FOLLOW_primitiveAtomWithConstant_in_atom1858);
-                primitiveAtomWithConstant35 = primitiveAtomWithConstant();
-                state._fsp--;
+            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:638:5: ( primitiveAtomWithConstant ->
+            // {$primitiveAtomWithConstant.st}| VariableId -> {%{$VariableId.text}})
+            int alt30 = 2;
+            int LA30_0 = input.LA(1);
+            if (((LA30_0 >= Bool && LA30_0 <= Null) || LA30_0 == CONSTANT)) {
+                alt30 = 1;
+            } else if ((LA30_0 == VariableId)) {
+                alt30 = 2;
+            } else {
+                NoViableAltException nvae =
+                        new NoViableAltException("", 30, 0, input);
+                throw nvae;
+            }
 
-			// TEMPLATE REWRITE
-                // 640:37: -> {$primitiveAtomWithConstant.st}
+            switch (alt30) {
+                case 1:
+                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:638:9: primitiveAtomWithConstant
                 {
-                    retval.st = (primitiveAtomWithConstant35 != null ? ((StringTemplate) primitiveAtomWithConstant35
-                            .getTemplate()) : null);
+                    pushFollow(FOLLOW_primitiveAtomWithConstant_in_atom2069);
+                    primitiveAtomWithConstant42 = primitiveAtomWithConstant();
+                    state._fsp--;
+
+                    // TEMPLATE REWRITE
+                    // 638:37: -> {$primitiveAtomWithConstant.st}
+                    {
+                        retval.st = (primitiveAtomWithConstant42 != null ? ((StringTemplate)
+                                primitiveAtomWithConstant42.getTemplate()) : null);
+                    }
+
+
                 }
+                break;
+                case 2:
+                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:639:9: VariableId
+                {
+                    VariableId43 = (ITSPHPAst) match(input, VariableId, FOLLOW_VariableId_in_atom2085);
+                    // TEMPLATE REWRITE
+                    // 639:37: -> {%{$VariableId.text}}
+                    {
+                        retval.st = new StringTemplate(templateLib, (VariableId43 != null ? VariableId43.getText() :
+                                null));
+                    }
 
 
+                }
+                break;
 
-			}
-
+            }
 		}
 		catch (RecognitionException re) {
 			reportError(re);
@@ -2584,7 +2909,7 @@ public class TSPHPTranslatorWalker extends TreeParser {
 
 
 	// $ANTLR start "primitiveAtomWithConstant"
-    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:649:1: primitiveAtomWithConstant : ( Bool ->
+    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:644:1: primitiveAtomWithConstant : ( Bool ->
     // {%{$Bool.text}}| Int -> {%{$Int.text}}| Float -> {%{$Float.text}}| String -> {%{$String.text}}| Null ->
     // {%{$Null.text}}| ^( TypeArray (keyValuePairs+= arrayKeyValue )* ) -> array(content=$keyValuePairs)| CONSTANT
     // -> {%{$CONSTANT.text.substring(0,$CONSTANT.text.length()-1)}});
@@ -2594,63 +2919,63 @@ public class TSPHPTranslatorWalker extends TreeParser {
                 .primitiveAtomWithConstant_return();
         retval.start = input.LT(1);
 
-        ITSPHPAst Bool36 = null;
-        ITSPHPAst Int37 = null;
-        ITSPHPAst Float38 = null;
-        ITSPHPAst String39 = null;
-        ITSPHPAst Null40 = null;
-        ITSPHPAst CONSTANT41 = null;
+        ITSPHPAst Bool44 = null;
+        ITSPHPAst Int45 = null;
+        ITSPHPAst Float46 = null;
+        ITSPHPAst String47 = null;
+        ITSPHPAst Null48 = null;
+        ITSPHPAst CONSTANT49 = null;
         List<Object> list_keyValuePairs = null;
         RuleReturnScope keyValuePairs = null;
         try {
-            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:650:5: ( Bool -> {%{$Bool.text}}| Int ->
+            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:645:5: ( Bool -> {%{$Bool.text}}| Int ->
             // {%{$Int.text}}| Float -> {%{$Float.text}}| String -> {%{$String.text}}| Null -> {%{$Null.text}}| ^(
             // TypeArray (keyValuePairs+= arrayKeyValue )* ) -> array(content=$keyValuePairs)| CONSTANT ->
             // {%{$CONSTANT.text.substring(0,$CONSTANT.text.length()-1)}})
-            int alt27 = 7;
+            int alt32 = 7;
             switch (input.LA(1)) {
                 case Bool: {
-                    alt27 = 1;
+                    alt32 = 1;
                 }
                 break;
                 case Int: {
-                    alt27 = 2;
+                    alt32 = 2;
                 }
                 break;
                 case Float: {
-                    alt27 = 3;
+                    alt32 = 3;
                 }
                 break;
                 case String: {
-                    alt27 = 4;
+                    alt32 = 4;
                 }
                 break;
                 case Null: {
-                    alt27 = 5;
+                    alt32 = 5;
                 }
                 break;
                 case TypeArray: {
-                    alt27 = 6;
+                    alt32 = 6;
                 }
                 break;
                 case CONSTANT: {
-                    alt27 = 7;
+                    alt32 = 7;
                 }
                 break;
                 default:
                     NoViableAltException nvae =
-                        new NoViableAltException("", 27, 0, input);
+                            new NoViableAltException("", 32, 0, input);
                     throw nvae;
             }
-            switch (alt27) {
+            switch (alt32) {
                 case 1:
-                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:650:9: Bool
+                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:645:9: Bool
                 {
-                    Bool36 = (ITSPHPAst) match(input, Bool, FOLLOW_Bool_in_primitiveAtomWithConstant1906);
+                    Bool44 = (ITSPHPAst) match(input, Bool, FOLLOW_Bool_in_primitiveAtomWithConstant2146);
                     // TEMPLATE REWRITE
-                    // 650:53: -> {%{$Bool.text}}
+                    // 645:53: -> {%{$Bool.text}}
                     {
-                        retval.st = new StringTemplate(templateLib, (Bool36 != null ? Bool36.getText() : null));
+                        retval.st = new StringTemplate(templateLib, (Bool44 != null ? Bool44.getText() : null));
                     }
 
 
@@ -2658,13 +2983,13 @@ public class TSPHPTranslatorWalker extends TreeParser {
 					}
 					break;
 				case 2 :
-                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:651:9: Int
+                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:646:9: Int
                 {
-                    Int37 = (ITSPHPAst) match(input, Int, FOLLOW_Int_in_primitiveAtomWithConstant1959);
+                    Int45 = (ITSPHPAst) match(input, Int, FOLLOW_Int_in_primitiveAtomWithConstant2199);
                     // TEMPLATE REWRITE
-                    // 651:53: -> {%{$Int.text}}
+                    // 646:53: -> {%{$Int.text}}
                     {
-                        retval.st = new StringTemplate(templateLib, (Int37 != null ? Int37.getText() : null));
+                        retval.st = new StringTemplate(templateLib, (Int45 != null ? Int45.getText() : null));
                     }
 
 
@@ -2672,13 +2997,13 @@ public class TSPHPTranslatorWalker extends TreeParser {
 					}
 					break;
 				case 3 :
-                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:652:9: Float
+                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:647:9: Float
                 {
-                    Float38 = (ITSPHPAst) match(input, Float, FOLLOW_Float_in_primitiveAtomWithConstant2013);
+                    Float46 = (ITSPHPAst) match(input, Float, FOLLOW_Float_in_primitiveAtomWithConstant2253);
                     // TEMPLATE REWRITE
-                    // 652:53: -> {%{$Float.text}}
+                    // 647:53: -> {%{$Float.text}}
                     {
-                        retval.st = new StringTemplate(templateLib, (Float38 != null ? Float38.getText() : null));
+                        retval.st = new StringTemplate(templateLib, (Float46 != null ? Float46.getText() : null));
                     }
 
 
@@ -2686,13 +3011,13 @@ public class TSPHPTranslatorWalker extends TreeParser {
 					}
 					break;
 				case 4 :
-                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:653:9: String
+                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:648:9: String
                 {
-                    String39 = (ITSPHPAst) match(input, String, FOLLOW_String_in_primitiveAtomWithConstant2065);
+                    String47 = (ITSPHPAst) match(input, String, FOLLOW_String_in_primitiveAtomWithConstant2305);
                     // TEMPLATE REWRITE
-                    // 653:53: -> {%{$String.text}}
+                    // 648:53: -> {%{$String.text}}
                     {
-                        retval.st = new StringTemplate(templateLib, (String39 != null ? String39.getText() : null));
+                        retval.st = new StringTemplate(templateLib, (String47 != null ? String47.getText() : null));
                     }
 
 
@@ -2700,13 +3025,13 @@ public class TSPHPTranslatorWalker extends TreeParser {
 					}
 					break;
 				case 5 :
-                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:654:9: Null
+                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:649:9: Null
                 {
-                    Null40 = (ITSPHPAst) match(input, Null, FOLLOW_Null_in_primitiveAtomWithConstant2116);
+                    Null48 = (ITSPHPAst) match(input, Null, FOLLOW_Null_in_primitiveAtomWithConstant2356);
                     // TEMPLATE REWRITE
-                    // 654:53: -> {%{$Null.text}}
+                    // 649:53: -> {%{$Null.text}}
                     {
-                        retval.st = new StringTemplate(templateLib, (Null40 != null ? Null40.getText() : null));
+                        retval.st = new StringTemplate(templateLib, (Null48 != null ? Null48.getText() : null));
                     }
 
 
@@ -2714,29 +3039,25 @@ public class TSPHPTranslatorWalker extends TreeParser {
 					}
 					break;
 				case 6 :
-                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:655:9: ^( TypeArray
-                    // (keyValuePairs+= arrayKeyValue )* )
+                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:650:9: ^( TypeArray (keyValuePairs+= arrayKeyValue )* )
                 {
-                    match(input, TypeArray, FOLLOW_TypeArray_in_primitiveAtomWithConstant2170);
+                    match(input, TypeArray, FOLLOW_TypeArray_in_primitiveAtomWithConstant2410);
                     if (input.LA(1) == Token.DOWN) {
                         match(input, Token.DOWN, null);
-                        // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:655:34: (keyValuePairs+=
-                        // arrayKeyValue )*
-                        loop26:
+                        // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:650:34: (keyValuePairs+= arrayKeyValue )*
+                        loop31:
                         while (true) {
-                            int alt26 = 2;
-                            int LA26_0 = input.LA(1);
-                            if (((LA26_0 >= Bool && LA26_0 <= Null) || LA26_0 == CONSTANT || LA26_0 == Arrow)) {
-                                alt26 = 1;
+                            int alt31 = 2;
+                            int LA31_0 = input.LA(1);
+                            if ((LA31_0 == Assign || (LA31_0 >= Bool && LA31_0 <= Null) || LA31_0 == CONSTANT || LA31_0 == Arrow || LA31_0 == VariableId)) {
+                                alt31 = 1;
                             }
 
-                            switch (alt26) {
+                            switch (alt31) {
                                 case 1:
-                                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:655:34:
-                                    // keyValuePairs+=
-                                    // arrayKeyValue
+                                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:650:34: keyValuePairs+= arrayKeyValue
                                 {
-                                    pushFollow(FOLLOW_arrayKeyValue_in_primitiveAtomWithConstant2174);
+                                    pushFollow(FOLLOW_arrayKeyValue_in_primitiveAtomWithConstant2414);
                                     keyValuePairs = arrayKeyValue();
                                     state._fsp--;
 
@@ -2746,7 +3067,7 @@ public class TSPHPTranslatorWalker extends TreeParser {
 								break;
 
 							default :
-                                break loop26;
+                                break loop31;
                             }
                         }
 
@@ -2754,10 +3075,9 @@ public class TSPHPTranslatorWalker extends TreeParser {
 					}
 
 					// TEMPLATE REWRITE
-                    // 655:53: -> array(content=$keyValuePairs)
+                    // 650:53: -> array(content=$keyValuePairs)
                     {
-                        retval.st = templateLib.getInstanceOf("array", new STAttrMap().put("content",
-                                list_keyValuePairs));
+                        retval.st = templateLib.getInstanceOf("array", new STAttrMap().put("content", list_keyValuePairs));
                     }
 
 
@@ -2765,13 +3085,13 @@ public class TSPHPTranslatorWalker extends TreeParser {
 					}
 					break;
 				case 7 :
-                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:656:9: CONSTANT
+                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:651:9: CONSTANT
                 {
-                    CONSTANT41 = (ITSPHPAst) match(input, CONSTANT, FOLLOW_CONSTANT_in_primitiveAtomWithConstant2197);
+                    CONSTANT49 = (ITSPHPAst) match(input, CONSTANT, FOLLOW_CONSTANT_in_primitiveAtomWithConstant2437);
                     // TEMPLATE REWRITE
-                    // 656:53: -> {%{$CONSTANT.text.substring(0,$CONSTANT.text.length()-1)}}
+                    // 651:53: -> {%{$CONSTANT.text.substring(0,$CONSTANT.text.length()-1)}}
                     {
-                        retval.st = new StringTemplate(templateLib, (CONSTANT41 != null ? CONSTANT41.getText() : null).substring(0, (CONSTANT41 != null ? CONSTANT41.getText() : null).length() - 1));
+                        retval.st = new StringTemplate(templateLib, (CONSTANT49 != null ? CONSTANT49.getText() : null).substring(0, (CONSTANT49 != null ? CONSTANT49.getText() : null).length() - 1));
                     }
 
 
@@ -2801,56 +3121,51 @@ public class TSPHPTranslatorWalker extends TreeParser {
 
 
 	// $ANTLR start "arrayKeyValue"
-    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:665:1: arrayKeyValue : ( ^( '=>' key= expression
-    // value= expression ) -> keyValue(key=$key.stvalue=$value.st)| expression -> {$expression.st});
+    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:660:1: arrayKeyValue : ( ^( '=>' key= expression value= expression ) -> keyValue(key=$key.stvalue=$value.st)| expression -> {$expression.st});
     public final TSPHPTranslatorWalker.arrayKeyValue_return arrayKeyValue() throws RecognitionException {
         TSPHPTranslatorWalker.arrayKeyValue_return retval = new TSPHPTranslatorWalker.arrayKeyValue_return();
         retval.start = input.LT(1);
 
 		TreeRuleReturnScope key =null;
 		TreeRuleReturnScope value =null;
-        TreeRuleReturnScope expression42 = null;
+        TreeRuleReturnScope expression50 = null;
 
 		try {
-            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:666:5: ( ^( '=>' key= expression value=
-            // expression ) -> keyValue(key=$key.stvalue=$value.st)| expression -> {$expression.st})
-            int alt28 = 2;
-            int LA28_0 = input.LA(1);
-            if ((LA28_0 == Arrow)) {
-                alt28 = 1;
-            } else if (((LA28_0 >= Bool && LA28_0 <= Null) || LA28_0 == CONSTANT)) {
-                alt28 = 2;
+            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:661:5: ( ^( '=>' key= expression value= expression ) -> keyValue(key=$key.stvalue=$value.st)| expression -> {$expression.st})
+            int alt33 = 2;
+            int LA33_0 = input.LA(1);
+            if ((LA33_0 == Arrow)) {
+                alt33 = 1;
+            } else if ((LA33_0 == Assign || (LA33_0 >= Bool && LA33_0 <= Null) || LA33_0 == CONSTANT || LA33_0 == VariableId)) {
+                alt33 = 2;
             }
 
 			else {
 				NoViableAltException nvae =
-                        new NoViableAltException("", 28, 0, input);
+                        new NoViableAltException("", 33, 0, input);
                 throw nvae;
             }
 
-            switch (alt28) {
+            switch (alt33) {
                 case 1:
-                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:666:9: ^( '=>' key= expression
-                    // value= expression )
+                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:661:9: ^( '=>' key= expression value= expression )
                 {
-                    match(input, Arrow, FOLLOW_Arrow_in_arrayKeyValue2286);
+                    match(input, Arrow, FOLLOW_Arrow_in_arrayKeyValue2526);
                     match(input, Token.DOWN, null);
-                    pushFollow(FOLLOW_expression_in_arrayKeyValue2290);
+                    pushFollow(FOLLOW_expression_in_arrayKeyValue2530);
                     key = expression();
                     state._fsp--;
 
-                    pushFollow(FOLLOW_expression_in_arrayKeyValue2294);
+                    pushFollow(FOLLOW_expression_in_arrayKeyValue2534);
                     value = expression();
                     state._fsp--;
 
 					match(input, Token.UP, null); 
 
 					// TEMPLATE REWRITE
-                    // 666:49: -> keyValue(key=$key.stvalue=$value.st)
+                    // 661:49: -> keyValue(key=$key.stvalue=$value.st)
                     {
-                        retval.st = templateLib.getInstanceOf("keyValue", new STAttrMap().put("key",
-                                (key != null ? ((StringTemplate) key.getTemplate()) : null)).put("value",
-                                (value != null ? ((StringTemplate) value.getTemplate()) : null)));
+                        retval.st = templateLib.getInstanceOf("keyValue", new STAttrMap().put("key", (key != null ? ((StringTemplate) key.getTemplate()) : null)).put("value", (value != null ? ((StringTemplate) value.getTemplate()) : null)));
                     }
 
 
@@ -2858,16 +3173,16 @@ public class TSPHPTranslatorWalker extends TreeParser {
 					}
 					break;
 				case 2 :
-                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:667:9: expression
+                    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:662:9: expression
                 {
-                    pushFollow(FOLLOW_expression_in_arrayKeyValue2319);
-                    expression42 = expression();
+                    pushFollow(FOLLOW_expression_in_arrayKeyValue2559);
+                    expression50 = expression();
                     state._fsp--;
 
 					// TEMPLATE REWRITE
-                    // 667:20: -> {$expression.st}
+                    // 662:20: -> {$expression.st}
                     {
-                        retval.st = (expression42 != null ? ((StringTemplate) expression42.getTemplate()) : null);
+                        retval.st = (expression50 != null ? ((StringTemplate) expression50.getTemplate()) : null);
                     }
 
 
@@ -2888,6 +3203,116 @@ public class TSPHPTranslatorWalker extends TreeParser {
 	}
 	// $ANTLR end "arrayKeyValue"
 
+
+    public static class operator_return extends TreeRuleReturnScope
+    {
+        public StringTemplate st;
+
+        public Object getTemplate() {
+            return st;
+        }
+
+        public String toString() {
+            return st == null ? null : st.toString();
+        }
+    }
+
+    ;
+
+
+    // $ANTLR start "operator"
+    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:674:1: operator : ^( binaryOperatorWithoutDivision left= expression right= expression ) -> binaryOperator(operator=$binaryOperatorWithoutDivision.stleft=$left.stright=$right.stneedParentheses=$binaryOperatorWithoutDivision.needParentheses);
+    public final TSPHPTranslatorWalker.operator_return operator() throws RecognitionException {
+        TSPHPTranslatorWalker.operator_return retval = new TSPHPTranslatorWalker.operator_return();
+        retval.start = input.LT(1);
+
+        TreeRuleReturnScope left = null;
+        TreeRuleReturnScope right = null;
+        TreeRuleReturnScope binaryOperatorWithoutDivision51 = null;
+
+        try {
+            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:675:5: ( ^( binaryOperatorWithoutDivision left= expression right= expression ) -> binaryOperator(operator=$binaryOperatorWithoutDivision.stleft=$left.stright=$right.stneedParentheses=$binaryOperatorWithoutDivision.needParentheses))
+            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:683:8: ^( binaryOperatorWithoutDivision left= expression right= expression )
+            {
+                pushFollow(FOLLOW_binaryOperatorWithoutDivision_in_operator2604);
+                binaryOperatorWithoutDivision51 = binaryOperatorWithoutDivision();
+                state._fsp--;
+
+                match(input, Token.DOWN, null);
+                pushFollow(FOLLOW_expression_in_operator2608);
+                left = expression();
+                state._fsp--;
+
+                pushFollow(FOLLOW_expression_in_operator2612);
+                right = expression();
+                state._fsp--;
+
+                match(input, Token.UP, null);
+
+                // TEMPLATE REWRITE
+                // 684:9: -> binaryOperator(operator=$binaryOperatorWithoutDivision.stleft=$left.stright=$right.stneedParentheses=$binaryOperatorWithoutDivision.needParentheses)
+                {
+                    retval.st = templateLib.getInstanceOf("binaryOperator", new STAttrMap().put("operator", (binaryOperatorWithoutDivision51 != null ? ((StringTemplate) binaryOperatorWithoutDivision51.getTemplate()) : null)).put("left", (left != null ? ((StringTemplate) left.getTemplate()) : null)).put("right", (right != null ? ((StringTemplate) right.getTemplate()) : null)).put("needParentheses", (binaryOperatorWithoutDivision51 != null ? ((TSPHPTranslatorWalker.binaryOperatorWithoutDivision_return) binaryOperatorWithoutDivision51).needParentheses : false)));
+                }
+
+
+            }
+
+        } catch (RecognitionException re) {
+            reportError(re);
+            recover(input, re);
+        } finally {
+            // do for sure before leaving
+        }
+        return retval;
+    }
+    // $ANTLR end "operator"
+
+
+    public static class binaryOperatorWithoutDivision_return extends TreeRuleReturnScope
+    {
+        public boolean needParentheses;
+        public StringTemplate st;
+
+        public Object getTemplate() {
+            return st;
+        }
+
+        public String toString() {
+            return st == null ? null : st.toString();
+        }
+    }
+
+    ;
+
+
+    // $ANTLR start "binaryOperatorWithoutDivision"
+    // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:737:1: binaryOperatorWithoutDivision returns [boolean needParentheses] : '=' ;
+    public final TSPHPTranslatorWalker.binaryOperatorWithoutDivision_return binaryOperatorWithoutDivision() throws RecognitionException {
+        TSPHPTranslatorWalker.binaryOperatorWithoutDivision_return retval = new TSPHPTranslatorWalker.binaryOperatorWithoutDivision_return();
+        retval.start = input.LT(1);
+
+        try {
+            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:742:5: ( '=' )
+            // D:\\tins-translators-tsphp\\antlr\\TSPHPTranslatorWalker.g:749:8: '='
+            {
+                match(input, Assign, FOLLOW_Assign_in_binaryOperatorWithoutDivision2754);
+            }
+
+
+            retval.st = templateLib.getInstanceOf("operator", new STAttrMap().put("o", ((ITSPHPAst) retval.start).getText()));
+            retval.needParentheses = precedenceHelper.needParentheses(((ITSPHPAst) retval.start));
+
+        } catch (RecognitionException re) {
+            reportError(re);
+            recover(input, re);
+        } finally {
+            // do for sure before leaving
+        }
+        return retval;
+    }
+    // $ANTLR end "binaryOperatorWithoutDivision"
+
 	// Delegated rules
 
 
@@ -2895,133 +3320,105 @@ public class TSPHPTranslatorWalker extends TreeParser {
 	public static final BitSet FOLLOW_namespace_in_compilationUnit80 = new BitSet(new long[]{0x0000000000000002L,0x0000000000000000L,0x0000000000000001L});
 	public static final BitSet FOLLOW_Namespace_in_namespace119 = new BitSet(new long[]{0x0000000000000004L});
 	public static final BitSet FOLLOW_TYPE_NAME_in_namespace124 = new BitSet(new long[]{0x0000000000000000L,0x8000000000000000L});
-    public static final BitSet FOLLOW_DEFAULT_NAMESPACE_in_namespace126 = new BitSet(new long[]{0x0000000000000000L,
-            0x8000000000000000L});
+    public static final BitSet FOLLOW_DEFAULT_NAMESPACE_in_namespace126 = new BitSet(new long[]{0x0000000000000000L, 0x8000000000000000L});
     public static final BitSet FOLLOW_namespaceBody_in_namespace129 = new BitSet(new long[]{0x0000000000000008L});
 	public static final BitSet FOLLOW_NAMESPACE_BODY_in_namespaceBody186 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_statement_in_namespaceBody190 = new BitSet(new long[]{0x0000000000000008L,
-            0x0004000000100000L, 0x0000080000000000L});
+    public static final BitSet FOLLOW_statement_in_namespaceBody190 = new BitSet(new long[]{0x0000000000000008L, 0x0004008000100000L, 0x0000280000000000L});
     public static final BitSet FOLLOW_NAMESPACE_BODY_in_namespaceBody211 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_useDeclarationList_in_statement239 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_definition_in_statement253 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_Use_in_useDeclarationList287 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_useDeclaration_in_useDeclarationList291 = new BitSet(new
-            long[]{0x0000000000000008L, 0x0000000000000000L, 0x0000040000000000L});
-    public static final BitSet FOLLOW_USE_DECLARATION_in_useDeclaration330 = new BitSet(new
-            long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_TYPE_NAME_in_useDeclaration332 = new BitSet(new long[]{0x0000000000000000L,
-            0x0020000000000000L});
-    public static final BitSet FOLLOW_Identifier_in_useDeclaration334 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_functionDeclaration_in_definition408 = new BitSet(new
-            long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_constDeclarationList_in_definition426 = new BitSet(new
-            long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_CONSTANT_DECLARATION_LIST_in_constDeclarationList462 = new BitSet(new
-            long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_TYPE_in_constDeclarationList477 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_TYPE_MODIFIER_in_constDeclarationList480 = new BitSet(new
-            long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_Public_in_constDeclarationList482 = new BitSet(new long[]{0x0000000000000000L,
-            0x0000000000000000L, 0x0000000001000000L});
-    public static final BitSet FOLLOW_Static_in_constDeclarationList484 = new BitSet(new long[]{0x0000000000000000L,
-            0x0000800000000000L});
-    public static final BitSet FOLLOW_Final_in_constDeclarationList486 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_scalarTypesOrUnknown_in_constDeclarationList489 = new BitSet(new
-            long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_constDeclaration_in_constDeclarationList506 = new BitSet(new
-            long[]{0x0000000000000008L, 0x0020000000000000L});
-    public static final BitSet FOLLOW_Identifier_in_constDeclaration564 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_unaryPrimitiveAtom_in_constDeclaration566 = new BitSet(new
-            long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_primitiveAtomWithConstant_in_unaryPrimitiveAtom616 = new BitSet(new
-            long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_UNARY_MINUS_in_unaryPrimitiveAtom647 = new BitSet(new
-            long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_UNARY_PLUS_in_unaryPrimitiveAtom668 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_primitiveAtomWithConstant_in_unaryPrimitiveAtom686 = new BitSet(new
-            long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_TYPE_MODIFIER_in_typeModifier769 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_Cast_in_typeModifier784 = new BitSet(new long[]{0x0001000000100008L});
-    public static final BitSet FOLLOW_LogicNot_in_typeModifier803 = new BitSet(new long[]{0x0000000000100008L});
-    public static final BitSet FOLLOW_QuestionMark_in_typeModifier826 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_TYPE_MODIFIER_in_typeModifier853 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_allTypesOrUnknown_in_returnTypesOrUnknown875 = new BitSet(new
-            long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_allTypes_in_allTypesOrUnknown912 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_QuestionMark_in_allTypesOrUnknown926 = new BitSet(new
-            long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_primitiveTypes_in_allTypes954 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_TYPE_NAME_in_allTypes969 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_scalarTypes_in_primitiveTypes1001 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_TypeArray_in_primitiveTypes1016 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_TypeResource_in_primitiveTypes1033 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_TypeMixed_in_primitiveTypes1047 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_scalarTypes_in_scalarTypesOrUnknown1074 = new BitSet(new
-            long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_QuestionMark_in_scalarTypesOrUnknown1088 = new BitSet(new
-            long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_TypeBool_in_scalarTypes1119 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_TypeInt_in_scalarTypes1136 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_TypeFloat_in_scalarTypes1154 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_TypeString_in_scalarTypes1170 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_PARAMETER_LIST_in_formalParameters1207 = new BitSet(new
-            long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_paramDeclaration_in_formalParameters1212 = new BitSet(new
-            long[]{0x0000000000000008L, 0x0000000000000000L, 0x0000000000000010L});
-    public static final BitSet FOLLOW_PARAMETER_LIST_in_formalParameters1249 = new BitSet(new
-            long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_BLOCK_in_block1277 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_instruction_in_block1281 = new BitSet(new long[]{0x0000000000000008L,
-            0x0000008000000000L});
-    public static final BitSet FOLLOW_BLOCK_in_block1295 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_PARAMETER_DECLARATION_in_paramDeclaration1322 = new BitSet(new
-            long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_TYPE_in_paramDeclaration1337 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_typeModifier_in_paramDeclaration1339 = new BitSet(new
-            long[]{0x0000000000100000L, 0x0000000000000008L, 0x0000037810000000L});
-    public static final BitSet FOLLOW_allTypesOrUnknown_in_paramDeclaration1341 = new BitSet(new
-            long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_VariableId_in_paramDeclaration1362 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_VariableId_in_paramDeclaration1383 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_unaryPrimitiveAtom_in_paramDeclaration1387 = new BitSet(new
-            long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_Function_in_functionDeclaration1442 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_FUNCTION_MODIFIER_in_functionDeclaration1456 = new BitSet(new
-            long[]{0x0000000000000000L, 0x0000000000000000L, 0x0000000004000000L});
-    public static final BitSet FOLLOW_TYPE_in_functionDeclaration1471 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_typeModifier_in_functionDeclaration1473 = new BitSet(new
-            long[]{0x0000000000100000L, 0x0000000000000008L, 0x0000037810000000L});
-    public static final BitSet FOLLOW_returnTypesOrUnknown_in_functionDeclaration1475 = new BitSet(new
-            long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_Identifier_in_functionDeclaration1490 = new BitSet(new
-            long[]{0x0000000000000000L, 0x0000000000000000L, 0x0000000000000020L});
-    public static final BitSet FOLLOW_formalParameters_in_functionDeclaration1504 = new BitSet(new
-            long[]{0x0000000000000000L, 0x0000000000001000L});
-    public static final BitSet FOLLOW_block_in_functionDeclaration1518 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_EXPRESSION_in_instruction1720 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_expression_in_instruction1722 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_atom_in_expression1803 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_primitiveAtomWithConstant_in_atom1858 = new BitSet(new
-            long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_Bool_in_primitiveAtomWithConstant1906 = new BitSet(new
-            long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_Int_in_primitiveAtomWithConstant1959 = new BitSet(new
-            long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_Float_in_primitiveAtomWithConstant2013 = new BitSet(new
-            long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_String_in_primitiveAtomWithConstant2065 = new BitSet(new
-            long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_Null_in_primitiveAtomWithConstant2116 = new BitSet(new
-            long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_TypeArray_in_primitiveAtomWithConstant2170 = new BitSet(new
-            long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_arrayKeyValue_in_primitiveAtomWithConstant2174 = new BitSet(new
-            long[]{0x8000000000000008L, 0x000000000000025FL});
-    public static final BitSet FOLLOW_CONSTANT_in_primitiveAtomWithConstant2197 = new BitSet(new
-            long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_Arrow_in_arrayKeyValue2286 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_expression_in_arrayKeyValue2290 = new BitSet(new long[]{0x8000000000000000L,
-            0x000000000000005FL});
-    public static final BitSet FOLLOW_expression_in_arrayKeyValue2294 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_expression_in_arrayKeyValue2319 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_instruction_in_statement267 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_Use_in_useDeclarationList291 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_useDeclaration_in_useDeclarationList295 = new BitSet(new long[]{0x0000000000000008L, 0x0000000000000000L, 0x0000040000000000L});
+    public static final BitSet FOLLOW_USE_DECLARATION_in_useDeclaration334 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_TYPE_NAME_in_useDeclaration336 = new BitSet(new long[]{0x0000000000000000L, 0x0020000000000000L});
+    public static final BitSet FOLLOW_Identifier_in_useDeclaration338 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_functionDeclaration_in_definition412 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_constDeclarationList_in_definition430 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_CONSTANT_DECLARATION_LIST_in_constDeclarationList466 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_TYPE_in_constDeclarationList481 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_TYPE_MODIFIER_in_constDeclarationList484 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_Public_in_constDeclarationList486 = new BitSet(new long[]{0x0000000000000000L, 0x0000000000000000L, 0x0000000001000000L});
+    public static final BitSet FOLLOW_Static_in_constDeclarationList488 = new BitSet(new long[]{0x0000000000000000L, 0x0000800000000000L});
+    public static final BitSet FOLLOW_Final_in_constDeclarationList490 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_scalarTypesOrUnknown_in_constDeclarationList493 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_constDeclaration_in_constDeclarationList510 = new BitSet(new long[]{0x0000000000000008L, 0x0020000000000000L});
+    public static final BitSet FOLLOW_Identifier_in_constDeclaration568 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_unaryPrimitiveAtom_in_constDeclaration570 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_primitiveAtomWithConstant_in_unaryPrimitiveAtom620 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_UNARY_MINUS_in_unaryPrimitiveAtom651 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_UNARY_PLUS_in_unaryPrimitiveAtom672 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_primitiveAtomWithConstant_in_unaryPrimitiveAtom690 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_VARIABLE_DECLARATION_LIST_in_localVariableDeclarationList755 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_TYPE_in_localVariableDeclarationList770 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_typeModifier_in_localVariableDeclarationList772 = new BitSet(new long[]{0x0000000000100000L, 0x0000000000000008L, 0x0000037810000000L});
+    public static final BitSet FOLLOW_allTypesOrUnknown_in_localVariableDeclarationList774 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_localVariableDeclaration_in_localVariableDeclarationList791 = new BitSet(new long[]{0x0000000000000008L, 0x0000000000000000L, 0x0000400000000000L});
+    public static final BitSet FOLLOW_VariableId_in_localVariableDeclaration870 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_VariableId_in_localVariableDeclaration893 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_unaryPrimitiveAtom_in_localVariableDeclaration897 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_TYPE_MODIFIER_in_typeModifier952 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_Cast_in_typeModifier967 = new BitSet(new long[]{0x0001000000100008L});
+    public static final BitSet FOLLOW_LogicNot_in_typeModifier986 = new BitSet(new long[]{0x0000000000100008L});
+    public static final BitSet FOLLOW_QuestionMark_in_typeModifier1009 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_TYPE_MODIFIER_in_typeModifier1036 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_allTypesOrUnknown_in_returnTypesOrUnknown1057 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_allTypes_in_allTypesOrUnknown1094 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_QuestionMark_in_allTypesOrUnknown1108 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_primitiveTypes_in_allTypes1136 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_TYPE_NAME_in_allTypes1151 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_scalarTypes_in_primitiveTypes1183 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_TypeArray_in_primitiveTypes1198 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_TypeResource_in_primitiveTypes1215 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_TypeMixed_in_primitiveTypes1229 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_scalarTypes_in_scalarTypesOrUnknown1256 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_QuestionMark_in_scalarTypesOrUnknown1270 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_TypeBool_in_scalarTypes1301 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_TypeInt_in_scalarTypes1318 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_TypeFloat_in_scalarTypes1336 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_TypeString_in_scalarTypes1352 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_PARAMETER_LIST_in_formalParameters1389 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_paramDeclaration_in_formalParameters1394 = new BitSet(new long[]{0x0000000000000008L, 0x0000000000000000L, 0x0000000000000010L});
+    public static final BitSet FOLLOW_PARAMETER_LIST_in_formalParameters1431 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_BLOCK_in_block1459 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_instruction_in_block1463 = new BitSet(new long[]{0x0000000000000008L, 0x0000008000000000L, 0x0000200000000000L});
+    public static final BitSet FOLLOW_BLOCK_in_block1477 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_PARAMETER_DECLARATION_in_paramDeclaration1504 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_TYPE_in_paramDeclaration1519 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_typeModifier_in_paramDeclaration1521 = new BitSet(new long[]{0x0000000000100000L, 0x0000000000000008L, 0x0000037810000000L});
+    public static final BitSet FOLLOW_allTypesOrUnknown_in_paramDeclaration1523 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_VariableId_in_paramDeclaration1544 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_VariableId_in_paramDeclaration1565 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_unaryPrimitiveAtom_in_paramDeclaration1569 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_Function_in_functionDeclaration1624 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_FUNCTION_MODIFIER_in_functionDeclaration1638 = new BitSet(new long[]{0x0000000000000000L, 0x0000000000000000L, 0x0000000004000000L});
+    public static final BitSet FOLLOW_TYPE_in_functionDeclaration1653 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_typeModifier_in_functionDeclaration1655 = new BitSet(new long[]{0x0000000000100000L, 0x0000000000000008L, 0x0000037810000000L});
+    public static final BitSet FOLLOW_returnTypesOrUnknown_in_functionDeclaration1657 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_Identifier_in_functionDeclaration1672 = new BitSet(new long[]{0x0000000000000000L, 0x0000000000000000L, 0x0000000000000020L});
+    public static final BitSet FOLLOW_formalParameters_in_functionDeclaration1686 = new BitSet(new long[]{0x0000000000000000L, 0x0000000000001000L});
+    public static final BitSet FOLLOW_block_in_functionDeclaration1700 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_localVariableDeclarationList_in_instruction1840 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_EXPRESSION_in_instruction1902 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_expression_in_instruction1904 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_atom_in_expression1985 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_operator_in_expression2018 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_primitiveAtomWithConstant_in_atom2069 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_VariableId_in_atom2085 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_Bool_in_primitiveAtomWithConstant2146 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_Int_in_primitiveAtomWithConstant2199 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_Float_in_primitiveAtomWithConstant2253 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_String_in_primitiveAtomWithConstant2305 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_Null_in_primitiveAtomWithConstant2356 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_TypeArray_in_primitiveAtomWithConstant2410 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_arrayKeyValue_in_primitiveAtomWithConstant2414 = new BitSet(new long[]{0x8000000000000088L, 0x000000000000025FL, 0x0000400000000000L});
+    public static final BitSet FOLLOW_CONSTANT_in_primitiveAtomWithConstant2437 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_Arrow_in_arrayKeyValue2526 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_expression_in_arrayKeyValue2530 = new BitSet(new long[]{0x8000000000000080L, 0x000000000000005FL, 0x0000400000000000L});
+    public static final BitSet FOLLOW_expression_in_arrayKeyValue2534 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_expression_in_arrayKeyValue2559 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_binaryOperatorWithoutDivision_in_operator2604 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_expression_in_operator2608 = new BitSet(new long[]{0x8000000000000080L, 0x000000000000005FL, 0x0000400000000000L});
+    public static final BitSet FOLLOW_expression_in_operator2612 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_Assign_in_binaryOperatorWithoutDivision2754 = new BitSet(new long[]{0x0000000000000002L});
 }

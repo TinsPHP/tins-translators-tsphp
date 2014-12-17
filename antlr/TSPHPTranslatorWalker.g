@@ -75,8 +75,7 @@ namespaceBody
 statement
     :   useDeclarationList -> {$useDeclarationList.st}
     |   definition -> {$definition.st}
-    //TODO rstoll TINS-270 translator procedural - instructions
-    //|   instruction -> {$instruction.st}
+    |   instruction -> {$instruction.st}
     ;
 
 useDeclarationList
@@ -181,9 +180,6 @@ unaryPrimitiveAtom
 fieldDeclaration
     :   ^(FIELD variableDeclarationList) -> {$variableDeclarationList.st}
     ;
-*/    
-//TODO rstoll TINS-253 translator procedural - definitions
-/*
 variableDeclarationList
     :   ^(VARIABLE_DECLARATION_LIST
             ^(TYPE typeModifier allTypes)
@@ -192,14 +188,32 @@ variableDeclarationList
         -> variableDeclarationList(modifier={$typeModifier.st},identifiers={$identifiers})
     ;
     
+variableDeclaration
+    :   ^(VariableId expression)    -> assign(id={$VariableId},value={$expression.st})
+    |   VariableId                  -> {%{$VariableId.text}}
+    ;
+*/
+    
 localVariableDeclarationList
     :   ^(VARIABLE_DECLARATION_LIST
-            ^(TYPE typeModifier allTypes) 
-            variables+=localVariableDeclaration[$typeModifier.st]+
+            ^(TYPE typeModifier allTypesOrUnknown)
+            variables+=localVariableDeclaration+
         )
-        -> localVariableDeclarationList(variables={$variables})
+        -> localVariableDeclarationList(
+            type={%type(
+                prefixModifiers={$typeModifier.prefixModifiers},
+                type={$allTypesOrUnknown.st},
+                suffixModifiers={$typeModifier.suffixModifiers}
+            )},
+            variables={$variables})
+    ;  
+
+localVariableDeclaration
+    :   VariableId
+        -> {%{$VariableId.text}}
+    |   ^(VariableId defaultValue=unaryPrimitiveAtom)
+         -> assign(id={$VariableId.text}, value={$unaryPrimitiveAtom.st})
     ;
-*/    
     
 typeModifier returns[Set<String> prefixModifiers, Set<String> suffixModifiers]
 @init{
@@ -213,22 +227,7 @@ typeModifier returns[Set<String> prefixModifiers, Set<String> suffixModifiers]
         )
     |   TYPE_MODIFIER
     ;
-
-//TODO rstoll TINS-253 translator procedural - definitions
-/*
-variableDeclaration
-    :   ^(VariableId expression)    -> assign(id={$VariableId},value={$expression.st})
-    |   VariableId                  -> {%{$VariableId.text}}
-    ;
-    
-localVariableDeclaration[StringTemplate modifier]
-    :   ^(VariableId v=expression)
-        -> localVariableDeclaration(modifier={modifier}, variableId={$VariableId.text}, initValue={v})
-
-    |   VariableId
-        -> localVariableDeclaration(modifier={modifier}, variableId={$VariableId.text}, initValue={null})
-    ;
-*/
+  
 returnTypesOrUnknown
     :   allTypesOrUnknown -> {$allTypesOrUnknown.st}
     //not yet supported by PHP
@@ -510,8 +509,7 @@ functionDeclaration
     ;
 
 instruction
-        //TINS-253 translator procedural - definitions
-    :   //localVariableDeclarationList    -> {$localVariableDeclarationList.st}
+    :   localVariableDeclarationList    -> {$localVariableDeclarationList.st}
         //TODO rstoll TINS-254 translator procedural - control structures
     //|   ifCondition                     -> {$ifCondition.st}
     //|   switchCondition                 -> {$switchCondition.st}
@@ -520,7 +518,7 @@ instruction
     //|   whileLoop                       -> {$whileLoop.st}
     //|   doWhileLoop                     -> {$doWhileLoop.st}
     //|   tryCatch                        -> {$tryCatch.st}
-       ^(EXPRESSION expression?)       -> expression(expression={$expression.st})
+    |   ^(EXPRESSION expression?)       -> expression(expression={$expression.st})
     //TODO rstoll TINS-270 translator procedural - instructions
     //|   ^('return' expression?)         -> return(expression = {$expression.st})
     //|   ^('throw' expression)           -> throw(expression = {$expression.st})
@@ -623,9 +621,9 @@ catchBlock
 
 expression
     :   atom                    -> {$atom.st}
+    |   operator                -> {$operator.st}
     //TODO rstoll TINS-255 translator procedural - expressions
     /*
-    |   operator                -> {$operator.st}
     |   functionCall            -> {$functionCall.st}
     |   methodCall              -> {$methodCall.st}
     |   methodCallSelfOrParent  -> {$methodCallSelfOrParent.st}
@@ -638,12 +636,9 @@ expression
   
 atom
     :   primitiveAtomWithConstant   -> {$primitiveAtomWithConstant.st}
-     //TODO rstoll TINS-255 translator procedural - expressions
-    /*
     |   VariableId                  -> {%{$VariableId.text}}
     //TODO rstoll TINS-271 - translator OOP - expressions 
     //|   This                        -> {%{$This.text}}
-    */
     ;
            
 primitiveAtomWithConstant
@@ -667,28 +662,32 @@ arrayKeyValue
     |   expression -> {$expression.st}
     ;
     
- //TODO rstoll TINS-255 translator procedural - expressions
- /*    
+//TODO rstoll TINS-271 - translator OOP - expressions    
+/*
 staticAccess
     :   TYPE_NAME   -> {%{$TYPE_NAME.text}}
     |   Self        -> {%{$Self.text}}
     |   Parent      -> {%{$Parent.text}}
     ;
+*/
  
 operator
-    :   ^(unaryPreOperator expr=expression)
+    : //TODO rstoll TINS-255 translator procedural - expressions
+    /*    
+        ^(unaryPreOperator expr=expression)
         -> unaryPreOperator(operator ={$unaryPreOperator.st}, expression = {$expr.st})
 
     |   ^(unaryPostOperator expr=expression)
         -> unaryPostOperator(operator = {$unaryPostOperator.st}, expression = {$expr.st})
-
-    |   ^(binaryOperatorWithoutDivision left=expression right=expression)
+    */
+       ^(binaryOperatorWithoutDivision left=expression right=expression)
         -> binaryOperator(
             operator={$binaryOperatorWithoutDivision.st},
             left={$left.st}, right={$right.st},
             needParentheses={$binaryOperatorWithoutDivision.needParentheses}
         )
-
+    //TODO rstoll TINS-255 translator procedural - expressions
+    /* 
     |   division
         -> {$division.st}
 
@@ -715,8 +714,11 @@ operator
 
     |   ^('clone' expr=expression)
         -> clone(expression={$expr.st})
+    */
     ;     
 
+//TODO rstoll TINS-255 translator procedural - expressions
+/* 
 unaryPreOperator 
     :   PRE_INCREMENT   -> {%{"++"}}
     |   PRE_DECREMENT   -> {%{"--"}}
@@ -731,17 +733,22 @@ unaryPostOperator
     :   POST_INCREMENT -> {%{"++"}}
     |   POST_DECREMENT -> {%{"--"}}
     ;
-
+*/
 binaryOperatorWithoutDivision returns[boolean needParentheses]
 @after {
     $st = %operator(o={$start.getText()});
     $needParentheses = precedenceHelper.needParentheses($start);
 }
-    :   'or'
+    : 
+    //TODO rstoll TINS-255 translator procedural - expressions
+    /*   
+        'or'
     |   'xor'
     |   'and'
-    
-    |   '='
+    */
+       '='
+    //TODO rstoll TINS-255 translator procedural - expressions
+    /* 
     |   '+='
     |   '-='
     |   '*='
@@ -778,8 +785,11 @@ binaryOperatorWithoutDivision returns[boolean needParentheses]
     
     |   '*'
     |   '%'
+    */
     ;
 
+//TODO rstoll TINS-255 translator procedural - expressions
+/* 
 division returns[boolean needParentheses]
 @init {
     $needParentheses = precedenceHelper.needParentheses($start);

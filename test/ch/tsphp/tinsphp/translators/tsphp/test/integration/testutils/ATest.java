@@ -93,13 +93,13 @@ public abstract class ATest implements IErrorLogger
         commonTreeNodeStream.setTokenStream(parser.getTokenStream());
     }
 
-    protected void typeCheck() {
+    protected void inferTypes() {
     }
 
     public void translate() throws IOException, RecognitionException {
         parse();
 
-        typeCheck();
+        inferTypes();
 
         // LOAD TEMPLATES (via classpath)
         URL url = ClassLoader.getSystemResource("TSPHP.stg");
@@ -107,6 +107,7 @@ public abstract class ATest implements IErrorLogger
         StringTemplateGroup templates = new StringTemplateGroup(fr);
         fr.close();
 
+        commonTreeNodeStream.reset();
         translator = new ErrorReportingTSPHPTranslatorWalker(
                 commonTreeNodeStream, new TSPHPPrecedenceHelper());
         translator.registerErrorLogger(this);
