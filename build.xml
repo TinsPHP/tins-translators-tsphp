@@ -70,7 +70,8 @@
         </java>
     </target>
 
-    <target name="cp.all" depends="cp.common, cpt.common, cpt.parser, cp.parser-common, cpt.symbols, cpt.core"/>
+    <target name="cp.all"
+            depends="cp.common, cpt.common, cpt.parser, cp.parser-common, cpt.symbols, cpt.core, cp.inference-engine"/>
 
     <target name="cp.inference-engine" depends="" description="copy the inference engine jar to the lib dev folder">
         <delete>

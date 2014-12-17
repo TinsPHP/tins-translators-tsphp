@@ -5,29 +5,29 @@
  */
 
 /*
- * This file is based on the file FunctionTest from the translator component of the TSPHP project.
+ * This file is based on the file UseTest from the translator component of the TSPHP project.
  * TSPHP is also published under the Apache License 2.0
  * For more information see http://tsphp.ch/wiki/display/TSPHP/License
  */
+
 package ch.tsphp.tinsphp.translators.tsphp.test.integration.parser;
 
+
 import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorParserTest;
-import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ParameterListHelper;
 import org.antlr.runtime.RecognitionException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 @RunWith(Parameterized.class)
-public class FunctionTest extends ATranslatorParserTest
+public class UseDeclarationTest extends ATranslatorParserTest
 {
 
-    public FunctionTest(String testString, String expectedResult) {
+    public UseDeclarationTest(String testString, String expectedResult) {
         super(testString, expectedResult);
     }
 
@@ -38,17 +38,19 @@ public class FunctionTest extends ATranslatorParserTest
 
     @Parameterized.Parameters
     public static Collection<Object[]> testStrings() {
-        List<Object[]> collection = new ArrayList<>();
-
-        //PHP does not yet support return types
-
-        //parameters
-        collection.addAll(ParameterListHelper.getTestStrings(
-                "function set", "{}",
-                "function ? set", " {\n}"));
-
-        return collection;
-
+        return Arrays.asList(new Object[][]{
+                {"use \\a;", "use \\a as a;"},
+                {"use a as b;", "use a as b;"},
+                {"use a\\b as c;", "use a\\b as c;"},
+                {"use a\\b\\c as d;", "use a\\b\\c as d;"},
+                {"use a\\b;", "use a\\b as b;"},
+                {"use a\\b\\c;", "use a\\b\\c as c;"},
+                {"use \\a as b;", "use \\a as b;"},
+                {"use \\a\\b as b;", "use \\a\\b as b;"},
+                {"use \\a\\b\\c as d;", "use \\a\\b\\c as d;"},
+                {"use \\a;", "use \\a as a;"},
+                {"use \\a\\b;", "use \\a\\b as b;"},
+                {"use \\a\\c\\f;", "use \\a\\c\\f as f;"},
+        });
     }
-
 }

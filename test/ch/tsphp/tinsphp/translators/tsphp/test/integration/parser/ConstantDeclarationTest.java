@@ -24,10 +24,10 @@ import java.util.Arrays;
 import java.util.Collection;
 
 @RunWith(Parameterized.class)
-public class ConstantTest extends ATranslatorParserTest
+public class ConstantDeclarationTest extends ATranslatorParserTest
 {
 
-    public ConstantTest(String testString, String expectedResult) {
+    public ConstantDeclarationTest(String testString, String expectedResult) {
         super(testString, expectedResult);
     }
 

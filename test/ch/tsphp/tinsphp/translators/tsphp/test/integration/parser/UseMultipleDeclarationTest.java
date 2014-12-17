@@ -13,7 +13,9 @@
 package ch.tsphp.tinsphp.translators.tsphp.test.integration.parser;
 
 
+import ch.tsphp.tinsphp.parser.antlr.TinsPHPParser;
 import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorParserTest;
+import org.antlr.runtime.ParserRuleReturnScope;
 import org.antlr.runtime.RecognitionException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,10 +26,10 @@ import java.util.Arrays;
 import java.util.Collection;
 
 @RunWith(Parameterized.class)
-public class UseTest extends ATranslatorParserTest
+public class UseMultipleDeclarationTest extends ATranslatorParserTest
 {
 
-    public UseTest(String testString, String expectedResult) {
+    public UseMultipleDeclarationTest(String testString, String expectedResult) {
         super(testString, expectedResult);
     }
 
@@ -36,21 +38,29 @@ public class UseTest extends ATranslatorParserTest
         translate();
     }
 
+    protected ParserRuleReturnScope parserRun(TinsPHPParser parser) throws RecognitionException {
+        return parser.compilationUnit();
+    }
+
+    protected void run() throws RecognitionException {
+        result = translator.compilationUnit();
+    }
+
     @Parameterized.Parameters
     public static Collection<Object[]> testStrings() {
         return Arrays.asList(new Object[][]{
-                {"use \\a;", "use \\a as a;"},
-                {"use a as b;", "use a as b;"},
-                {"use a\\b as c;", "use a\\b as c;"},
-                {"use a\\b\\c as d;", "use a\\b\\c as d;"},
-                {"use a\\b;", "use a\\b as b;"},
-                {"use a\\b\\c;", "use a\\b\\c as c;"},
-                {"use \\a as b;", "use \\a as b;"},
-                {"use \\a\\b as b;", "use \\a\\b as b;"},
-                {"use \\a\\b\\c as d;", "use \\a\\b\\c as d;"},
-                {"use \\a;", "use \\a as a;"},
-                {"use \\a\\b;", "use \\a\\b as b;"},
-                {"use \\a\\c\\f;", "use \\a\\c\\f as f;"},
+                {
+                        "<?php use \\a, \\b; ?>",
+                        "namespace{\n    use \\a as a, \\b as b;\n}"
+                },
+                {
+                        "<?php use \\a\\a, \\b\\b, \\c as c; ?>",
+                        "namespace{\n    use \\a\\a as a, \\b\\b as b, \\c as c;\n}"
+                },
+                {
+                        "<?php use \\a, \\a\\b as c, \\a\\d; ?>",
+                        "namespace{\n    use \\a as a, \\a\\b as c, \\a\\d as d;\n}"
+                }
         });
     }
 }
