@@ -96,3 +96,11 @@ parameterList(declarations) ::= <<
 parameter(type, variableId, defaultValue) ::=<<
 <type> <variableId><if(defaultValue)> = <defaultValue><endif>
 >>
+
+if(condition, ifBlock, elseBlock) ::= <<
+if (<condition>) {
+    <ifBlock; separator="\n">
+}<if(elseBlock)> else {
+    <elseBlock; separator="\n">
+}<endif>
+>>
