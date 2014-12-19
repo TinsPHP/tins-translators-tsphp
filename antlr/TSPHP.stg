@@ -104,3 +104,18 @@ if (<condition>) {
     <elseBlock; separator="\n">
 }<endif>
 >>
+
+switch(condition, content) ::= <<
+switch (<condition>) {
+    <content; separator="\n">
+}
+>>
+
+switchContent(labels, block) ::= <<
+<labels; separator="\n">
+    <block; separator="\n">
+>>
+
+caseLabel(label) ::= <<
+case <label>:
+>>

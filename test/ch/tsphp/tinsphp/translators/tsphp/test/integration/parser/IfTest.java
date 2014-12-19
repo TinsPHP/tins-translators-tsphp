@@ -13,6 +13,7 @@
 package ch.tsphp.tinsphp.translators.tsphp.test.integration.parser;
 
 import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorParserTest;
+import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ExpressionHelper;
 import org.antlr.runtime.RecognitionException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,14 +42,13 @@ public class IfTest extends ATranslatorParserTest
     public static Collection<Object[]> testStrings() {
         List<Object[]> collection = new ArrayList<>();
 
-        //TODO rstoll TINS-255 translator procedural - expressions
-//        List<String[]> expressions = ExpressionHelper.getAllExpressions(3);
-//        for (Object[] expression : expressions) {
-//            collection.add(new Object[]{
-//                        "if(" + expression[0] + ") $a=1; else $a=1;",
-//                        "if (" + expression[1] + ") {\n    $a = 1;\n} else {\n    $a = 1;\n}"
-//                    });
-//        }
+        List<String[]> expressions = ExpressionHelper.getAllExpressions(3);
+        for (Object[] expression : expressions) {
+            collection.add(new Object[]{
+                    "if(" + expression[0] + ") $a=1; else $a=1;",
+                    "if (" + expression[1] + ") {\n    $a = 1;\n} else {\n    $a = 1;\n}"
+            });
+        }
         collection.addAll(Arrays.asList(new Object[][]{
                 {
                         "if(true){$a=1;}",

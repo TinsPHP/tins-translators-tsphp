@@ -25,7 +25,8 @@ public class ExpressionHelper
      */
     public static List<String[]> getAllExpressions(int offset) {
         List<String[]> list = new ArrayList<>();
-        list.addAll(getCastToTypeExpressions(offset));
+        //TODO rstoll TINS-276 conversions and casts
+//        list.addAll(getCastToTypeExpressions(offset));
         list.addAll(getExpressions());
         return list;
     }
@@ -74,7 +75,8 @@ public class ExpressionHelper
 
     public static List<String[]> getExpressions() {
         List<String[]> list = new ArrayList<>();
-        list.addAll(getExpressionsWithoutUnaryPrimary());
+        //TODO rstoll TINS-255 translator procedural - expressions
+//        list.addAll(getExpressionsWithoutUnaryPrimary());
         list.addAll(ExpressionHelper.getUnaryPrimaryExpressions());
         return list;
     }
@@ -83,6 +85,7 @@ public class ExpressionHelper
 
 
         return Arrays.asList(new String[][]{
+
                 {"$a or $b", "$a or $b"},
                 {"$a or $b or $c", "$a or $b or $c"},
                 {"$a xor $b", "$a xor $b"},
@@ -168,58 +171,61 @@ public class ExpressionHelper
 
     public static List<String[]> getUnaryPrimaryExpressions() {
         return Arrays.asList(new String[][]{
-                {
-                        "(Type) $a",
-                        "($a !== null ? ("
-                                + "$a !== false ? ("
-                                + "$a instanceof Type ? $a "
-                                + ": \\trigger_error('Cast failed, the evaluation type of $a must be Type.', " +
-                                "\\E_RECOVERABLE_ERROR))"
-                                + " : false)"
-                                + " : null)"
-                },
-                {"~$a", "~$a"},
-                {"@$a", "@$a"},
-                {"!$a", "!$a"},
-                {"!!$a", "!!$a"},
-                {"!!! $a", "!!!$a"},
-                {"+$a", "+$a"},
-                {"+1", "+1"},
-                {"-$a", "-$a"},
-                {"-2", "-2"},
-                {"+$a + $b", "+$a + $b"},
-                {"-$a - $b", "-$a - $b"},
-                {"clone $a", "clone $a"},
-                {"clone $a->a", "clone $a->a"},
-                {"new Type", "new Type()"},
-                {"new Type()", "new Type()"},
-                {"new Type(1,$a,'hello')", "new Type(1, $a, 'hello')"},
-                {"exit", "exit"},
-                {"exit(1)", "exit(1)"},
-                {"($a)", "$a"},
-                {"$a++", "$a++"},
-                {"$a--", "$a--"},
-                {"++$a", "++$a"},
-                {"--$a", "--$a"},
-                {"$a", "$a"},
-                {"$a[0]", "$a[0]"},
-                {"$a->a", "$a->a"},
-                {"$a->foo()", "$a->foo()"},
-                {"$a->foo(true || false,123*9)", "$a->foo(true || false, 123 * 9)"},
-                {"foo()", "foo()"},
-                {"\\foo(1,1+2,3)", "\\foo(1, 1 + 2, 3)"},
-                {"\\a\\foo()", "\\a\\foo()"},
-                {"foo()", "foo()"},
-                {"self::foo()", "self::foo()"},
-                {"parent::foo()", "parent::foo()"},
-                {"Foo::foo()", "Foo::foo()"},
-                {"self::$a", "self::$a"},
-                {"parent::$a", "parent::$a"},
-                {"Foo::$a", "Foo::$a"},
-                {"self::a", "self::a"},
-                {"parent::a", "parent::a"},
-                {"Foo::a", "Foo::a"},
-                {"a\\Foo::a", "a\\Foo::a"},
+                //TODO rstoll TINS-276 conversions and casts
+//                {
+//                        "(Type) $a",
+//                        "($a !== null ? ("
+//                                + "$a !== false ? ("
+//                                + "$a instanceof Type ? $a "
+//                                + ": \\trigger_error('Cast failed, the evaluation type of $a must be Type.', " +
+//                                "\\E_RECOVERABLE_ERROR))"
+//                                + " : false)"
+//                                + " : null)"
+//                },
+                //TODO rstoll TINS-255 translator procedural - expressions
+//                {"~$a", "~$a"},
+//                {"@$a", "@$a"},
+//                {"!$a", "!$a"},
+//                {"!!$a", "!!$a"},
+//                {"!!! $a", "!!!$a"},
+//                {"+$a", "+$a"},
+//                {"+1", "+1"},
+//                {"-$a", "-$a"},
+//                {"-2", "-2"},
+//                {"+$a + $b", "+$a + $b"},
+//                {"-$a - $b", "-$a - $b"},
+//                {"clone $a", "clone $a"},
+//                {"clone $a->a", "clone $a->a"},
+//                {"new Type", "new Type()"},
+//                {"new Type()", "new Type()"},
+//                {"new Type(1,$a,'hello')", "new Type(1, $a, 'hello')"},
+//                {"exit", "exit"},
+//                {"exit(1)", "exit(1)"},
+//                {"($a)", "$a"},
+//                {"$a++", "$a++"},
+//                {"$a--", "$a--"},
+//                {"++$a", "++$a"},
+//                {"--$a", "--$a"},
+                {"$_GET", "$_GET"},
+                //TODO rstoll TINS-255 translator procedural - expressions
+//                {"$a[0]", "$a[0]"},
+//                {"$a->a", "$a->a"},
+//                {"$a->foo()", "$a->foo()"},
+//                {"$a->foo(true || false,123*9)", "$a->foo(true || false, 123 * 9)"},
+//                {"foo()", "foo()"},
+//                {"\\foo(1,1+2,3)", "\\foo(1, 1 + 2, 3)"},
+//                {"\\a\\foo()", "\\a\\foo()"},
+//                {"foo()", "foo()"},
+//                {"self::foo()", "self::foo()"},
+//                {"parent::foo()", "parent::foo()"},
+//                {"Foo::foo()", "Foo::foo()"},
+//                {"self::$a", "self::$a"},
+//                {"parent::$a", "parent::$a"},
+//                {"Foo::$a", "Foo::$a"},
+//                {"self::a", "self::a"},
+//                {"parent::a", "parent::a"},
+//                {"Foo::a", "Foo::a"},
+//                {"a\\Foo::a", "a\\Foo::a"},
                 {"true", "true"},
                 {"false", "false"},
                 {"null", "null"},
@@ -229,11 +235,12 @@ public class ExpressionHelper
                 {"'a'", "'a'"},
                 {"\"asdf\"", "\"asdf\""},
                 {"[1,2,'a'=>3]", "[1, 2, 'a' => 3]"},
-                {"(-$a + $b) * $c", "(-$a + $b) * $c"},
-                {
-                        "!($a instanceof Type) || $a < $b+$c == ~(1 | 3 & 12)",
-                        "!($a instanceof Type) || $a < $b + $c == ~(1 | 3 & 12)"
-                }
+                //TODO rstoll TINS-255 translator procedural - expressions
+//                {"(-$a + $b) * $c", "(-$a + $b) * $c"},
+//                {
+//                        "!($a instanceof Type) || $a < $b+$c == ~(1 | 3 & 12)",
+//                        "!($a instanceof Type) || $a < $b + $c == ~(1 | 3 & 12)"
+//                }
         });
     }
 }

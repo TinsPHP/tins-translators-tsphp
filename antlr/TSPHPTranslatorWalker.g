@@ -510,8 +510,8 @@ functionDeclaration
 instruction
     :   localVariableDeclarationList    -> {$localVariableDeclarationList.st}
     |   ifCondition                     -> {$ifCondition.st}
+    |   switchCondition                 -> {$switchCondition.st}
     //TODO rstoll TINS-254 translator procedural - control structures
-    //|   switchCondition                 -> {$switchCondition.st}
     //|   forLoop                         -> {$forLoop.st}
     //|   foreachLoop                     -> {$foreachLoop.st}
     //|   whileLoop                       -> {$whileLoop.st}
@@ -542,10 +542,9 @@ blockConditional returns[List<Object> instructions]
     :   ^(BLOCK_CONDITIONAL instr+=instruction*) {$instructions=$instr;}
     ;
     
-//TODO rstoll TINS-254 translator procedural - control structures
-/*
 switchCondition
-    :   ^('switch' expression content+=switchContent*) -> switch(condition={$expression.st}, content={$content})
+    :   ^('switch' expression content+=switchContent*) 
+        -> switch(condition={$expression.st}, content={$content})
     ;
 
 switchContent
@@ -558,6 +557,8 @@ caseLabel
     |   Default     -> {%{$Default.text+":"}}
     ;
     
+//TODO rstoll TINS-254 translator procedural - control structures
+/*    
 forLoop
     :   ^('for'
             (init=variableDeclarationList|init=expressionList[true])

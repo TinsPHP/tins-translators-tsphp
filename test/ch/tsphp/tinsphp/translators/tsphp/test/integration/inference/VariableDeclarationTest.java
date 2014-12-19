@@ -43,18 +43,25 @@ public class VariableDeclarationTest extends ATranslatorInferenceTest
         List<Object[]> collection = new ArrayList<>();
         collection.addAll(Arrays.asList(new Object[][]{
                 {"<?php $a=1;", "namespace{\n    ? $a;\n    $a = 1;\n}"},
-                //TODO rstoll TINS-254 translator procedural - control structures
-//                {"<?php if(true){$a=1;}", "? $a;\nif(true) {\n    $a = 1;\n}"},
+                {"<?php if(true){$a=1;}", "namespace{\n    ? $a;\n    if (true) {\n        $a = 1;\n    }\n}"},
+                {
+                        "<?php if(true){}else{$a=1;}",
+                        "namespace{\n    ? $a;\n    if (true) {\n    } else {\n        $a = 1;\n    }\n}"
+                },
+                {
+                        "<?php if(true){}else{if(true){$a=1;}}",
+                        "namespace{\n"
+                                + "    ? $a;\n"
+                                + "    if (true) {\n"
+                                + "    } else {\n"
+                                + "        if (true) {\n"
+                                + "            $a = 1;\n"
+                                + "        }\n"
+                                + "    }\n"
+                                + "}"
+                },
         }));
 
-        //TODO rstoll TINS-255 translator procedural - expressions
-//        List<String[]> expressions = ExpressionHelper.getAllExpressions(7);
-//        for (String[] expression : expressions) {
-//            collection.add(new Object[]{
-//                    "int $a=" + expression[0] + ";",
-//                    "$a = " + expression[1] + ";"
-//            });
-//        }
         return collection;
     }
 }
