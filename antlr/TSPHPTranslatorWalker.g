@@ -511,10 +511,11 @@ instruction
     :   localVariableDeclarationList    -> {$localVariableDeclarationList.st}
     |   ifCondition                     -> {$ifCondition.st}
     |   switchCondition                 -> {$switchCondition.st}
-    //TODO rstoll TINS-254 translator procedural - control structures
-    //|   forLoop                         -> {$forLoop.st}
+    |   forLoop                         -> {$forLoop.st}
+    //TODO rstoll TINS-247 translate procedural - foreach header
     //|   foreachLoop                     -> {$foreachLoop.st}
-    //|   whileLoop                       -> {$whileLoop.st}
+    //TODO rstoll TINS-254 translator procedural - control structures
+    |   whileLoop                       -> {$whileLoop.st}
     //|   doWhileLoop                     -> {$doWhileLoop.st}
     //|   tryCatch                        -> {$tryCatch.st}
     |   ^(EXPRESSION expression?)       -> expression(expression={$expression.st})
@@ -557,11 +558,9 @@ caseLabel
     |   Default     -> {%{$Default.text+":"}}
     ;
     
-//TODO rstoll TINS-254 translator procedural - control structures
-/*    
 forLoop
     :   ^('for'
-            (init=variableDeclarationList|init=expressionList[true])
+            (init=expressionList[true])
             condition=expressionList[true]
             update=expressionList[false]
             blockConditional
@@ -576,7 +575,9 @@ expressionList[boolean semicolonAtTheEnd]
     |   EXPRESSION_LIST
         -> expressionList(expressions={null}, semicolonAtTheEnd={semicolonAtTheEnd})
     ;
-
+    
+//TODO rstoll TINS-247 translate procedural - foreach header
+/*  
 foreachLoop
     :   ^('foreach'
             expression
@@ -593,11 +594,15 @@ foreachLoop
         )
         -> foreach(array={$expression.st}, keyVariableId={$keyVariableId.text}, valueVariableId={$valueVariableId.text}, block={$blockConditional.instructions})
     ;
+*/
 
 whileLoop
-    :   ^('while' expression blockConditional) -> while(condition={$expression.st}, block={$blockConditional.instructions})
+    :   ^('while' expression blockConditional) 
+        -> while(condition={$expression.st}, block={$blockConditional.instructions})
     ;
 
+//TODO rstoll TINS-254 translator procedural - control structures
+/*
 doWhileLoop
     :   ^('do' block expression) -> doWhile(block={$block.instructions}, condition={$expression.st})
     ;

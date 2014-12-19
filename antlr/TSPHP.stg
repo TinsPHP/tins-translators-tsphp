@@ -119,3 +119,13 @@ switchContent(labels, block) ::= <<
 caseLabel(label) ::= <<
 case <label>:
 >>
+
+for(init, condition, update, block) ::= <<
+for (<init> <condition> <update>) {
+    <block; separator="\n">
+}
+>>
+
+expressionList(expressions,semicolonAtTheEnd) ::= <<
+<expressions; separator=", "><if(semicolonAtTheEnd)>;<endif>
+>>
