@@ -79,7 +79,7 @@ public class NotCorrectStartNodeTypeTest extends AWalkerTest
                 {"arrayKeyValue", TokenTypes.Else},
 //                {"arrayType", TokenTypes.Else},
                 {"atom", TokenTypes.Else},
-                {"binaryOperatorWithoutDivision", TokenTypes.Else},
+                {"binaryOperator", TokenTypes.Else},
                 {"block", TokenTypes.Else},
 //                {"blockConditional", TokenTypes.Else},
 //                {"caseLabel", TokenTypes.Else},

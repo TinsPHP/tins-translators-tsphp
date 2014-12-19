@@ -269,7 +269,6 @@ scalarTypes
     |   TypeString  -> {%{$TypeString.text}}
     ;
 
-
 //TODO rstoll TINS-267 translator OOP - classes
 /*    
 abstractConstructDeclaration
@@ -623,15 +622,15 @@ expression
     :   atom                    -> {$atom.st}
     |   operator                -> {$operator.st}
     //TODO rstoll TINS-255 translator procedural - expressions
-    /*
-    |   functionCall            -> {$functionCall.st}
-    |   methodCall              -> {$methodCall.st}
-    |   methodCallSelfOrParent  -> {$methodCallSelfOrParent.st}
-    |   methodCallStatic        -> {$methodCallStatic.st}
-    |   classStaticAccess       -> {$classStaticAccess.st}
-    |   postFixExpression       -> {$postFixExpression.st}
-    |   exit                    -> {$exit.st}
-    */
+    //|   functionCall            -> {$functionCall.st}
+    //TODO rstoll TINS-271 - translator OOP - expressions 
+    //|   methodCall              -> {$methodCall.st}
+    //|   methodCallSelfOrParent  -> {$methodCallSelfOrParent.st}
+    //|   methodCallStatic        -> {$methodCallStatic.st}
+    //|   classStaticAccess       -> {$classStaticAccess.st}
+    //TODO rstoll TINS-255 translator procedural - expressions
+    //|   postFixExpression       -> {$postFixExpression.st}
+    //|   exit                    -> {$exit.st}
     ;
   
 atom
@@ -680,11 +679,11 @@ operator
     |   ^(unaryPostOperator expr=expression)
         -> unaryPostOperator(operator = {$unaryPostOperator.st}, expression = {$expr.st})
     */
-       ^(binaryOperatorWithoutDivision left=expression right=expression)
+       ^(binaryOperator left=expression right=expression)
         -> binaryOperator(
-            operator={$binaryOperatorWithoutDivision.st},
+            operator={$binaryOperator.st},
             left={$left.st}, right={$right.st},
-            needParentheses={$binaryOperatorWithoutDivision.needParentheses}
+            needParentheses={$binaryOperator.needParentheses}
         )
     //TODO rstoll TINS-255 translator procedural - expressions
     /* 
@@ -734,24 +733,20 @@ unaryPostOperator
     |   POST_DECREMENT -> {%{"--"}}
     ;
 */
-binaryOperatorWithoutDivision returns[boolean needParentheses]
+binaryOperator returns[boolean needParentheses]
 @after {
     $st = %operator(o={$start.getText()});
     $needParentheses = precedenceHelper.needParentheses($start);
 }
-    : 
-    //TODO rstoll TINS-255 translator procedural - expressions
-    /*   
-        'or'
+    :   'or'
     |   'xor'
     |   'and'
-    */
-       '='
-    //TODO rstoll TINS-255 translator procedural - expressions
-    /* 
+    
+    |   '=' 
     |   '+='
     |   '-='
     |   '*='
+    |   '/=' 
     |   '&='
     |   '|='
     |   '^='
@@ -784,65 +779,22 @@ binaryOperatorWithoutDivision returns[boolean needParentheses]
     |   '.'
     
     |   '*'
+    |   '/'
     |   '%'
-    */
     ;
 
 //TODO rstoll TINS-255 translator procedural - expressions
-/* 
-division returns[boolean needParentheses]
-@init {
-    $needParentheses = precedenceHelper.needParentheses($start);
-}
-    :   ^('/' left=expression right=expression)
-        {
-            if(evaluatesToInt($left.start) && evaluatesToInt($right.start)){
-                $st = %intDivision(
-                    operator={$start.getText()},
-                    left={$left.st},
-                    right={$right.st},
-                    needParentheses={$needParentheses});
-            } else {
-                $st = %binaryOperator(
-                    operator={$start.getText()},
-                    left={$left.st},
-                    right={$right.st},
-                    needParentheses={$needParentheses});
-            }
-        }
-
-    |   ^('/=' left=expression right=expression)
-        {
-            if(evaluatesToInt($left.start) && evaluatesToInt($right.start)){
-                $st = %intDivision(
-                    operator={$start.getText()},
-                    left={$left.st},
-                    right={$right.st},
-                    needParentheses={false});
-
-                $st = %binaryOperator(
-                    operator={"="},
-                    left={$left.st},
-                    right={$right.st},
-                    needParentheses={$needParentheses});
-            } else {
-                $st = %binaryOperator(
-                    operator={$start.getText()},
-                    left={$left.st},
-                    right={$right.st},
-                    needParentheses={$needParentheses});
-            }
-        }
-    ;
-
+/*
 castOperator
     :   ^(CAST
-            ^(TYPE tMod=. (type=scalarTypes|type=arrayType|type=classInterfaceType))
+            ^(TYPE tMod=. (type=scalarTypes|type=arrayType)
             expr=expression
         )
         {$st = castHelper.getCast(templateLib, $type.start, $expr.start, $expr.st);}
     ;
-    
+*/
+//TODO rstoll TINS-271 - translator OOP - expressions 
+/*    
 newOperator
     :   ^('new'
             type=TYPE_NAME 
@@ -850,16 +802,19 @@ newOperator
         )    
         -> new(type={$type.text}, parameters={$actualParameters.parameters})
     ;
+*/
 
-actualParameters returns[List<Object> parameters]
-    :   ^(ACTUAL_PARAMETERS params+=expression+) {$parameters=$params;}
-    |   ACTUAL_PARAMETERS
-    ;
-
+//TODO rstoll TINS-255 translator procedural - expressions
+/*
 functionCall
     :   ^(FUNCTION_CALL    identifier=TYPE_NAME actualParameters)
         -> functionCall(identifier={getMethodName($identifier.text)}, parameters={$actualParameters.parameters})
     ;
+
+actualParameters returns[List<Object> parameters]
+    :   ^(ACTUAL_PARAMETERS params+=expression+) {$parameters=$params;}
+    |   ACTUAL_PARAMETERS
+    ;   
 */
 
 //TODO rstoll TINS-271 - translator OOP - expressions 
