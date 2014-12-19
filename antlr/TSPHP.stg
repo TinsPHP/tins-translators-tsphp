@@ -129,3 +129,15 @@ for (<init> <condition> <update>) {
 expressionList(expressions,semicolonAtTheEnd) ::= <<
 <expressions; separator=", "><if(semicolonAtTheEnd)>;<endif>
 >>
+
+while(condition, block) ::= <<
+while (<condition>) {
+    <block; separator="\n">
+}
+>>
+
+doWhile(block, condition) ::= <<
+do {
+    <block; separator="\n">
+} while (<condition>);
+>>

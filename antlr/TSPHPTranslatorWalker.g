@@ -516,7 +516,8 @@ instruction
     //|   foreachLoop                     -> {$foreachLoop.st}
     //TODO rstoll TINS-254 translator procedural - control structures
     |   whileLoop                       -> {$whileLoop.st}
-    //|   doWhileLoop                     -> {$doWhileLoop.st}
+    |   doWhileLoop                     -> {$doWhileLoop.st}
+    //TODO rstoll TINS-248 translate procedural - catch header
     //|   tryCatch                        -> {$tryCatch.st}
     |   ^(EXPRESSION expression?)       -> expression(expression={$expression.st})
     //TODO rstoll TINS-270 translator procedural - instructions
@@ -601,12 +602,13 @@ whileLoop
         -> while(condition={$expression.st}, block={$blockConditional.instructions})
     ;
 
-//TODO rstoll TINS-254 translator procedural - control structures
-/*
 doWhileLoop
-    :   ^('do' block expression) -> doWhile(block={$block.instructions}, condition={$expression.st})
+    :   ^('do' block expression) 
+        -> doWhile(block={$block.instructions}, condition={$expression.st})
     ;
 
+//TODO rstoll TINS-248 translate procedural - catch header
+/*
 tryCatch
     :   ^('try' blockConditional catchBlocks+=catchBlock+)
         -> tryCatch(tryBlock={$blockConditional.instructions}, catchBlocks={$catchBlocks})
