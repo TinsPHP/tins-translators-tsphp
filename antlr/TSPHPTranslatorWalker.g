@@ -263,10 +263,13 @@ scalarTypesOrUnknown
     ;
 
 scalarTypes
-    :   TypeBool    -> {%{$TypeBool.text}}
-    |   TypeInt     -> {%{$TypeInt.text}}
-    |   TypeFloat   -> {%{$TypeFloat.text}}
-    |   TypeString  -> {%{$TypeString.text}}
+@init{
+    $st = %{$start.getText()};
+}
+    :   TypeBool
+    |   TypeInt
+    |   TypeFloat
+    |   TypeString
     ;
 
 //TODO rstoll TINS-267 translator OOP - classes
@@ -650,11 +653,13 @@ atom
     ;
            
 primitiveAtomWithConstant
-    :   Bool                                        -> {%{$Bool.text}}
-    |   Int                                         -> {%{$Int.text}}
-    |   Float                                       -> {%{$Float.text}}
-    |   String                                      -> {%{$String.text}}
-    |   Null                                        -> {%{$Null.text}}
+    :   (   v=Null
+        |   v=False
+        |   v=True
+        |   v=Int   
+        |   v=Float
+        |   v=String
+        ) -> {%{$v.text}}
     |   ^(TypeArray keyValuePairs+=arrayKeyValue*)  -> array(content ={$keyValuePairs})
     |   CONSTANT                                    -> {%{$CONSTANT.text.substring(0,$CONSTANT.text.length()-1)}}
     //TODO rstoll TINS-271 - translator OOP - expressions 
