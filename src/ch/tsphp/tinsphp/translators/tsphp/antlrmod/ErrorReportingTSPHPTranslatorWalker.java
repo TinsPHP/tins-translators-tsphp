@@ -12,9 +12,10 @@
 
 package ch.tsphp.tinsphp.translators.tsphp.antlrmod;
 
-import ch.tsphp.common.ErrorReporterHelper;
-import ch.tsphp.common.IErrorLogger;
-import ch.tsphp.common.IErrorReporter;
+import ch.tsphp.tinsphp.common.issues.EIssueSeverity;
+import ch.tsphp.tinsphp.common.issues.IIssueLogger;
+import ch.tsphp.tinsphp.common.issues.IIssueReporter;
+import ch.tsphp.tinsphp.common.issues.IssueReporterHelper;
 import ch.tsphp.tinsphp.common.translation.IPrecedenceHelper;
 import ch.tsphp.tinsphp.translators.tsphp.antlr.TSPHPTranslatorWalker;
 import org.antlr.runtime.RecognitionException;
@@ -22,14 +23,15 @@ import org.antlr.runtime.tree.TreeNodeStream;
 
 import java.util.ArrayDeque;
 import java.util.Collection;
+import java.util.EnumSet;
 
 /**
  * Extends PHP54TranslatorWalker by IErrorReporter.
  */
-public class ErrorReportingTSPHPTranslatorWalker extends TSPHPTranslatorWalker implements IErrorReporter
+public class ErrorReportingTSPHPTranslatorWalker extends TSPHPTranslatorWalker implements IIssueReporter
 {
 
-    private Collection<IErrorLogger> errorLoggers = new ArrayDeque<>();
+    private Collection<IIssueLogger> errorLoggers = new ArrayDeque<>();
     private boolean hasFoundError;
 
     public ErrorReportingTSPHPTranslatorWalker(
@@ -40,18 +42,18 @@ public class ErrorReportingTSPHPTranslatorWalker extends TSPHPTranslatorWalker i
     }
 
     @Override
-    public boolean hasFoundError() {
+    public boolean hasFound(EnumSet<EIssueSeverity> severities) {
         return hasFoundError;
     }
 
     @Override
     public void reportError(RecognitionException exception) {
         hasFoundError = true;
-        ErrorReporterHelper.reportError(errorLoggers, exception, "translating to tsphp");
+        IssueReporterHelper.reportIssue(errorLoggers, exception, "translating to tsphp");
     }
 
     @Override
-    public void registerErrorLogger(IErrorLogger errorLogger) {
+    public void registerIssueLogger(IIssueLogger errorLogger) {
         errorLoggers.add(errorLogger);
     }
 }

@@ -14,12 +14,15 @@ package ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils;
 
 
 import ch.tsphp.tinsphp.common.IInferenceEngine;
+import ch.tsphp.tinsphp.common.issues.EIssueSeverity;
 import ch.tsphp.tinsphp.inference_engine.InferenceEngine;
 import ch.tsphp.tinsphp.parser.antlr.TinsPHPParser;
 import org.antlr.runtime.ParserRuleReturnScope;
 import org.antlr.runtime.RecognitionException;
 import org.junit.Assert;
 import org.junit.Ignore;
+
+import java.util.EnumSet;
 
 @Ignore
 public abstract class ATranslatorInferenceTest extends ATest
@@ -32,16 +35,19 @@ public abstract class ATranslatorInferenceTest extends ATest
     @Override
     protected void inferTypes() {
         IInferenceEngine inferenceEngine = new InferenceEngine();
-        inferenceEngine.registerErrorLogger(this);
+        inferenceEngine.registerIssueLogger(this);
 
         inferenceEngine.enrichWithDefinitions(ast, commonTreeNodeStream);
-        Assert.assertFalse(testString + " failed. found definition exception(s)", inferenceEngine.hasFoundError());
+        Assert.assertFalse(testString + " failed. found definition exception(s)",
+                inferenceEngine.hasFound(EnumSet.allOf(EIssueSeverity.class)));
 
         inferenceEngine.enrichWithReferences(ast, commonTreeNodeStream);
-        Assert.assertFalse(testString + " failed. found reference exception(s)", inferenceEngine.hasFoundError());
+        Assert.assertFalse(testString + " failed. found reference exception(s)",
+                inferenceEngine.hasFound(EnumSet.allOf(EIssueSeverity.class)));
 
         inferenceEngine.enrichtWithTypes(ast, commonTreeNodeStream);
-        Assert.assertFalse(testString + " failed. found type checking exception(s)", inferenceEngine.hasFoundError());
+        Assert.assertFalse(testString + " failed. found type checking exception(s)",
+                inferenceEngine.hasFound(EnumSet.allOf(EIssueSeverity.class)));
     }
 
     @Override

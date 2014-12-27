@@ -14,12 +14,13 @@ package ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils;
 
 import ch.tsphp.common.AstHelper;
 import ch.tsphp.common.AstHelperRegistry;
-import ch.tsphp.common.IErrorLogger;
 import ch.tsphp.common.ITSPHPAst;
 import ch.tsphp.common.ITSPHPAstAdaptor;
 import ch.tsphp.common.TSPHPAstAdaptor;
 import ch.tsphp.common.exceptions.TSPHPException;
 import ch.tsphp.parser.common.ANTLRNoCaseStringStream;
+import ch.tsphp.tinsphp.common.issues.EIssueSeverity;
+import ch.tsphp.tinsphp.common.issues.IIssueLogger;
 import ch.tsphp.tinsphp.parser.antlr.TinsPHPParser;
 import ch.tsphp.tinsphp.parser.antlrmod.ErrorReportingTinsPHPLexer;
 import ch.tsphp.tinsphp.parser.antlrmod.ErrorReportingTinsPHPParser;
@@ -38,9 +39,10 @@ import org.junit.Ignore;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
+import java.util.EnumSet;
 
 @Ignore
-public abstract class ATest implements IErrorLogger
+public abstract class ATest implements IIssueLogger
 {
 
     protected String testString;
@@ -58,14 +60,14 @@ public abstract class ATest implements IErrorLogger
 
     public void check() {
         Assert.assertFalse(testString + " failed. found translator exception(s). See output.",
-                translator.hasFoundError());
+                translator.hasFound(EnumSet.allOf(EIssueSeverity.class)));
 
         Assert.assertEquals(testString + " failed.", expectedResult,
                 result.getTemplate().toString().replaceAll("\r", ""));
     }
 
     @Override
-    public void log(TSPHPException exception) {
+    public void log(TSPHPException exception, EIssueSeverity severity) {
         System.err.println(exception.getMessage());
     }
 
@@ -80,14 +82,15 @@ public abstract class ATest implements IErrorLogger
 
         ErrorReportingTinsPHPParser parser = new ErrorReportingTinsPHPParser(tokens);
         parser.setTreeAdaptor(astAdaptor);
-        parser.registerErrorLogger(new WriteExceptionToConsole());
+        parser.registerIssueLogger(new WriteExceptionToConsole());
 
         ParserRuleReturnScope parserResult = parserRun(parser);
         ast = (ITSPHPAst) parserResult.getTree();
 
-        Assert.assertFalse(testString.replaceAll("\n", " ") + " failed - lexer throw exception", lexer.hasFoundError());
+        Assert.assertFalse(testString.replaceAll("\n", " ") + " failed - lexer throw exception",
+                lexer.hasFound(EnumSet.allOf(EIssueSeverity.class)));
         Assert.assertFalse(testString.replaceAll("\n", " ") + " failed - parser throw exception",
-                parser.hasFoundError());
+                parser.hasFound(EnumSet.allOf(EIssueSeverity.class)));
 
         commonTreeNodeStream = new CommonTreeNodeStream(astAdaptor, ast);
         commonTreeNodeStream.setTokenStream(parser.getTokenStream());
@@ -110,7 +113,7 @@ public abstract class ATest implements IErrorLogger
         commonTreeNodeStream.reset();
         translator = new ErrorReportingTSPHPTranslatorWalker(
                 commonTreeNodeStream, new TSPHPPrecedenceHelper());
-        translator.registerErrorLogger(this);
+        translator.registerIssueLogger(this);
         translator.setTemplateLib(templates);
 
         run();
