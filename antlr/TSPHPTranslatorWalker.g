@@ -688,11 +688,10 @@ operator
         
         ^(unaryPreOperator expr=expression)
         -> unaryPreOperator(operator ={$unaryPreOperator.st}, expression = {$expr.st})
-//TODO rstoll TINS-255 translator procedural - expressions
-	/*
+
     |   ^(unaryPostOperator expr=expression)
         -> unaryPostOperator(operator = {$unaryPostOperator.st}, expression = {$expr.st})
-    */
+
     |   ^(binaryOperator left=expression right=expression)
         -> binaryOperator(
             operator={$binaryOperator.st},
@@ -701,9 +700,6 @@ operator
         )
     //TODO rstoll TINS-255 translator procedural - expressions
     /* 
-    |   division
-        -> {$division.st}
-
     |   ^(QuestionMark cond=expression ifCase=expression elseCase=expression)
         -> ternaryOperator(
             cond={$cond.st},
@@ -739,14 +735,12 @@ unaryPreOperator
     |   UNARY_MINUS     -> {%{"-"}}
     |   UNARY_PLUS      -> {%{"+"}}
     ;
-    
-//TODO rstoll TINS-255 translator procedural - expressions
-/*     
+
 unaryPostOperator  
     :   POST_INCREMENT -> {%{"++"}}
     |   POST_DECREMENT -> {%{"--"}}
     ;
-*/
+
 binaryOperator returns[boolean needParentheses]
 @after {
     $st = %operator(o={$start.getText()});

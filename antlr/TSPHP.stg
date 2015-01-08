@@ -48,6 +48,10 @@ unaryPreOperator(operator, expression) ::= <<
 <operator><expression>
 >>
 
+unaryPostOperator(operator, expression) ::= <<
+<expression><operator>
+>>
+
 localVariableDeclarationList(type, variables) ::=<<
 <type> <variables; separator=",">;
 >>

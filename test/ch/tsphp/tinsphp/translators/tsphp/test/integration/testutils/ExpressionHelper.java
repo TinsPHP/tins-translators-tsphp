@@ -222,11 +222,11 @@ public class ExpressionHelper
                 //TODO rstoll TINS-255 translator procedural - expressions
 //                {"exit", "exit"},
 //                {"exit(1)", "exit(1)"},
-//                {"($a)", "$a"},
-//                {"$a++", "$a++"},
-//                {"$a--", "$a--"},
-//                {"++$a", "++$a"},
-//                {"--$a", "--$a"},
+                {"($a)", "$a"},
+                {"$a++", "$a++"},
+                {"$a--", "$a--"},
+                {"++$a", "++$a"},
+                {"--$a", "--$a"},
                 {"$_GET", "$_GET"},
                 //TODO rstoll TINS-255 translator procedural - expressions
 //                {"$a[0]", "$a[0]"},
