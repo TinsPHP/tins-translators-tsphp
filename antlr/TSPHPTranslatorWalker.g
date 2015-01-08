@@ -639,7 +639,7 @@ expression
     //|   methodCallStatic        -> {$methodCallStatic.st}
     //|   classStaticAccess       -> {$classStaticAccess.st}
     |   postFixExpression       -> {$postFixExpression.st}
-    //|   exit                    -> {$exit.st}
+    |   exit                    -> {$exit.st}
     ;
   
 atom
@@ -875,10 +875,7 @@ postFixExpression
     //    )
     ;
 
-//TODO rstoll TINS-255 translator procedural - expressions
-/*
 exit
-    :   ^('exit' expression?)   -> exit(expression={$expression.st})
+    :   ^('exit' expression)   -> exit(expression={$expression.st})
     |   'exit'                  -> exit(expression={null})
     ;
-*/    

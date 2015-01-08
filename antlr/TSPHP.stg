@@ -94,6 +94,10 @@ arrayAccess(expression, identifier) ::= <<
 <expression>[<index>]
 >>
 
+exit(expression) ::= <<
+exit<if(expression)>(<expression>)<endif>
+>>
+
 method(modifier, returnType, identifier, params, body) ::=<<
 <if(modifier)><modifier> <endif>function <returnType> <identifier>(<if(params)><params><endif>) {<if(body)>
 

@@ -99,7 +99,7 @@ public class NotCorrectStartNodeTypeTest extends AWalkerTest
 //                {"constructDestructModifier", TokenTypes.Else},
                 {"definition", TokenTypes.Else},
                 {"doWhileLoop", TokenTypes.Else},
-//                {"exit", TokenTypes.Else},
+                {"exit", TokenTypes.Else},
                 {"expression", TokenTypes.Else},
 //                {"extendsDeclaration", TokenTypes.Else},
 //                {"fieldDeclaration", TokenTypes.Else},
