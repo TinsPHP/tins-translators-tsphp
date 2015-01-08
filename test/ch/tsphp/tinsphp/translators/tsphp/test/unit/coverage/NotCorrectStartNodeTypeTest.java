@@ -129,7 +129,7 @@ public class NotCorrectStartNodeTypeTest extends AWalkerTest
 //                {"newOperator", TokenTypes.Else},
                 {"operator", TokenTypes.Else},
                 {"paramDeclaration", TokenTypes.Else},
-//                {"postFixExpression", TokenTypes.Else},
+                {"postFixExpression", TokenTypes.Else},
                 {"primitiveAtomWithConstant", TokenTypes.Else},
                 {"primitiveTypes", TokenTypes.Else},
 //                {"primitiveTypesWithoutArray", TokenTypes.Else},

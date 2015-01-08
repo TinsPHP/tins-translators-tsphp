@@ -216,7 +216,6 @@ public class ExpressionHelper
 //                {"new Type", "new Type()"},
 //                {"new Type()", "new Type()"},
 //                {"new Type(1,$a,'hello')", "new Type(1, $a, 'hello')"},
-                //TODO rstoll TINS-255 translator procedural - expressions
 //                {"exit", "exit"},
 //                {"exit(1)", "exit(1)"},
                 {"($a)", "$a"},

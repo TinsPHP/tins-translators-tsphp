@@ -90,6 +90,10 @@ functionCall(identifier, parameters) ::= <<
 <identifier>(<parameters; separator=", ">)
 >>
 
+arrayAccess(expression, identifier) ::= <<
+<expression>[<index>]
+>>
+
 method(modifier, returnType, identifier, params, body) ::=<<
 <if(modifier)><modifier> <endif>function <returnType> <identifier>(<if(params)><params><endif>) {<if(body)>
 

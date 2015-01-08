@@ -638,8 +638,7 @@ expression
     //|   methodCallSelfOrParent  -> {$methodCallSelfOrParent.st}
     //|   methodCallStatic        -> {$methodCallStatic.st}
     //|   classStaticAccess       -> {$classStaticAccess.st}
-    //TODO rstoll TINS-255 translator procedural - expressions
-    //|   postFixExpression       -> {$postFixExpression.st}
+    |   postFixExpression       -> {$postFixExpression.st}
     //|   exit                    -> {$exit.st}
     ;
   
@@ -859,14 +858,12 @@ classStaticAccess
     ;    
 */
 
- //TODO rstoll TINS-255 translator procedural - expressions
-/*
 postFixExpression
     :   //TODO rstoll TINS-271 - translator OOP - expressions 
         //^(FIELD_ACCESS expression Identifier)
         //-> fieldAccess(expression={$expression.st}, identifier={$Identifier.text})
 
-    |   ^(ARRAY_ACCESS expr=expression index=expression)
+       ^(ARRAY_ACCESS expr=expression index=expression)
         -> arrayAccess(expression={$expr.st}, index={$index.st})
 
     //TODO rstoll TINS-271 - translator OOP - expressions 
@@ -878,6 +875,8 @@ postFixExpression
     //    )
     ;
 
+//TODO rstoll TINS-255 translator procedural - expressions
+/*
 exit
     :   ^('exit' expression?)   -> exit(expression={$expression.st})
     |   'exit'                  -> exit(expression={null})
