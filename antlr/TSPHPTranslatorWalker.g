@@ -684,15 +684,16 @@ staticAccess
 */
  
 operator
-    : //TODO rstoll TINS-255 translator procedural - expressions
-    /*    
+    : 
+        
         ^(unaryPreOperator expr=expression)
         -> unaryPreOperator(operator ={$unaryPreOperator.st}, expression = {$expr.st})
-
+//TODO rstoll TINS-255 translator procedural - expressions
+	/*
     |   ^(unaryPostOperator expr=expression)
         -> unaryPostOperator(operator = {$unaryPostOperator.st}, expression = {$expr.st})
     */
-       ^(binaryOperator left=expression right=expression)
+    |   ^(binaryOperator left=expression right=expression)
         -> binaryOperator(
             operator={$binaryOperator.st},
             left={$left.st}, right={$right.st},
@@ -729,8 +730,6 @@ operator
     */
     ;     
 
-//TODO rstoll TINS-255 translator procedural - expressions
-/* 
 unaryPreOperator 
     :   PRE_INCREMENT   -> {%{"++"}}
     |   PRE_DECREMENT   -> {%{"--"}}
@@ -740,7 +739,9 @@ unaryPreOperator
     |   UNARY_MINUS     -> {%{"-"}}
     |   UNARY_PLUS      -> {%{"+"}}
     ;
-       
+    
+//TODO rstoll TINS-255 translator procedural - expressions
+/*     
 unaryPostOperator  
     :   POST_INCREMENT -> {%{"++"}}
     |   POST_DECREMENT -> {%{"--"}}

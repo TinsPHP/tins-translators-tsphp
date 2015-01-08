@@ -18,10 +18,10 @@ import java.io.IOException;
 import java.util.Collection;
 
 @RunWith(Parameterized.class)
-public class BlockExpressionTest extends ATranslatorParserTest
+public class BlockInstructionTest extends ATranslatorParserTest
 {
 
-    public BlockExpressionTest(String testString, String expectedResult) {
+    public BlockInstructionTest(String testString, String expectedResult) {
         super(testString, expectedResult);
     }
 

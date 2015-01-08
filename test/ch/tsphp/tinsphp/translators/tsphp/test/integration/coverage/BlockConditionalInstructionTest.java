@@ -18,10 +18,10 @@ import java.io.IOException;
 import java.util.Collection;
 
 @RunWith(Parameterized.class)
-public class BlockConditionalExpressionTest extends ATranslatorParserTest
+public class BlockConditionalInstructionTest extends ATranslatorParserTest
 {
 
-    public BlockConditionalExpressionTest(String testString, String expectedResult) {
+    public BlockConditionalInstructionTest(String testString, String expectedResult) {
         super(testString, expectedResult);
     }
 

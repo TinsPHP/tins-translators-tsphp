@@ -23,7 +23,7 @@ public class InstructionHelper
         collection.addAll(StatementHelper.getControlStructures(
                 prefix, "$a;", appendix, prefixExpected, indent, "$a;", appendixExpected));
 
-        List<String[]> expressions = ExpressionHelper.getAllExpressions(0);
+        List<String[]> expressions = ExpressionHelper.getAllExpressions(prefix.length());
         for (Object[] expression : expressions) {
             collection.add(new String[]{
                     prefix + expression[0] + ";" + appendix,

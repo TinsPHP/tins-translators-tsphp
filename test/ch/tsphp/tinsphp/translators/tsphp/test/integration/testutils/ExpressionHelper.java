@@ -200,23 +200,26 @@ public class ExpressionHelper
 //                                + " : false)"
 //                                + " : null)"
 //                },
+
+                {"~$a", "~$a"},
+                {"@$a", "@$a"},
+                {"!$a", "!$a"},
+                {"!!$a", "!!$a"},
+                {"!!! $a", "!!!$a"},
+                {"+$a", "+$a"},
+                {"+1", "+1"},
+                {"-$a", "-$a"},
+                {"-2", "-2"},
+                {"+$a + $b", "+$a + $b"},
+                {"-$a - $b", "-$a - $b"},
                 //TODO rstoll TINS-255 translator procedural - expressions
-//                {"~$a", "~$a"},
-//                {"@$a", "@$a"},
-//                {"!$a", "!$a"},
-//                {"!!$a", "!!$a"},
-//                {"!!! $a", "!!!$a"},
-//                {"+$a", "+$a"},
-//                {"+1", "+1"},
-//                {"-$a", "-$a"},
-//                {"-2", "-2"},
-//                {"+$a + $b", "+$a + $b"},
-//                {"-$a - $b", "-$a - $b"},
 //                {"clone $a", "clone $a"},
 //                {"clone $a->a", "clone $a->a"},
+                //TODO rstoll TINS-271 - translator OOP - expressions
 //                {"new Type", "new Type()"},
 //                {"new Type()", "new Type()"},
 //                {"new Type(1,$a,'hello')", "new Type(1, $a, 'hello')"},
+                //TODO rstoll TINS-255 translator procedural - expressions
 //                {"exit", "exit"},
 //                {"exit(1)", "exit(1)"},
 //                {"($a)", "$a"},
@@ -227,6 +230,7 @@ public class ExpressionHelper
                 {"$_GET", "$_GET"},
                 //TODO rstoll TINS-255 translator procedural - expressions
 //                {"$a[0]", "$a[0]"},
+                //TODO rstoll TINS-255 translator procedural - expressions
 //                {"$a->a", "$a->a"},
 //                {"$a->foo()", "$a->foo()"},
 //                {"$a->foo(true || false,123*9)", "$a->foo(true || false, 123 * 9)"},
@@ -254,8 +258,8 @@ public class ExpressionHelper
                 {"[1,2,'a'=>3]", "[1, 2, 'a' => 3]"},
                 {"a\\b", "a\\b"},
                 {"$a", "$a"},
+                {"(-$a + $b) * $c", "(-$a + $b) * $c"},
                 //TODO rstoll TINS-255 translator procedural - expressions
-//                {"(-$a + $b) * $c", "(-$a + $b) * $c"},
 //                {
 //                        "!($a instanceof Type) || $a < $b+$c == ~(1 | 3 & 12)",
 //                        "!($a instanceof Type) || $a < $b + $c == ~(1 | 3 & 12)"
