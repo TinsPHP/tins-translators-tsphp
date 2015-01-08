@@ -725,11 +725,8 @@ operator
         -> {$newOperator.st}
     */
     
-    //TODO rstoll TINS-255 translator procedural - expressions
-    /*
     |   ^('clone' expr=expression)
         -> clone(expression={$expr.st})
-    */
     ;     
 
 unaryPreOperator 
@@ -797,7 +794,7 @@ binaryOperator returns[boolean needParentheses]
     |   '%'
     ;
 
-//TODO rstoll TINS-255 translator procedural - expressions
+//TODO rstoll TINS-276 conversions and casts
 /*
 castOperator
     :   ^(CAST

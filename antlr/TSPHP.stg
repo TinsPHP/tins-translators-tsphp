@@ -82,6 +82,10 @@ instanceof(expression, type, needParentheses) ::= <<
 <if(needParentheses)>(<endif><expression> instanceof <type><if(needParentheses)>)<endif>
 >>
 
+clone(expression) ::= <<
+clone <expression>
+>>
+
 method(modifier, returnType, identifier, params, body) ::=<<
 <if(modifier)><modifier> <endif>function <returnType> <identifier>(<if(params)><params><endif>) {<if(body)>
 

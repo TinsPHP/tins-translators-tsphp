@@ -210,10 +210,9 @@ public class ExpressionHelper
                 {"-2", "-2"},
                 {"+$a + $b", "+$a + $b"},
                 {"-$a - $b", "-$a - $b"},
-                //TODO rstoll TINS-255 translator procedural - expressions
-//                {"clone $a", "clone $a"},
-//                {"clone $a->a", "clone $a->a"},
+                {"clone $a", "clone $a"},
                 //TODO rstoll TINS-271 - translator OOP - expressions
+//                {"clone $a->a", "clone $a->a"},
 //                {"new Type", "new Type()"},
 //                {"new Type()", "new Type()"},
 //                {"new Type(1,$a,'hello')", "new Type(1, $a, 'hello')"},
