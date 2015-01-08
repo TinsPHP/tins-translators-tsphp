@@ -78,6 +78,10 @@ ternaryOperator(cond, ifCase, elseCase, needParentheses) ::= <<
 <if(needParentheses)>(<endif><cond> ? <ifCase> : <elseCase><if(needParentheses)>)<endif>
 >>
 
+instanceof(expression, type, needParentheses) ::= <<
+<if(needParentheses)>(<endif><expression> instanceof <type><if(needParentheses)>)<endif>
+>>
+
 method(modifier, returnType, identifier, params, body) ::=<<
 <if(modifier)><modifier> <endif>function <returnType> <identifier>(<if(params)><params><endif>) {<if(body)>
 

@@ -707,11 +707,11 @@ operator
             needParentheses={precedenceHelper.needParentheses($QuestionMark)}
         )
         
-    //TODO rstoll TINS-255 translator procedural - expressions
+    //TODO rstoll TINS-276 conversions and casts
     /* 
     |   castOperator
         -> {$castOperator.st}
-
+    */
     |   ^(Instanceof expr=expression (type=TYPE_NAME|type=VariableId))
         -> instanceof(
             expression={$expr.st},
@@ -719,9 +719,14 @@ operator
             needParentheses={precedenceHelper.needParentheses($Instanceof)}
         )
 
+    //TODO rstoll TINS-271 - translator OOP - expressions
+    /* 
     |   newOperator
         -> {$newOperator.st}
-
+    */
+    
+    //TODO rstoll TINS-255 translator procedural - expressions
+    /*
     |   ^('clone' expr=expression)
         -> clone(expression={$expr.st})
     */

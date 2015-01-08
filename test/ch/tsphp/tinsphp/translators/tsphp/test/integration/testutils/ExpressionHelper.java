@@ -179,9 +179,8 @@ public class ExpressionHelper
                 {"$a % $b % $c", "$a % $b % $c"},
                 {"$a % $b / $c % $d * $f", "$a % $b / $c % $d * $f"},
 
-                //TODO rstoll TINS-255 translator procedural - expressions
-//                {"$a instanceof MyClass", "$a instanceof MyClass"},
-//                {"$a instanceof $b", "$a instanceof $b"},
+                {"$a instanceof MyClass", "$a instanceof MyClass"},
+                {"$a instanceof $b", "$a instanceof $b"},
         });
 
     }
@@ -258,11 +257,10 @@ public class ExpressionHelper
                 {"a\\b", "a\\b"},
                 {"$a", "$a"},
                 {"(-$a + $b) * $c", "(-$a + $b) * $c"},
-                //TODO rstoll TINS-255 translator procedural - expressions
-//                {
-//                        "!($a instanceof Type) || $a < $b+$c == ~(1 | 3 & 12)",
-//                        "!($a instanceof Type) || $a < $b + $c == ~(1 | 3 & 12)"
-//                }
+                {
+                        "!($a instanceof Type) || $a < $b+$c == ~(1 | 3 & 12)",
+                        "!($a instanceof Type) || $a < $b + $c == ~(1 | 3 & 12)"
+                }
         });
     }
 }
