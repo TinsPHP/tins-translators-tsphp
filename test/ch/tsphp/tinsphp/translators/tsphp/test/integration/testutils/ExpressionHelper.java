@@ -227,14 +227,14 @@ public class ExpressionHelper
                 {"$_GET", "$_GET"},
                 //TODO rstoll TINS-255 translator procedural - expressions
 //                {"$a[0]", "$a[0]"},
-                //TODO rstoll TINS-255 translator procedural - expressions
+                //TODO rstoll TINS-271 - translator OOP - expressions
 //                {"$a->a", "$a->a"},
 //                {"$a->foo()", "$a->foo()"},
 //                {"$a->foo(true || false,123*9)", "$a->foo(true || false, 123 * 9)"},
-//                {"foo()", "foo()"},
-//                {"\\foo(1,1+2,3)", "\\foo(1, 1 + 2, 3)"},
-//                {"\\a\\foo()", "\\a\\foo()"},
-//                {"foo()", "foo()"},
+                {"foo()", "foo()"},
+                {"\\foo(1,1+2,3)", "\\foo(1, 1 + 2, 3)"},
+                {"\\a\\foo()", "\\a\\foo()"},
+                //TODO rstoll TINS-271 - translator OOP - expressions
 //                {"self::foo()", "self::foo()"},
 //                {"parent::foo()", "parent::foo()"},
 //                {"Foo::foo()", "Foo::foo()"},

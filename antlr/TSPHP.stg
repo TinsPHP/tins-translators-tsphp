@@ -86,6 +86,10 @@ clone(expression) ::= <<
 clone <expression>
 >>
 
+functionCall(identifier, parameters) ::= <<
+<identifier>(<parameters; separator=", ">)
+>>
+
 method(modifier, returnType, identifier, params, body) ::=<<
 <if(modifier)><modifier> <endif>function <returnType> <identifier>(<if(params)><params><endif>) {<if(body)>
 

@@ -632,8 +632,7 @@ catchBlock
 expression
     :   atom                    -> {$atom.st}
     |   operator                -> {$operator.st}
-    //TODO rstoll TINS-255 translator procedural - expressions
-    //|   functionCall            -> {$functionCall.st}
+    |   functionCall            -> {$functionCall.st}
     //TODO rstoll TINS-271 - translator OOP - expressions 
     //|   methodCall              -> {$methodCall.st}
     //|   methodCallSelfOrParent  -> {$methodCallSelfOrParent.st}
@@ -815,10 +814,8 @@ newOperator
     ;
 */
 
-//TODO rstoll TINS-255 translator procedural - expressions
-/*
 functionCall
-    :   ^(FUNCTION_CALL    identifier=TYPE_NAME actualParameters)
+    :   ^(FUNCTION_CALL identifier=TYPE_NAME actualParameters)
         -> functionCall(identifier={getMethodName($identifier.text)}, parameters={$actualParameters.parameters})
     ;
 
@@ -826,7 +823,6 @@ actualParameters returns[List<Object> parameters]
     :   ^(ACTUAL_PARAMETERS params+=expression+) {$parameters=$params;}
     |   ACTUAL_PARAMETERS
     ;   
-*/
 
 //TODO rstoll TINS-271 - translator OOP - expressions 
 /*
