@@ -630,16 +630,16 @@ catchBlock
 
 
 expression
-    :   atom                    -> {$atom.st}
-    |   operator                -> {$operator.st}
-    |   functionCall            -> {$functionCall.st}
+    :   atom                       -> {$atom.st}
+    |   operator                   -> {$operator.st}
+    |   functionCall               -> {$functionCall.st}
     //TODO rstoll TINS-271 - translator OOP - expressions 
-    //|   methodCall              -> {$methodCall.st}
-    //|   methodCallSelfOrParent  -> {$methodCallSelfOrParent.st}
-    //|   methodCallStatic        -> {$methodCallStatic.st}
-    //|   classStaticAccess       -> {$classStaticAccess.st}
-    |   postFixExpression       -> {$postFixExpression.st}
-    |   exit                    -> {$exit.st}
+    //|   methodCall                 -> {$methodCall.st}
+    //|   methodCallSelfOrParent     -> {$methodCallSelfOrParent.st}
+    //|   methodCallStatic           -> {$methodCallStatic.st}
+    //|   classStaticAccess          -> {$classStaticAccess.st}
+    |   postFixExpression          -> {$postFixExpression.st}
+    |   ^('exit' ex=expression?)   -> exit(expression={$ex.st})
     ;
   
 atom
@@ -873,9 +873,4 @@ postFixExpression
     //        identifier={getMethodName($Identifier.text)},
     //        parameters={$actualParameters.parameters}
     //    )
-    ;
-
-exit
-    :   ^('exit' expression)   -> exit(expression={$expression.st})
-    |   'exit'                  -> exit(expression={null})
     ;
