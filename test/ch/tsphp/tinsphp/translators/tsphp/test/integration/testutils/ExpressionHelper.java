@@ -110,30 +110,30 @@ public class ExpressionHelper
                         "$a = $b += $c -= $d *= $e /= $f &= $g |= $h ^= $i %= $j .= $k <<= $l >>= $m",
                         "$a = $b += $c -= $d *= $e /= $f &= $g |= $h ^= $i %= $j .= $k <<= $l >>= $m"
                 },
-                //TODO rstoll TINS-255 translator procedural - expressions
-//                {"true ? $a : $b", "true ? $a : $b"},
-//                {"true ? ($a ? $b : $c) : $d", "true ? $a ? $b : $c : $d"},
-//                {"true ? $a : ($b ? $c : $d)", "true ? $a : $b ? $c : $d"},
-//                {"$a = true ? $c += $d : ($e -= $f)", "$a = true ? ($c = $c + $d) : ($e = $e - $f)"},
-//                {
-//                        "($a *= true) ? $c /= $d ? $e &= $f : ($g |= $h) : ($i ^= $j)",
-//                        "($a = $a * true) ? ($c = $c / ($d ? ($e = $e & $f) : ($g = $g | $h))) : ($i = $i ^ $j)"
-//                },
-//                {
-//                        "$a %= true ? $c .= $d ? $e <<= $f : ($g >>= $h) : ($i = $j)",
-//                        "$a = $a % (true ? ($c = $c . ($d ? ($e = $e << $f) : ($g = $g >> $h))) : ($i = $j))"
-//                },
-//                // = has lower precedence than ternary
-//                // and the following is equal to $a = (true ? $a : $b) = 1
-//                {"$a = true ? $a : $b = 1", "$a = true ? $a : $b = 1"},
+
+                {"true ? $a : $b", "true ? $a : $b"},
+                {"true ? ($a ? $b : $c) : $d", "true ? $a ? $b : $c : $d"},
+                {"true ? $a : ($b ? $c : $d)", "true ? $a : $b ? $c : $d"},
+                {"$a = true ? $c += $d : ($e -= $f)", "$a = true ? ($c += $d) : ($e -= $f)"},
+                {
+                        "($a *= true) ? $c /= $d ? $e &= $f : ($g |= $h) : ($i ^= $j)",
+                        "($a *= true) ? ($c /= $d ? ($e &= $f) : ($g |= $h)) : ($i ^= $j)"
+                },
+                {
+                        "$a %= true ? $c .= $d ? $e <<= $f : ($g >>= $h) : ($i = $j)",
+                        "$a %= true ? ($c .= $d ? ($e <<= $f) : ($g >>= $h)) : ($i = $j)"
+                },
+                // = has lower precedence than ternary
+                // and the following is equal to $a = (true ? $a : $b) = 1
+                {"$a = true ? $a : $b = 1", "$a = true ? $a : $b = 1"},
+
                 {"$a || $b", "$a || $b"},
                 {"$a || $b || $c", "$a || $b || $c"},
                 {"$a && $b", "$a && $b"},
                 {"$a && $b && $c", "$a && $b && $c"},
                 {"$a && $b || $c", "$a && $b || $c"},
                 {"$a || $b && $c", "$a || $b && $c"},
-                //TODO rstoll TINS-255 translator procedural - expressions
-//                {"$a || $b && $c ? $d : $e", "$a || $b && $c ? $d : $e"},
+                {"$a || $b && $c ? $d : $e", "$a || $b && $c ? $d : $e"},
 
                 {"$a | $b", "$a | $b"},
                 {"$a | $b | $c", "$a | $b | $c"},
@@ -153,11 +153,10 @@ public class ExpressionHelper
                 {"$a <= $b", "$a <= $b"},
                 {"$a > $b", "$a > $b"},
                 {"$a >= $b", "$a >= $b"},
-                //TODO rstoll TINS-255 translator procedural - expressions
-//                {
-//                        "$a == $b | $c < $d & $e ? $f != $g : $h === $i",
-//                        "$a == $b | $c < $d & $e ? $f != $g : $h === $i"
-//                },
+                {
+                        "$a == $b | $c < $d & $e ? $f != $g : $h === $i",
+                        "$a == $b | $c < $d & $e ? $f != $g : $h === $i"
+                },
                 {"1 << 2", "1 << 2"},
                 {"1 << 2 << 3", "1 << 2 << 3"},
                 {"1 >> 2", "1 >> 2"},

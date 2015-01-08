@@ -698,8 +698,7 @@ operator
             left={$left.st}, right={$right.st},
             needParentheses={$binaryOperator.needParentheses}
         )
-    //TODO rstoll TINS-255 translator procedural - expressions
-    /* 
+
     |   ^(QuestionMark cond=expression ifCase=expression elseCase=expression)
         -> ternaryOperator(
             cond={$cond.st},
@@ -707,7 +706,9 @@ operator
             elseCase={$elseCase.st},
             needParentheses={precedenceHelper.needParentheses($QuestionMark)}
         )
-
+        
+    //TODO rstoll TINS-255 translator procedural - expressions
+    /* 
     |   castOperator
         -> {$castOperator.st}
 

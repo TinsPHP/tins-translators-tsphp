@@ -44,14 +44,6 @@ assign(id,value) ::=<<
 <id> = <value>
 >>
 
-unaryPreOperator(operator, expression) ::= <<
-<operator><expression>
->>
-
-unaryPostOperator(operator, expression) ::= <<
-<expression><operator>
->>
-
 localVariableDeclarationList(type, variables) ::=<<
 <type> <variables; separator=",">;
 >>
@@ -70,8 +62,20 @@ keyValue(key, value) ::= <<
 
 operator(o) ::= "<o>"
 
+unaryPreOperator(operator, expression) ::= <<
+<operator><expression>
+>>
+
+unaryPostOperator(operator, expression) ::= <<
+<expression><operator>
+>>
+
 binaryOperator(operator, left, right, needParentheses) ::= <<
 <if(needParentheses)>(<endif><left> <operator> <right><if(needParentheses)>)<endif>
+>>
+
+ternaryOperator(cond, ifCase, elseCase, needParentheses) ::= <<
+<if(needParentheses)>(<endif><cond> ? <ifCase> : <elseCase><if(needParentheses)>)<endif>
 >>
 
 method(modifier, returnType, identifier, params, body) ::=<<
