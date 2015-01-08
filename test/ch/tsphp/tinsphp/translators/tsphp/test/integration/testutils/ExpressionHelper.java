@@ -134,6 +134,7 @@ public class ExpressionHelper
                 {"$a || $b && $c", "$a || $b && $c"},
                 //TODO rstoll TINS-255 translator procedural - expressions
 //                {"$a || $b && $c ? $d : $e", "$a || $b && $c ? $d : $e"},
+
                 {"$a | $b", "$a | $b"},
                 {"$a | $b | $c", "$a | $b | $c"},
                 {"$a ^ $b", "$a ^ $b"},
@@ -142,10 +143,12 @@ public class ExpressionHelper
                 {"$a & $b & $c", "$a & $b & $c"},
                 {"$a & $b | $c ^ $d", "$a & $b | $c ^ $d"},
                 {"($a | $b) & $c ^ $d", "($a | $b) & $c ^ $d"},
+
                 {"$a == $b", "$a == $b"},
                 {"$a === $b", "$a === $b"},
                 {"$a != $b", "$a != $b"},
                 {"$a !== $b", "$a !== $b"},
+
                 {"$a < $b", "$a < $b"},
                 {"$a <= $b", "$a <= $b"},
                 {"$a > $b", "$a > $b"},
@@ -156,12 +159,26 @@ public class ExpressionHelper
 //                        "$a == $b | $c < $d & $e ? $f != $g : $h === $i"
 //                },
                 {"1 << 2", "1 << 2"},
+                {"1 << 2 << 3", "1 << 2 << 3"},
                 {"1 >> 2", "1 >> 2"},
+                {"1 >> 2 >> 3", "1 >> 2 >> 3"},
                 {"1 >> 2 << 3 >> 5", "1 >> 2 << 3 >> 5"},
+
                 {"1 + 2", "1 + 2"},
+                {"1 + 2 + 3", "1 + 2 + 3"},
                 {"1 - 2", "1 - 2"},
+                {"1 - 2 - 3", "1 - 2 - 3"},
                 {"$a . $b", "$a . $b"},
-                {"$a << $b >> $c + $d * $e - $f", "$a << $b >> $c + $d * $e - $f"},
+                {"$a . $b . $c", "$a . $b . $c"},
+                {"$a + $b . $c + $d - $f", "$a + $b . $c + $d - $f"},
+
+                {"$a * $b", "$a * $b"},
+                {"$a * $b * $c", "$a * $b * $c"},
+                {"$a / $b", "$a / $b"},
+                {"$a / $b / $c", "$a / $b / $c"},
+                {"$a % $b", "$a % $b"},
+                {"$a % $b % $c", "$a % $b % $c"},
+                {"$a % $b / $c % $d * $f", "$a % $b / $c % $d * $f"},
 
                 //TODO rstoll TINS-255 translator procedural - expressions
 //                {"$a instanceof MyClass", "$a instanceof MyClass"},
