@@ -75,8 +75,7 @@ public class ExpressionHelper
 
     public static List<String[]> getExpressions() {
         List<String[]> list = new ArrayList<>();
-        //TODO rstoll TINS-255 translator procedural - expressions
-//        list.addAll(getExpressionsWithoutUnaryPrimary());
+        list.addAll(getExpressionsWithoutUnaryPrimary());
         list.addAll(ExpressionHelper.getUnaryPrimaryExpressions());
         return list;
     }
@@ -96,45 +95,45 @@ public class ExpressionHelper
                 {"$a or $b and $c xor $d", "$a or $b and $c xor $d"},
 
                 {"$a = $b", "$a = $b"},
-                {"$a += $b", "$a = $a + $b"},
-                {"$a -= $b", "$a = $a - $b"},
-                {"$a *= $b", "$a = $a * $b"},
-                {"$a /= $b", "$a = $a / $b"},
-                {"$a &= $b", "$a = $a & $b"},
-                {"$a |= $b", "$a = $a | $b"},
-                {"$a ^= $b", "$a = $a ^ $b"},
-                {"$a %= $b", "$a = $a % $b"},
-                {"$a .= $b", "$a = $a . $b"},
-                {"$a <<= $b", "$a = $a << $b"},
-                {"$a >>= $b", "$a = $a >> $b"},
+                {"$a += $b", "$a += $b"},
+                {"$a -= $b", "$a -= $b"},
+                {"$a *= $b", "$a *= $b"},
+                {"$a /= $b", "$a /= $b"},
+                {"$a &= $b", "$a &= $b"},
+                {"$a |= $b", "$a |= $b"},
+                {"$a ^= $b", "$a ^= $b"},
+                {"$a %= $b", "$a %= $b"},
+                {"$a .= $b", "$a .= $b"},
+                {"$a <<= $b", "$a <<= $b"},
+                {"$a >>= $b", "$a >>= $b"},
                 {
                         "$a = $b += $c -= $d *= $e /= $f &= $g |= $h ^= $i %= $j .= $k <<= $l >>= $m",
-                        "$a = $b = $b + ($c = $c - ($d = $d * ($e = $e / ($f = $f & ($g = $g | ($h = $h ^ "
-                                + "($i = $i % ($j = $j . ($k = $k << ($l = $l >> $m))))))))))"
+                        "$a = $b += $c -= $d *= $e /= $f &= $g |= $h ^= $i %= $j .= $k <<= $l >>= $m"
                 },
-
-                {"true ? $a : $b", "true ? $a : $b"},
-                {"true ? ($a ? $b : $c) : $d", "true ? $a ? $b : $c : $d"},
-                {"true ? $a : ($b ? $c : $d)", "true ? $a : $b ? $c : $d"},
-                {"$a = true ? $c += $d : ($e -= $f)", "$a = true ? ($c = $c + $d) : ($e = $e - $f)"},
-                {
-                        "($a *= true) ? $c /= $d ? $e &= $f : ($g |= $h) : ($i ^= $j)",
-                        "($a = $a * true) ? ($c = $c / ($d ? ($e = $e & $f) : ($g = $g | $h))) : ($i = $i ^ $j)"
-                },
-                {
-                        "$a %= true ? $c .= $d ? $e <<= $f : ($g >>= $h) : ($i = $j)",
-                        "$a = $a % (true ? ($c = $c . ($d ? ($e = $e << $f) : ($g = $g >> $h))) : ($i = $j))"
-                },
-                // = has lower precedence than ternary
-                // and the following is equal to $a = (true ? $a : $b) = 1
-                {"$a = true ? $a : $b = 1", "$a = true ? $a : $b = 1"},
+                //TODO rstoll TINS-255 translator procedural - expressions
+//                {"true ? $a : $b", "true ? $a : $b"},
+//                {"true ? ($a ? $b : $c) : $d", "true ? $a ? $b : $c : $d"},
+//                {"true ? $a : ($b ? $c : $d)", "true ? $a : $b ? $c : $d"},
+//                {"$a = true ? $c += $d : ($e -= $f)", "$a = true ? ($c = $c + $d) : ($e = $e - $f)"},
+//                {
+//                        "($a *= true) ? $c /= $d ? $e &= $f : ($g |= $h) : ($i ^= $j)",
+//                        "($a = $a * true) ? ($c = $c / ($d ? ($e = $e & $f) : ($g = $g | $h))) : ($i = $i ^ $j)"
+//                },
+//                {
+//                        "$a %= true ? $c .= $d ? $e <<= $f : ($g >>= $h) : ($i = $j)",
+//                        "$a = $a % (true ? ($c = $c . ($d ? ($e = $e << $f) : ($g = $g >> $h))) : ($i = $j))"
+//                },
+//                // = has lower precedence than ternary
+//                // and the following is equal to $a = (true ? $a : $b) = 1
+//                {"$a = true ? $a : $b = 1", "$a = true ? $a : $b = 1"},
                 {"$a || $b", "$a || $b"},
                 {"$a || $b || $c", "$a || $b || $c"},
                 {"$a && $b", "$a && $b"},
                 {"$a && $b && $c", "$a && $b && $c"},
                 {"$a && $b || $c", "$a && $b || $c"},
                 {"$a || $b && $c", "$a || $b && $c"},
-                {"$a || $b && $c ? $d : $e", "$a || $b && $c ? $d : $e"},
+                //TODO rstoll TINS-255 translator procedural - expressions
+//                {"$a || $b && $c ? $d : $e", "$a || $b && $c ? $d : $e"},
                 {"$a | $b", "$a | $b"},
                 {"$a | $b | $c", "$a | $b | $c"},
                 {"$a ^ $b", "$a ^ $b"},
@@ -151,10 +150,11 @@ public class ExpressionHelper
                 {"$a <= $b", "$a <= $b"},
                 {"$a > $b", "$a > $b"},
                 {"$a >= $b", "$a >= $b"},
-                {
-                        "$a == $b | $c < $d & $e ? $f != $g : $h === $i",
-                        "$a == $b | $c < $d & $e ? $f != $g : $h === $i"
-                },
+                //TODO rstoll TINS-255 translator procedural - expressions
+//                {
+//                        "$a == $b | $c < $d & $e ? $f != $g : $h === $i",
+//                        "$a == $b | $c < $d & $e ? $f != $g : $h === $i"
+//                },
                 {"1 << 2", "1 << 2"},
                 {"1 >> 2", "1 >> 2"},
                 {"1 >> 2 << 3 >> 5", "1 >> 2 << 3 >> 5"},
@@ -163,8 +163,9 @@ public class ExpressionHelper
                 {"$a . $b", "$a . $b"},
                 {"$a << $b >> $c + $d * $e - $f", "$a << $b >> $c + $d * $e - $f"},
 
-                {"$a instanceof MyClass", "$a instanceof MyClass"},
-                {"$a instanceof $b", "$a instanceof $b"},
+                //TODO rstoll TINS-255 translator procedural - expressions
+//                {"$a instanceof MyClass", "$a instanceof MyClass"},
+//                {"$a instanceof $b", "$a instanceof $b"},
         });
 
     }
