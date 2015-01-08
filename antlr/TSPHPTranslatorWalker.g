@@ -383,29 +383,29 @@ formalParameters
     List<StringTemplate> declarations = new ArrayList<>();
 }
     :   ^(PARAMETER_LIST (param=paramDeclaration {parameterDtos.add($param.parameterDto);})+) 
-    	{
+        {
 
-    	   boolean canBeDefaultValue = true;
-    	   for(int i=parameterDtos.size()-1; i >= 0; --i){    	
-    	       ParameterDto dto = parameterDtos.get(i);   	
-    	       String defaultValue = canBeDefaultValue ? dto.defaultValue : null;
-    	       canBeDefaultValue &= defaultValue != null; 
-    	       if(!canBeDefaultValue && !dto.suffixModifiers.contains("?") && dto.defaultValue != null && dto.defaultValue.toLowerCase().equals("null")){
-    	           dto.suffixModifiers.add("?");
-    	       }
-    	       StringTemplate type = %type(
-    	               prefixModifiers={dto.prefixModifiers}, 
-    	               type={dto.type},
-    	               suffixModifiers={dto.suffixModifiers}
-    	       );
-    	       declarations.add(0, %parameter(
-    	           type={type},
-    	           variableId={dto.variableId}, 
-    	           defaultValue={defaultValue}
-    	       ));
-    	   }
-    	}
-    	-> parameterList(declarations={declarations})
+           boolean canBeDefaultValue = true;
+           for(int i=parameterDtos.size()-1; i >= 0; --i){
+               ParameterDto dto = parameterDtos.get(i);
+               String defaultValue = canBeDefaultValue ? dto.defaultValue : null;
+               canBeDefaultValue &= defaultValue != null; 
+               if(!canBeDefaultValue && !dto.suffixModifiers.contains("?") && dto.defaultValue != null && dto.defaultValue.toLowerCase().equals("null")){
+                   dto.suffixModifiers.add("?");
+               }
+               StringTemplate type = %type(
+                       prefixModifiers={dto.prefixModifiers}, 
+                       type={dto.type},
+                       suffixModifiers={dto.suffixModifiers}
+               );
+               declarations.add(0, %parameter(
+                   type={type},
+                   variableId={dto.variableId}, 
+                   defaultValue={defaultValue}
+               ));
+           }
+        }
+        -> parameterList(declarations={declarations})
     |   PARAMETER_LIST -> {null}
     ;
 
@@ -517,7 +517,6 @@ instruction
     |   forLoop                         -> {$forLoop.st}
     //TODO rstoll TINS-247 translate procedural - foreach header
     //|   foreachLoop                     -> {$foreachLoop.st}
-    //TODO rstoll TINS-254 translator procedural - control structures
     |   whileLoop                       -> {$whileLoop.st}
     |   doWhileLoop                     -> {$doWhileLoop.st}
     //TODO rstoll TINS-248 translate procedural - catch header

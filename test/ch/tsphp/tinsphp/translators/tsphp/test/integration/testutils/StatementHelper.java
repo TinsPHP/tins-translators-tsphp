@@ -25,39 +25,43 @@ public class StatementHelper
             String prefixExpected, String indent, String appendixExpected) {
         List<Object[]> collection = new ArrayList<>();
 
-        collection.addAll(getControlStructures(prefix, "int $a;", appendix,
+        collection.addAll(getControlStructures(prefix, "$a;", appendix,
                 prefixExpected, indent, "$a;", appendixExpected));
 
         collection.addAll(Arrays.asList(new Object[][]{
-                {prefix + "int $a;" + appendix, prefixExpected + "\n" + indent + "$a;" + appendixExpected},
+                //localVariableDeclartion not possible to define via PHP
+//                {prefix + "int $a;" + appendix, prefixExpected + "\n" + indent + "$a;" + appendixExpected},
                 {prefix + ";" + appendix, prefixExpected + appendixExpected},
-                {prefix + "return;" + appendix, prefixExpected + "\n" + indent + "return;" + appendixExpected},
+                //TODO rstoll TINS-270 translator procedural - instructions
+//                {prefix + "return;" + appendix, prefixExpected + "\n" + indent + "return;" + appendixExpected},
+//                {
+//                        prefix + "throw new Exception();" + appendix,
+//                        prefixExpected + "\n" + indent + "throw new Exception();" + appendixExpected
+//                },
+//                {prefix + "break;" + appendix, prefixExpected + "\n" + indent + "break;" + appendixExpected},
+//                {prefix + "continue;" + appendix, prefixExpected + "\n" + indent + "continue;" + appendixExpected},
+//                {
+//                        prefix + "echo 'hello';" + appendix,
+//                        prefixExpected + "\n" + indent + "echo 'hello';" + appendixExpected
+//                },
                 {
-                        prefix + "throw new Exception();" + appendix,
-                        prefixExpected + "\n" + indent + "throw new Exception();" + appendixExpected
+                        prefix + "const a=1;" + appendix,
+                        prefixExpected + "\n" + indent + "const ? a = 1;" + appendixExpected
                 },
-                {prefix + "break;" + appendix, prefixExpected + "\n" + indent + "break;" + appendixExpected},
-                {prefix + "continue;" + appendix, prefixExpected + "\n" + indent + "continue;" + appendixExpected},
+                //TODO rstoll TINS-267 translator OOP - classes
+//                {
+//                        prefix + "class A{}" + appendix,
+//                        prefixExpected + "\n" + indent + "class A {}" + appendixExpected
+//                },
                 {
-                        prefix + "echo 'hello';" + appendix,
-                        prefixExpected + "\n" + indent + "echo 'hello';" + appendixExpected
+                        prefix + "function foo(){}" + appendix,
+                        prefixExpected + "\n" + indent + "function ? foo() {\n" + indent + "}" + appendixExpected
                 },
-                {
-                        prefix + "const int a=1;" + appendix,
-                        prefixExpected + "\n" + indent + "const a = 1;" + appendixExpected
-                },
-                {
-                        prefix + "class A{}" + appendix,
-                        prefixExpected + "\n" + indent + "class A {}" + appendixExpected
-                },
-                {
-                        prefix + "function void foo(){}" + appendix,
-                        prefixExpected + "\n" + indent + "function foo() {\n" + indent + "}" + appendixExpected
-                },
-                {
-                        prefix + "interface A{}" + appendix,
-                        prefixExpected + "\n" + indent + "interface A {}" + appendixExpected
-                },
+                //TODO rstoll TINS-268 translator OOP - interfaces
+//                {
+//                        prefix + "interface A{}" + appendix,
+//                        prefixExpected + "\n" + indent + "interface A {}" + appendixExpected
+//                },
                 {
                         prefix + "use \\A;" + appendix,
                         prefixExpected + "\n" + indent + "use \\A as A;" + appendixExpected
@@ -91,51 +95,36 @@ public class StatementHelper
                         prefixExpected + "\n" + indent + instructionExpected + appendixExpected
                 },
                 {
-                        prefix + "for(;;) " + instruction + appendix,
+                        prefix + "if($a)" + instruction + appendix,
                         prefixExpected + "\n" + indent
-                                + "for (; ; ) {\n" + indent + "    " + instructionExpected + "\n" + indent + "}"
+                                + "if ($a) {\n" + indent + "    " + instructionExpected + "\n" + indent + "}"
                                 + appendixExpected
                 },
                 {
-                        prefix + "for(;;){ " + instruction + "}" + appendix,
+                        prefix + "if($a){" + instruction + "}" + appendix,
                         prefixExpected + "\n" + indent
-                                + "for (; ; ) {\n" + indent + "    " + instructionExpected + "\n" + indent + "}"
+                                + "if ($a) {\n" + indent + "    " + instructionExpected + "\n" + indent + "}"
                                 + appendixExpected
                 },
                 {
-                        prefix + "foreach([] as int $k)" + instruction + appendix,
+                        prefix + "if($a) $a=1; else " + instruction + appendix,
                         prefixExpected + "\n" + indent
-                                + "foreach ([] as $k) {\n" + indent + "    " + instructionExpected + "\n" + indent + "}"
+                                + "if ($a) {\n"
+                                + indent + "    $a = 1;\n"
+                                + indent + "} else {\n"
+                                + indent + "    " + instructionExpected + "\n"
+                                + indent + "}"
                                 + appendixExpected
                 },
+
                 {
-                        prefix + "foreach([] as int $k){" + instruction + "}" + appendix,
+                        prefix + "if($a){$a=1;}else{" + instruction + "}" + appendix,
                         prefixExpected + "\n" + indent
-                                + "foreach ([] as $k) {\n" + indent + "    " + instructionExpected + "\n" + indent + "}"
-                                + appendixExpected
-                },
-                {
-                        prefix + "while(true)" + instruction + appendix,
-                        prefixExpected + "\n" + indent
-                                + "while (true) {\n" + indent + "    " + instructionExpected + "\n" + indent + "}"
-                                + appendixExpected
-                },
-                {
-                        prefix + "while(true){" + instruction + "}" + appendix,
-                        prefixExpected + "\n" + indent
-                                + "while (true) {\n" + indent + "    " + instructionExpected + "\n" + indent + "}"
-                                + appendixExpected
-                },
-                {
-                        prefix + "do " + instruction + " while(true);" + appendix,
-                        prefixExpected + "\n" + indent
-                                + "do {\n" + indent + "    " + instructionExpected + "\n" + indent + "} while (true);"
-                                + appendixExpected
-                },
-                {
-                        prefix + "do{ " + instruction + "}while(true);" + appendix,
-                        prefixExpected + "\n" + indent
-                                + "do {\n" + indent + "    " + instructionExpected + "\n" + indent + "} while (true);"
+                                + "if ($a) {\n"
+                                + indent + "    $a = 1;\n"
+                                + indent + "} else {\n"
+                                + indent + "    " + instructionExpected + "\n"
+                                + indent + "}"
                                 + appendixExpected
                 },
                 {
@@ -180,57 +169,76 @@ public class StatementHelper
                                 + appendixExpected
                 },
                 {
-                        prefix + "if($a)" + instruction + appendix,
+                        prefix + "for(;;) " + instruction + appendix,
                         prefixExpected + "\n" + indent
-                                + "if ($a) {\n" + indent + "    " + instructionExpected + "\n" + indent + "}"
+                                + "for (; ; ) {\n" + indent + "    " + instructionExpected + "\n" + indent + "}"
                                 + appendixExpected
                 },
                 {
-                        prefix + "if($a){" + instruction + "}" + appendix,
+                        prefix + "for(;;){ " + instruction + "}" + appendix,
                         prefixExpected + "\n" + indent
-                                + "if ($a) {\n" + indent + "    " + instructionExpected + "\n" + indent + "}"
+                                + "for (; ; ) {\n" + indent + "    " + instructionExpected + "\n" + indent + "}"
+                                + appendixExpected
+                },
+                //TODO rstoll TINS-247 translate procedural - foreach header
+//                {
+//                        prefix + "foreach([] as int $k)" + instruction + appendix,
+//                        prefixExpected + "\n" + indent
+//                                + "foreach ([] as $k) {\n" + indent + "    " + instructionExpected + "\n" + indent
+// + "}"
+//                                + appendixExpected
+//                },
+//                {
+//                        prefix + "foreach([] as int $k){" + instruction + "}" + appendix,
+//                        prefixExpected + "\n" + indent
+//                                + "foreach ([] as $k) {\n" + indent + "    " + instructionExpected + "\n" + indent
+// + "}"
+//                                + appendixExpected
+//                },
+                {
+                        prefix + "while(true)" + instruction + appendix,
+                        prefixExpected + "\n" + indent
+                                + "while (true) {\n" + indent + "    " + instructionExpected + "\n" + indent + "}"
                                 + appendixExpected
                 },
                 {
-                        prefix + "if($a) $a=1; else " + instruction + appendix,
+                        prefix + "while(true){" + instruction + "}" + appendix,
                         prefixExpected + "\n" + indent
-                                + "if ($a) {\n"
-                                + indent + "    $a = 1;\n"
-                                + indent + "} else {\n"
-                                + indent + "    " + instructionExpected + "\n"
-                                + indent + "}"
-                                + appendixExpected
-                },
-
-                {
-                        prefix + "if($a){$a=1;}else{" + instruction + "}" + appendix,
-                        prefixExpected + "\n" + indent
-                                + "if ($a) {\n"
-                                + indent + "    $a = 1;\n"
-                                + indent + "} else {\n"
-                                + indent + "    " + instructionExpected + "\n"
-                                + indent + "}"
+                                + "while (true) {\n" + indent + "    " + instructionExpected + "\n" + indent + "}"
                                 + appendixExpected
                 },
                 {
-                        prefix + "try{" + instruction + "}catch(\\Exception $e){}" + appendix,
+                        prefix + "do " + instruction + " while(true);" + appendix,
                         prefixExpected + "\n" + indent
-                                + "try {\n"
-                                + indent + "    " + instructionExpected + "\n"
-                                + indent + "} catch (\\Exception $e) {\n"
-                                + indent + "}"
+                                + "do {\n" + indent + "    " + instructionExpected + "\n" + indent + "} while (true);"
                                 + appendixExpected
                 },
                 {
-                        prefix + "try{$a=1;}catch(\\Exception $e){" + instruction + "}" + appendix,
+                        prefix + "do{ " + instruction + "}while(true);" + appendix,
                         prefixExpected + "\n" + indent
-                                + "try {\n"
-                                + indent + "    $a = 1;\n"
-                                + indent + "} catch (\\Exception $e) {\n"
-                                + indent + "    " + instructionExpected + "\n"
-                                + indent + "}"
+                                + "do {\n" + indent + "    " + instructionExpected + "\n" + indent + "} while (true);"
                                 + appendixExpected
-                }
+                },
+                //TODO rstoll TINS-248 translate procedural - catch header
+//                {
+//                        prefix + "try{" + instruction + "}catch(\\Exception $e){}" + appendix,
+//                        prefixExpected + "\n" + indent
+//                                + "try {\n"
+//                                + indent + "    " + instructionExpected + "\n"
+//                                + indent + "} catch (\\Exception $e) {\n"
+//                                + indent + "}"
+//                                + appendixExpected
+//                },
+//                {
+//                        prefix + "try{$a=1;}catch(\\Exception $e){" + instruction + "}" + appendix,
+//                        prefixExpected + "\n" + indent
+//                                + "try {\n"
+//                                + indent + "    $a = 1;\n"
+//                                + indent + "} catch (\\Exception $e) {\n"
+//                                + indent + "    " + instructionExpected + "\n"
+//                                + indent + "}"
+//                                + appendixExpected
+//                }
         });
     }
 }

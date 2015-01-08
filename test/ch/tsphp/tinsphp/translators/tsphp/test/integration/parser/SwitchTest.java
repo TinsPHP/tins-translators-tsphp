@@ -49,6 +49,14 @@ public class SwitchTest extends ATranslatorParserTest
                     "switch (" + expression[1] + ") {\n}"
             });
         }
+
+        for (String[] expression : expressions) {
+            collection.add(new Object[]{
+                    "switch(true){ case " + expression[0] + ":}",
+                    "switch (true) {\n    case " + expression[1] + ":\n\n}"
+            });
+        }
+
         collection.addAll(Arrays.asList(new Object[][]{
                 {
                         "switch($a){ case 1: $a=1; }",

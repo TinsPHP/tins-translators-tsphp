@@ -244,15 +244,16 @@ public class ExpressionHelper
 //                {"parent::a", "parent::a"},
 //                {"Foo::a", "Foo::a"},
 //                {"a\\Foo::a", "a\\Foo::a"},
+                {"null", "null"},
                 {"true", "true"},
                 {"false", "false"},
-                {"null", "null"},
-                {"a\\b", "a\\b"},
                 {"1", "1"},
                 {"2.123", "2.123"},
                 {"'a'", "'a'"},
                 {"\"asdf\"", "\"asdf\""},
                 {"[1,2,'a'=>3]", "[1, 2, 'a' => 3]"},
+                {"a\\b", "a\\b"},
+                {"$a", "$a"},
                 //TODO rstoll TINS-255 translator procedural - expressions
 //                {"(-$a + $b) * $c", "(-$a + $b) * $c"},
 //                {
