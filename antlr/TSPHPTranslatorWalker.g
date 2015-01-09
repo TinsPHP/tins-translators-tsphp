@@ -381,7 +381,7 @@ formalParameters
     List<ParameterDto> parameterDtos = new ArrayList<>();
     List<StringTemplate> declarations = new ArrayList<>();
 }
-    :   ^(PARAMETER_LIST (param=paramDeclaration {parameterDtos.add($param.parameterDto);})+) 
+    :   ^(PARAMETER_LIST (param=paramDeclaration {parameterDtos.add($param.parameterDto);})*) 
         {
 
            boolean canBeDefaultValue = true;
