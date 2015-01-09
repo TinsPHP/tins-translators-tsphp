@@ -62,8 +62,7 @@ public class NamespaceTest extends ATranslatorParserTest
                         "namespace{}\nnamespace a\\b{}\nnamespace{}\nnamespace a{}"
                 },
                 //without namespace and empty statement
-                //TODO rstoll TINS-255 translator procedural - expressions
-//                {"<?php ; ?>","namespace{}"},
+                {"<?php ; ?>", "namespace{\n}"},
                 //without namespace, statement and ?>
                 {"<?php ", "namespace{}"},
         });

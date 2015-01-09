@@ -7,6 +7,7 @@
 package ch.tsphp.tinsphp.translators.tsphp.test.unit.coverage;
 
 import ch.tsphp.tinsphp.translators.tsphp.antlr.TSPHPTranslatorWalker;
+import org.antlr.runtime.tree.TreeRuleReturnScope;
 import org.antlr.stringtemplate.StringTemplate;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,42 +21,41 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 @RunWith(Parameterized.class)
-public class RulesToStringTest
+public class RulesGetTemplateTest
 {
 
     private static final String WALKER_NAME = TSPHPTranslatorWalker.class.getName() + "$";
 
     private String ruleName;
 
-    public RulesToStringTest(String theRuleName) {
+    public RulesGetTemplateTest(String theRuleName) {
         ruleName = theRuleName;
     }
 
     @Test
-    public void toString_Standard_DelegatesToTemplate() throws ClassNotFoundException, IllegalAccessException,
+    public void getTemplate_IsDefined_ReturnsTemplate() throws ClassNotFoundException, IllegalAccessException,
             InstantiationException, NoSuchFieldException {
         StringTemplate stringTemplate = mock(StringTemplate.class);
-        String toString = "hello world";
-        when(stringTemplate.toString()).thenReturn(toString);
 
-        Object treeRuleReturnScope = Class.forName(WALKER_NAME + ruleName + "_return").newInstance();
+        TreeRuleReturnScope treeRuleReturnScope =
+                (TreeRuleReturnScope) Class.forName(WALKER_NAME + ruleName + "_return").newInstance();
         Field field = treeRuleReturnScope.getClass().getField("st");
         field.set(treeRuleReturnScope, stringTemplate);
-        String result = treeRuleReturnScope.toString();
+        StringTemplate result = (StringTemplate) treeRuleReturnScope.getTemplate();
 
-        assertEquals(ruleName + "- failed. ", toString, result);
+        assertEquals(ruleName + "- failed. ", stringTemplate, result);
     }
 
     @Test
-    public void toString_TemplateIsNull_ReturnsNull() throws ClassNotFoundException, IllegalAccessException,
+    public void getTemplate_IsNull_ReturnsNull() throws ClassNotFoundException, IllegalAccessException,
             InstantiationException, NoSuchFieldException {
         //no arrange necessary
 
-        Object treeRuleReturnScope = Class.forName(WALKER_NAME + ruleName + "_return").newInstance();
-        String result = treeRuleReturnScope.toString();
+        TreeRuleReturnScope treeRuleReturnScope =
+                (TreeRuleReturnScope) Class.forName(WALKER_NAME + ruleName + "_return").newInstance();
+        StringTemplate result = (StringTemplate) treeRuleReturnScope.getTemplate();
 
         assertNull(ruleName + "- failed. ", result);
     }

@@ -69,7 +69,6 @@ namespace
     
 namespaceBody
     :   ^(NAMESPACE_BODY statements+=statement*) -> body(statements={$statements})
-    |   NAMESPACE_BODY -> body(statements={null})
     ;
 
 statement
@@ -406,13 +405,11 @@ formalParameters
            }
         }
         -> parameterList(declarations={declarations})
-    |   PARAMETER_LIST -> {null}
     ;
 
 
 block returns[List<Object> instructions]
-    :   ^(BLOCK instr+=instruction+) {$instructions=$instr;}
-    |   BLOCK
+    :   ^(BLOCK instr+=instruction*) {$instructions=$instr;}
     ;
 
 //TODO rstoll TINS-268 translator OOP - interfaces
@@ -574,9 +571,6 @@ forLoop
 expressionList[boolean semicolonAtTheEnd]
     :   ^(EXPRESSION_LIST expr+=expression*)
         -> expressionList(expressions={$expr}, semicolonAtTheEnd={semicolonAtTheEnd})
-
-    |   EXPRESSION_LIST
-        -> expressionList(expressions={null}, semicolonAtTheEnd={semicolonAtTheEnd})
     ;
     
 //TODO rstoll TINS-247 translate procedural - foreach header
@@ -682,9 +676,7 @@ staticAccess
 */
  
 operator
-    : 
-        
-        ^(unaryPreOperator expr=expression)
+    :   ^(unaryPreOperator expr=expression)
         -> unaryPreOperator(operator ={$unaryPreOperator.st}, expression = {$expr.st})
 
     |   ^(unaryPostOperator expr=expression)
@@ -819,8 +811,7 @@ functionCall
     ;
 
 actualParameters returns[List<Object> parameters]
-    :   ^(ACTUAL_PARAMETERS params+=expression+) {$parameters=$params;}
-    |   ACTUAL_PARAMETERS
+    :   ^(ACTUAL_PARAMETERS params+=expression*) {$parameters=$params;}
     ;   
 
 //TODO rstoll TINS-271 - translator OOP - expressions 
