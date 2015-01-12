@@ -25,8 +25,7 @@ public class ExpressionHelper
      */
     public static List<String[]> getAllExpressions(int offset) {
         List<String[]> list = new ArrayList<>();
-        //TODO rstoll TINS-276 conversions and casts
-//        list.addAll(getCastToTypeExpressions(offset));
+        list.addAll(getCastToTypeExpressions(offset));
         list.addAll(getExpressions());
         return list;
     }
@@ -42,33 +41,34 @@ public class ExpressionHelper
                 + " : false)"
                 + " : null)";
         return Arrays.asList(new String[][]{
-                {"(MyClass) $a", $a},
-                {
-                        "(Type) (MyClass) $a",
-                        "(($_t1_" + (offset + 7) + " = " + $a + ") !== null ? "
-                                + "($_t1_" + (offset + 7) + " !== false ? "
-                                + "($_t1_" + (offset + 7) + " instanceof Type ? "
-                                + "$_t1_" + (offset + 7) + " "
-                                + ": \\trigger_error('Cast failed, the evaluation type of "
-                                + $a + " must be Type.', \\E_RECOVERABLE_ERROR)" +
-                                ")"
-                                + " : false)"
-                                + " : null)"
-                },
-                {"~~$a", "~~$a"},
-                {"@@$a", "@@$a"},
-                {
-                        "@(Type) ~$a",
-                        "@(($_t1_" + (offset + 8) + " = ~$a) !== null ? "
-                                + "($_t1_" + (offset + 8) + " !== false ? "
-                                + "($_t1_" + (offset + 8) + " instanceof Type ? "
-                                + "$_t1_" + (offset + 8) + " "
-                                + ": \\trigger_error('Cast failed, the evaluation type of "
-                                + "~$a must be Type.', \\E_RECOVERABLE_ERROR)" +
-                                ")"
-                                + " : false)"
-                                + " : null)"
-                },
+                //TODO rstoll TINS-276 conversions and casts
+//                {"(MyClass) $a", $a},
+//                {
+//                        "(Type) (MyClass) $a",
+//                        "(($_t1_" + (offset + 7) + " = " + $a + ") !== null ? "
+//                                + "($_t1_" + (offset + 7) + " !== false ? "
+//                                + "($_t1_" + (offset + 7) + " instanceof Type ? "
+//                                + "$_t1_" + (offset + 7) + " "
+//                                + ": \\trigger_error('Cast failed, the evaluation type of "
+//                                + $a + " must be Type.', \\E_RECOVERABLE_ERROR)" +
+//                                ")"
+//                                + " : false)"
+//                                + " : null)"
+//                },
+//                {"~~$a", "~~$a"},
+//                {"@@$a", "@@$a"},
+//                {
+//                        "@(Type) ~$a",
+//                        "@(($_t1_" + (offset + 8) + " = ~$a) !== null ? "
+//                                + "($_t1_" + (offset + 8) + " !== false ? "
+//                                + "($_t1_" + (offset + 8) + " instanceof Type ? "
+//                                + "$_t1_" + (offset + 8) + " "
+//                                + ": \\trigger_error('Cast failed, the evaluation type of "
+//                                + "~$a must be Type.', \\E_RECOVERABLE_ERROR)" +
+//                                ")"
+//                                + " : false)"
+//                                + " : null)"
+//                },
         });
     }
 

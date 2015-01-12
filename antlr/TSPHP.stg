@@ -177,3 +177,7 @@ return<if(expression)> <expression><endif>;
 throw(expression) ::= <<
 throw <expression>;
 >>
+
+echo(expressions) ::= <<
+echo <expressions; separator=", ">;
+>>
