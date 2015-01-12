@@ -38,15 +38,27 @@ public abstract class ATranslatorInferenceTest extends ATest
         inferenceEngine.registerIssueLogger(this);
 
         inferenceEngine.enrichWithDefinitions(ast, commonTreeNodeStream);
-        Assert.assertFalse(testString + " failed. found definition exception(s)",
-                inferenceEngine.hasFound(EnumSet.allOf(EIssueSeverity.class)));
+        checkDefinitionPhase(inferenceEngine);
 
         inferenceEngine.enrichWithReferences(ast, commonTreeNodeStream);
-        Assert.assertFalse(testString + " failed. found reference exception(s)",
-                inferenceEngine.hasFound(EnumSet.allOf(EIssueSeverity.class)));
+        checkReferencePhase(inferenceEngine);
 
         inferenceEngine.enrichtWithTypes(ast, commonTreeNodeStream);
-        Assert.assertFalse(testString + " failed. found type checking exception(s)",
+        checkInferencePhase(inferenceEngine);
+    }
+
+    protected void checkDefinitionPhase(IInferenceEngine inferenceEngine) {
+        Assert.assertFalse(testString + " failed. found issue(s) during the definition phase",
+                inferenceEngine.hasFound(EnumSet.allOf(EIssueSeverity.class)));
+    }
+
+    protected void checkReferencePhase(IInferenceEngine inferenceEngine) {
+        Assert.assertFalse(testString + " failed. found issue(s) during the reference phase",
+                inferenceEngine.hasFound(EnumSet.allOf(EIssueSeverity.class)));
+    }
+
+    protected void checkInferencePhase(IInferenceEngine inferenceEngine) {
+        Assert.assertFalse(testString + " failed. found issue(s) during the inference phase",
                 inferenceEngine.hasFound(EnumSet.allOf(EIssueSeverity.class)));
     }
 

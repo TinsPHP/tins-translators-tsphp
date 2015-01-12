@@ -43,19 +43,18 @@ public class ForTest extends ATranslatorParserTest
     public static Collection<Object[]> testStrings() {
         List<Object[]> collection = new ArrayList<>();
         collection.addAll(Arrays.asList(new Object[][]{
-                //TODO rstoll TINS-255 translator procedural - expressions
-//                {
-//                        "for($a=1     ; true ; ++$i  ) $a=1;",
-//                        "for ($a = 1; true; ++$i) {\n    $a = 1;\n}"
-//                },
-//                {
-//                        "for(         ; true ; ++$i  ) $a=1;",
-//                        "for (; true; ++$i) {\n    $a = 1;\n}"
-//                },
-//                {
-//                        "for(         ;      ; $i+=1 ) $a=1;",
-//                        "for (; ; $i = $i + 1) {\n    $a = 1;\n}"
-//                },
+                {
+                        "for($a=1     ; true ; ++$i  ) $a=1;",
+                        "for ($a = 1; true; ++$i) {\n    $a = 1;\n}"
+                },
+                {
+                        "for(         ; true ; ++$i  ) $a=1;",
+                        "for (; true; ++$i) {\n    $a = 1;\n}"
+                },
+                {
+                        "for(         ;      ; $i+=1 ) $a=1;",
+                        "for (; ; $i = $i + 1) {\n    $a = 1;\n}"
+                },
                 {
                         "for(         ; true ;       ) $a=1;",
                         "for (; true; ) {\n    $a = 1;\n}"
@@ -64,11 +63,10 @@ public class ForTest extends ATranslatorParserTest
                         "for(         ;      ;       ) $a=1;",
                         "for (; ; ) {\n    $a = 1;\n}"
                 },
-                //TODO rstoll TINS-255 translator procedural - expressions
-//                {
-//                        "for(int $i=0;$i<10;++$i){}",
-//                        "for ($i = 0; $i < 10; ++$i) {\n}"
-//                }
+                {
+                        "for(int $i=0;$i<10;++$i){}",
+                        "for ($i = 0; $i < 10; ++$i) {\n}"
+                }
         }));
 
         List<String[]> expressions = ExpressionHelper.getExpressions();
