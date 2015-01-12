@@ -173,3 +173,7 @@ do {
 return(expression) ::= <<
 return<if(expression)> <expression><endif>;
 >>
+
+throw(expression) ::= <<
+throw <expression>;
+>>

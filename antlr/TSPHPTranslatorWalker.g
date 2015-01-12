@@ -520,8 +520,8 @@ instruction
     //|   tryCatch                        -> {$tryCatch.st}
     |   ^(EXPRESSION expression?)       -> expression(expression={$expression.st})
     |   ^('return' expression?)         -> return(expression = {$expression.st})
+    |   ^('throw' expression)           -> throw(expression = {$expression.st})
     //TODO rstoll TINS-270 translator procedural - instructions
-    //|   ^('throw' expression)           -> throw(expression = {$expression.st})
     //|   ^('echo' exprs+=expression+)    -> echo(expressions = {$exprs})
     //|   ^('break' index=Int)            -> break(index={$index.text})
     //|   'break'                         -> break(index={null})
