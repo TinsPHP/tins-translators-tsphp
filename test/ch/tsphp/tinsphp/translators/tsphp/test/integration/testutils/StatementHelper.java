@@ -34,8 +34,8 @@ public class StatementHelper
                 {prefix + ";" + appendix, prefixExpected + appendixExpected},
                 {prefix + "return;" + appendix, prefixExpected + "\n" + indent + "return;" + appendixExpected},
                 {
-                        prefix + "throw new Exception();" + appendix,
-                        prefixExpected + "\n" + indent + "throw new Exception();" + appendixExpected
+                        prefix + "throw $a;" + appendix,
+                        prefixExpected + "\n" + indent + "throw $a;" + appendixExpected
                 },
                 {prefix + "break;" + appendix, prefixExpected + "\n" + indent + "break;" + appendixExpected},
                 {prefix + "continue;" + appendix, prefixExpected + "\n" + indent + "continue;" + appendixExpected},

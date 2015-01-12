@@ -53,7 +53,7 @@ public class ForTest extends ATranslatorParserTest
                 },
                 {
                         "for(         ;      ; $i+=1 ) $a=1;",
-                        "for (; ; $i = $i + 1) {\n    $a = 1;\n}"
+                        "for (; ; $i += 1) {\n    $a = 1;\n}"
                 },
                 {
                         "for(         ; true ;       ) $a=1;",
@@ -64,7 +64,7 @@ public class ForTest extends ATranslatorParserTest
                         "for (; ; ) {\n    $a = 1;\n}"
                 },
                 {
-                        "for(int $i=0;$i<10;++$i){}",
+                        "for($i=0;$i<10;++$i){}",
                         "for ($i = 0; $i < 10; ++$i) {\n}"
                 }
         }));
