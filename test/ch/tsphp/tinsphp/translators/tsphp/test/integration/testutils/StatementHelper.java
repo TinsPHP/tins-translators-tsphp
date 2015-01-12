@@ -32,18 +32,17 @@ public class StatementHelper
                 //localVariableDeclartion not possible to define via PHP
 //                {prefix + "int $a;" + appendix, prefixExpected + "\n" + indent + "$a;" + appendixExpected},
                 {prefix + ";" + appendix, prefixExpected + appendixExpected},
-                //TODO rstoll TINS-270 translator procedural - instructions
-//                {prefix + "return;" + appendix, prefixExpected + "\n" + indent + "return;" + appendixExpected},
-//                {
-//                        prefix + "throw new Exception();" + appendix,
-//                        prefixExpected + "\n" + indent + "throw new Exception();" + appendixExpected
-//                },
-//                {prefix + "break;" + appendix, prefixExpected + "\n" + indent + "break;" + appendixExpected},
-//                {prefix + "continue;" + appendix, prefixExpected + "\n" + indent + "continue;" + appendixExpected},
-//                {
-//                        prefix + "echo 'hello';" + appendix,
-//                        prefixExpected + "\n" + indent + "echo 'hello';" + appendixExpected
-//                },
+                {prefix + "return;" + appendix, prefixExpected + "\n" + indent + "return;" + appendixExpected},
+                {
+                        prefix + "throw new Exception();" + appendix,
+                        prefixExpected + "\n" + indent + "throw new Exception();" + appendixExpected
+                },
+                {prefix + "break;" + appendix, prefixExpected + "\n" + indent + "break;" + appendixExpected},
+                {prefix + "continue;" + appendix, prefixExpected + "\n" + indent + "continue;" + appendixExpected},
+                {
+                        prefix + "echo 'hello';" + appendix,
+                        prefixExpected + "\n" + indent + "echo 'hello';" + appendixExpected
+                },
                 {
                         prefix + "const a=1;" + appendix,
                         prefixExpected + "\n" + indent + "const ? a = 1;" + appendixExpected

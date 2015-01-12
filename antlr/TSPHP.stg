@@ -181,3 +181,11 @@ throw <expression>;
 echo(expressions) ::= <<
 echo <expressions; separator=", ">;
 >>
+
+break(index) ::= <<
+break<if(index)> <index><endif>;
+>>
+
+continue(index) ::= <<
+continue<if(index)> <index><endif>;
+>>

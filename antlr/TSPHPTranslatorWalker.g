@@ -522,13 +522,9 @@ instruction
     |   ^('return' expression?)         -> return(expression = {$expression.st})
     |   ^('throw' expression)           -> throw(expression = {$expression.st})
     |   ^('echo' exprs+=expression+)    -> echo(expressions = {$exprs})
-    //TODO rstoll TINS-270 translator procedural - instructions
-    //|   ^('break' index=Int)            -> break(index={$index.text})
-    //|   'break'                         -> break(index={null})
-    //|   ^('continue' index=Int)         -> continue(index={$index.text})
-    //|   'continue'                      -> continue(index={null})
+    |   ^('break' index=Int?)           -> break(index={$index.text})
+    |   ^('continue' index=Int?)        -> continue(index={$index.text})
     ;
-
 
 ifCondition
     :   ^('if'
