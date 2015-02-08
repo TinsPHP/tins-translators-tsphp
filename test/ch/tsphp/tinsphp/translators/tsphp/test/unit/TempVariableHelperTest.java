@@ -41,13 +41,19 @@ public class TempVariableHelperTest
     }
 
     @Test
-    public void getTempVariableName_IsVariable_ReturnVariableName() {
+    public void getTempVariableName_IsVariable_ReturnTempName() {
         ITSPHPAst ast = createAst(TokenTypes.VariableId, "$dummy");
+        IScope scope = mock(IScope.class);
+        when(ast.getScope()).thenReturn(scope);
+        ITSPHPAst tmpVariable = mock(ITSPHPAst.class);
+        when(astAdaptor.create(anyInt(), anyString())).thenReturn(tmpVariable);
+        when(scope.resolve(tmpVariable)).thenReturn(null);
+        when(tmpVariable.getText()).thenReturn("$_t12_14");
 
         ITempVariableHelper tempVariableHelper = createTempVariableHelper();
         String name = tempVariableHelper.getTempVariableName(ast);
 
-        assertThat(name, is("$dummy"));
+        assertThat(name, is("$_t12_14"));
     }
 
     @Test
@@ -115,6 +121,87 @@ public class TempVariableHelperTest
 
         ITempVariableHelper tempVariableHelper = createTempVariableHelper();
         String name = tempVariableHelper.getTempVariableName(ast);
+
+        assertThat(name, is("$_t12_14_1"));
+        verify(tmpVariable).setText("$_t12_14_1");
+    }
+
+    @Test
+    public void getTempVariableNameIfNotVariable_IsVariable_ReturnVariableName() {
+        ITSPHPAst ast = createAst(TokenTypes.VariableId, "$dummy");
+
+        ITempVariableHelper tempVariableHelper = createTempVariableHelper();
+        String name = tempVariableHelper.getTempVariableNameIfNotVariable(ast);
+
+        assertThat(name, is("$dummy"));
+    }
+
+    @Test
+    public void getTempVariableNameIfNotVariable_IsNotVariable_ReturnTempName() {
+        ITSPHPAst ast = createAst(TokenTypes.Plus, "+");
+        IScope scope = mock(IScope.class);
+        when(ast.getScope()).thenReturn(scope);
+        ITSPHPAst tmpVariable = mock(ITSPHPAst.class);
+        when(astAdaptor.create(anyInt(), anyString())).thenReturn(tmpVariable);
+        when(scope.resolve(tmpVariable)).thenReturn(null);
+        when(tmpVariable.getText()).thenReturn("$_t12_14");
+
+        ITempVariableHelper tempVariableHelper = createTempVariableHelper();
+        String name = tempVariableHelper.getTempVariableNameIfNotVariable(ast);
+
+        assertThat(name, is("$_t12_14"));
+    }
+
+    @Test
+    public void getTempVariableNameIfNotVariable_IsNotVariableAndScopeIsNull_ReturnTempName() {
+        ITSPHPAst ast = createAst(TokenTypes.Plus, "+");
+        when(ast.getScope()).thenReturn(null);
+        ITSPHPAst tmpVariable = mock(ITSPHPAst.class);
+        when(astAdaptor.create(anyInt(), anyString())).thenReturn(tmpVariable);
+        when(tmpVariable.getText()).thenReturn("$_t12_14");
+
+        ITempVariableHelper tempVariableHelper = createTempVariableHelper();
+        String name = tempVariableHelper.getTempVariableNameIfNotVariable(ast);
+
+        assertThat(name, is("$_t12_14"));
+    }
+
+    @Test
+    public void getTempVariableNameIfNotVariable_IsNotVariableTempAlreadyDefined_ReturnTempNameWithAppendix() {
+        ITSPHPAst ast = createAst(TokenTypes.Plus, "+");
+        when(ast.getLine()).thenReturn(12);
+        when(ast.getCharPositionInLine()).thenReturn(14);
+        IScope scope = mock(IScope.class);
+        when(ast.getScope()).thenReturn(scope);
+        ITSPHPAst tmpVariable = mock(ITSPHPAst.class);
+        when(astAdaptor.create(anyInt(), anyString())).thenReturn(tmpVariable);
+        when(scope.resolve(tmpVariable)).thenReturn(mock(ISymbol.class)).thenReturn(null);
+        when(tmpVariable.getText()).thenReturn("$_t12_14_0");
+
+        ITempVariableHelper tempVariableHelper = createTempVariableHelper();
+        String name = tempVariableHelper.getTempVariableNameIfNotVariable(ast);
+
+        assertThat(name, is("$_t12_14_0"));
+        verify(tmpVariable).setText("$_t12_14_0");
+    }
+
+    @Test
+    public void
+    getTempVariableNameIfNotVariable_IsNotVariableTempAlreadyDefinedTwice_ReturnTempNameWithAppendixCount1() {
+        ITSPHPAst ast = createAst(TokenTypes.Plus, "+");
+        when(ast.getLine()).thenReturn(12);
+        when(ast.getCharPositionInLine()).thenReturn(14);
+        IScope scope = mock(IScope.class);
+        when(ast.getScope()).thenReturn(scope);
+        ITSPHPAst tmpVariable = mock(ITSPHPAst.class);
+        when(astAdaptor.create(anyInt(), anyString())).thenReturn(tmpVariable);
+        when(scope.resolve(tmpVariable)).thenReturn(mock(ISymbol.class))
+                .thenReturn(mock(ISymbol.class))
+                .thenReturn(null);
+        when(tmpVariable.getText()).thenReturn("$_t12_14_1");
+
+        ITempVariableHelper tempVariableHelper = createTempVariableHelper();
+        String name = tempVariableHelper.getTempVariableNameIfNotVariable(ast);
 
         assertThat(name, is("$_t12_14_1"));
         verify(tmpVariable).setText("$_t12_14_1");

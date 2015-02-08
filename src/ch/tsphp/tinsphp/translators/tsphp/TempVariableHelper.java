@@ -33,10 +33,11 @@ public class TempVariableHelper implements ITempVariableHelper
 
     @Override
     public String getTempVariableName(ITSPHPAst expression) {
+        String tokenText = "$_t";
         if (expression.getToken().getType() == TokenTypes.VariableId) {
-            return expression.getText();
+            tokenText = expression.getText();
         }
-        String tokenText = "$_t" + expression.getLine() + "_" + expression.getCharPositionInLine();
+        tokenText += expression.getLine() + "_" + expression.getCharPositionInLine();
         ITSPHPAst tmpVariable = astAdaptor.create(TokenTypes.VariableId, tokenText);
         IScope scope = expression.getScope();
         ISymbol symbol = scope != null ? scope.resolve(tmpVariable) : null;
@@ -47,5 +48,13 @@ public class TempVariableHelper implements ITempVariableHelper
             ++count;
         }
         return tmpVariable.getText();
+    }
+
+    @Override
+    public String getTempVariableNameIfNotVariable(ITSPHPAst expression) {
+        if (expression.getToken().getType() == TokenTypes.VariableId) {
+            return expression.getText();
+        }
+        return getTempVariableName(expression);
     }
 }
