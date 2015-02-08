@@ -11,6 +11,7 @@ import ch.tsphp.tinsphp.common.ITranslator;
 import ch.tsphp.tinsphp.common.issues.EIssueSeverity;
 import ch.tsphp.tinsphp.common.issues.IIssueLogger;
 import ch.tsphp.tinsphp.common.translation.IPrecedenceHelper;
+import ch.tsphp.tinsphp.common.translation.ITempVariableHelper;
 import ch.tsphp.tinsphp.translators.tsphp.TSPHPTranslator;
 import org.antlr.runtime.tree.TreeNodeStream;
 import org.antlr.stringtemplate.StringTemplateGroup;
@@ -98,14 +99,19 @@ public class TSPHPTranslatorTest
     }
 
     private ITranslator createTranslator(Exception exception) {
-        return createTranslator(mock(StringTemplateGroup.class), mock(IPrecedenceHelper.class), exception);
+        return createTranslator(
+                mock(StringTemplateGroup.class),
+                mock(IPrecedenceHelper.class),
+                mock(ITempVariableHelper.class),
+                exception);
     }
 
     protected ITranslator createTranslator(
             StringTemplateGroup templateGroup,
             IPrecedenceHelper precedenceHelper,
+            ITempVariableHelper tempVariableHelper,
             Exception exception) {
-        return new TSPHPTranslator(templateGroup, precedenceHelper, exception);
+        return new TSPHPTranslator(templateGroup, precedenceHelper, tempVariableHelper, exception);
     }
 
 }

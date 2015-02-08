@@ -16,6 +16,7 @@ import ch.tsphp.common.ITSPHPAst;
 import ch.tsphp.common.TSPHPAst;
 import ch.tsphp.common.TSPHPAstAdaptor;
 import ch.tsphp.tinsphp.common.translation.IPrecedenceHelper;
+import ch.tsphp.tinsphp.common.translation.ITempVariableHelper;
 import ch.tsphp.tinsphp.translators.tsphp.antlrmod.ErrorReportingTSPHPTranslatorWalker;
 import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
@@ -29,11 +30,13 @@ public abstract class AWalkerTest
 {
     protected TreeNodeStream treeNodeStream;
     protected IPrecedenceHelper precedenceHelper;
+    protected ITempVariableHelper tempVariableHelper;
 
     protected ErrorReportingTSPHPTranslatorWalker createWalker(ITSPHPAst ast) {
         treeNodeStream = createTreeNodeStream(ast);
         precedenceHelper = mock(IPrecedenceHelper.class);
-        return new ErrorReportingTSPHPTranslatorWalker(treeNodeStream, precedenceHelper);
+        tempVariableHelper = mock(ITempVariableHelper.class);
+        return new ErrorReportingTSPHPTranslatorWalker(treeNodeStream, precedenceHelper, tempVariableHelper);
     }
 
     protected TreeNodeStream createTreeNodeStream(ITSPHPAst ast) {

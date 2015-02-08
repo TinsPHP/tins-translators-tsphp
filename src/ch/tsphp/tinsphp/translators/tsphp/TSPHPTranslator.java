@@ -19,6 +19,7 @@ import ch.tsphp.tinsphp.common.issues.EIssueSeverity;
 import ch.tsphp.tinsphp.common.issues.IIssueLogger;
 import ch.tsphp.tinsphp.common.issues.IssueReporterHelper;
 import ch.tsphp.tinsphp.common.translation.IPrecedenceHelper;
+import ch.tsphp.tinsphp.common.translation.ITempVariableHelper;
 import ch.tsphp.tinsphp.translators.tsphp.antlrmod.ErrorReportingTSPHPTranslatorWalker;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.TreeNodeStream;
@@ -36,6 +37,7 @@ public class TSPHPTranslator implements ITranslator, IIssueLogger
 
     private final StringTemplateGroup templateGroup;
     private final IPrecedenceHelper precedenceHelper;
+    private final ITempVariableHelper tempVariableHelper;
     private Collection<IIssueLogger> issueLoggers = new ArrayDeque<>();
     private EnumSet<EIssueSeverity> foundIssues = EnumSet.noneOf(EIssueSeverity.class);
     private Exception loadingTemplateException;
@@ -43,9 +45,11 @@ public class TSPHPTranslator implements ITranslator, IIssueLogger
     public TSPHPTranslator(
             StringTemplateGroup theTemplateGroup,
             IPrecedenceHelper thePrecedenceHelper,
+            ITempVariableHelper theTempVariableHelper,
             Exception exception) {
         templateGroup = theTemplateGroup;
         precedenceHelper = thePrecedenceHelper;
+        tempVariableHelper = theTempVariableHelper;
         loadingTemplateException = exception;
     }
 
@@ -55,7 +59,7 @@ public class TSPHPTranslator implements ITranslator, IIssueLogger
         if (loadingTemplateException == null) {
             stream.reset();
             ErrorReportingTSPHPTranslatorWalker translator =
-                    new ErrorReportingTSPHPTranslatorWalker(stream, precedenceHelper);
+                    new ErrorReportingTSPHPTranslatorWalker(stream, precedenceHelper, tempVariableHelper);
 
             for (IIssueLogger logger : issueLoggers) {
                 translator.registerIssueLogger(logger);

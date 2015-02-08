@@ -17,6 +17,7 @@ import ch.tsphp.tinsphp.common.issues.IIssueLogger;
 import ch.tsphp.tinsphp.common.issues.IIssueReporter;
 import ch.tsphp.tinsphp.common.issues.IssueReporterHelper;
 import ch.tsphp.tinsphp.common.translation.IPrecedenceHelper;
+import ch.tsphp.tinsphp.common.translation.ITempVariableHelper;
 import ch.tsphp.tinsphp.translators.tsphp.antlr.TSPHPTranslatorWalker;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.TreeNodeStream;
@@ -36,9 +37,10 @@ public class ErrorReportingTSPHPTranslatorWalker extends TSPHPTranslatorWalker i
 
     public ErrorReportingTSPHPTranslatorWalker(
             TreeNodeStream input,
-            IPrecedenceHelper precedenceHelper) {
+            IPrecedenceHelper precedenceHelper,
+            ITempVariableHelper tempVariableHelper) {
 
-        super(input, precedenceHelper);
+        super(input, precedenceHelper, tempVariableHelper);
     }
 
     @Override

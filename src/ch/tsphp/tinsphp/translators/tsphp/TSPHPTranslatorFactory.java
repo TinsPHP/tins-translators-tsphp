@@ -12,10 +12,13 @@
 
 package ch.tsphp.tinsphp.translators.tsphp;
 
+import ch.tsphp.common.ITSPHPAstAdaptor;
+import ch.tsphp.common.TSPHPAstAdaptor;
 import ch.tsphp.common.exceptions.TSPHPException;
 import ch.tsphp.tinsphp.common.ITranslator;
 import ch.tsphp.tinsphp.common.ITranslatorFactory;
 import ch.tsphp.tinsphp.common.translation.IPrecedenceHelper;
+import ch.tsphp.tinsphp.common.translation.ITempVariableHelper;
 import org.antlr.stringtemplate.StringTemplateGroup;
 
 import java.io.IOException;
@@ -32,10 +35,16 @@ public class TSPHPTranslatorFactory implements ITranslatorFactory
 
     private StringTemplateGroup templateGroup;
     private final IPrecedenceHelper precedenceHelper;
+    private final ITempVariableHelper tempVariableHelper;
     private Exception loadingTemplateException;
 
     public TSPHPTranslatorFactory() {
+        this(new TSPHPAstAdaptor());
+    }
+
+    public TSPHPTranslatorFactory(ITSPHPAstAdaptor anAstAdaptor) {
         precedenceHelper = new TSPHPPrecedenceHelper();
+        tempVariableHelper = new TempVariableHelper(anAstAdaptor);
         InputStreamReader streamReader = null;
         try {
             // LOAD TEMPLATES (via classpath)
@@ -63,6 +72,6 @@ public class TSPHPTranslatorFactory implements ITranslatorFactory
 
     @Override
     public ITranslator build() {
-        return new TSPHPTranslator(templateGroup, precedenceHelper, loadingTemplateException);
+        return new TSPHPTranslator(templateGroup, precedenceHelper, tempVariableHelper, loadingTemplateException);
     }
 }

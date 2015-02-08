@@ -10,7 +10,6 @@
  * For more information see http://tsphp.ch/wiki/display/TSPHP/License
  */
 
-
 package ch.tsphp.tinsphp.translators.tsphp.test.integration.parser;
 
 

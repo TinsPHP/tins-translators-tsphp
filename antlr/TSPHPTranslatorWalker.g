@@ -31,18 +31,22 @@ package ch.tsphp.tinsphp.translators.tsphp.antlr;
 import java.util.Set;
 import java.util.HashSet;
 import ch.tsphp.common.ITSPHPAst;
+import ch.tsphp.common.symbols.ISymbol;
 import ch.tsphp.common.symbols.ITypeSymbol;
 import ch.tsphp.tinsphp.common.translation.IPrecedenceHelper;
+import ch.tsphp.tinsphp.common.translation.ITempVariableHelper;
 import ch.tsphp.tinsphp.translators.tsphp.antlrmod.ParameterDto;
 
 }
 
 @members{
 private IPrecedenceHelper precedenceHelper;
+private ITempVariableHelper tempVariableHelper;
 
-public TSPHPTranslatorWalker(TreeNodeStream input, IPrecedenceHelper thePrecedenceHelper) {
+public TSPHPTranslatorWalker(TreeNodeStream input, IPrecedenceHelper thePrecedenceHelper, ITempVariableHelper theTempVariableHelper) {
     this(input);
     precedenceHelper = thePrecedenceHelper;
+    tempVariableHelper = theTempVariableHelper;
 }
 
 private String getMethodName(String name) {
@@ -512,8 +516,7 @@ instruction
     |   ifCondition                     -> {$ifCondition.st}
     |   switchCondition                 -> {$switchCondition.st}
     |   forLoop                         -> {$forLoop.st}
-    //TODO rstoll TINS-247 translate procedural - foreach header
-    //|   foreachLoop                     -> {$foreachLoop.st}
+    |   foreachLoop                     -> {$foreachLoop.st}
     |   whileLoop                       -> {$whileLoop.st}
     |   doWhileLoop                     -> {$doWhileLoop.st}
     //TODO rstoll TINS-248 translate procedural - catch header
@@ -569,25 +572,33 @@ expressionList[boolean semicolonAtTheEnd]
         -> expressionList(expressions={$expr}, semicolonAtTheEnd={semicolonAtTheEnd})
     ;
     
-//TODO rstoll TINS-247 translate procedural - foreach header
-/*  
 foreachLoop
     :   ^('foreach'
             expression
-            
-            //key 
-            (    ^(VARIABLE_DECLARATION_LIST
-                    ^(TYPE TYPE_MODIFIER scalarTypes) 
-                    keyVariableId=VariableId
-                )
-            )?
-                
-            ^(VARIABLE_DECLARATION_LIST ^(TYPE TYPE_MODIFIER allTypes) valueVariableId=VariableId) 
+            keyVariableId=VariableId?
+            valueVariableId=VariableId
             blockConditional
         )
-        -> foreach(array={$expression.st}, keyVariableId={$keyVariableId.text}, valueVariableId={$valueVariableId.text}, block={$blockConditional.instructions})
+        {
+            ITSPHPAst keyVarId = $keyVariableId;
+            String keyVarIdTemp = keyVarId != null ? tempVariableHelper.getTempVariableName(keyVarId) : null;
+            ISymbol keyVarIdSymbol = keyVarId != null ? keyVarId.getSymbol() : null;
+            String keyVarIdType = keyVarIdSymbol != null ? keyVarIdSymbol.getType().getName() : "?";
+            ITSPHPAst valueVarId = $valueVariableId;
+            ISymbol valueVarIdSymbol = valueVarId.getSymbol();
+            String valueVarIdType = valueVarIdSymbol != null ? valueVarIdSymbol.getType().getName() : "?";
+            
+        }
+        -> foreach(
+            array={$expression.st}, 
+            keyVariableIdType={keyVarIdType},
+            keyVariableId={keyVarId != null ? keyVarId.getText() : null}, 
+            keyVariableIdTemp={keyVarIdTemp}, 
+            valueVariableIdType={valueVarIdType},            
+            valueVariableId={valueVarId.getText()},
+            valueVariableIdTemp={tempVariableHelper.getTempVariableName(valueVarId)},
+            block={$blockConditional.instructions})
     ;
-*/
 
 whileLoop
     :   ^('while' expression blockConditional) 

@@ -158,6 +158,22 @@ expressionList(expressions,semicolonAtTheEnd) ::= <<
 <expressions; separator=", "><if(semicolonAtTheEnd)>;<endif>
 >>
 
+foreach(
+    array,
+    keyVariableIdType,
+    keyVariableId,
+    keyVariableIdTemp,
+    valueVariableIdType,
+    valueVariableId,
+    valueVariableIdTemp,
+    block) ::= <<
+foreach (<array> as <if(keyVariableIdTemp)><keyVariableIdType> <keyVariableIdTemp> => <endif><valueVariableIdType> <valueVariableIdTemp>) {
+    <if(keyVariableId)><keyVariableId> = <keyVariableIdTemp>;<endif>
+    <valueVariableId> = <valueVariableIdTemp>;
+    <block; separator="\n">
+}
+>>
+
 while(condition, block) ::= <<
 while (<condition>) {
     <block; separator="\n">
