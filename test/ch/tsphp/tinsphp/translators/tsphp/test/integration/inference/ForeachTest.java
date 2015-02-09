@@ -19,10 +19,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 @RunWith(Parameterized.class)
 public class ForeachTest extends ATranslatorInferenceTest
@@ -39,8 +37,7 @@ public class ForeachTest extends ATranslatorInferenceTest
 
     @Parameterized.Parameters
     public static Collection<Object[]> testStrings() {
-        List<Object[]> collection = new ArrayList<>();
-        collection.addAll(Arrays.asList(new Object[][]{
+        return Arrays.asList(new Object[][]{
                 {
                         "<?php foreach([1,2] as \n$k => \n$v)$a=1;",
                         "namespace{"
@@ -130,8 +127,28 @@ public class ForeachTest extends ATranslatorInferenceTest
                                 + "\n        $b = 3;"
                                 + "\n    }"
                                 + "\n}"
+                },
+                //see TINS-247 translator procedural - foreach header
+                {
+                        "<?php $v = null;"
+                                + "\n foreach([1,2] as \n$k => \n$v){"
+                                + "\n }"
+                                + "\n if($v != null){"
+                                + "\n   echo $v;"
+                                + "\n }",
+                        "namespace{"
+                                + "\n    ? $k;"
+                                + "\n    ? $v;"
+                                + "\n    $v = null;"
+                                + "\n    foreach ([1, 2] as scalar $k3_0 => mixed $v4_0) {"
+                                + "\n        $k = $k3_0;"
+                                + "\n        $v = $v4_0;"
+                                + "\n    }"
+                                + "\n    if ($v != null) {"
+                                + "\n        echo $v;"
+                                + "\n    }"
+                                + "\n}"
                 }
-        }));
-        return collection;
+        });
     }
 }
