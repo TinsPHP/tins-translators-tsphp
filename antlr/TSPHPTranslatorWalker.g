@@ -520,8 +520,7 @@ instruction
     |   foreachLoop                     -> {$foreachLoop.st}
     |   whileLoop                       -> {$whileLoop.st}
     |   doWhileLoop                     -> {$doWhileLoop.st}
-    //TODO rstoll TINS-248 translate procedural - catch header
-    //|   tryCatch                        -> {$tryCatch.st}
+    |   tryCatch                        -> {$tryCatch.st}
     |   ^(EXPRESSION expression?)       -> expression(expression={$expression.st})
     |   ^('return' expression?)         -> return(expression = {$expression.st})
     |   ^('throw' expression)           -> throw(expression = {$expression.st})
@@ -609,25 +608,20 @@ doWhileLoop
         -> doWhile(block={$block.instructions}, condition={$expression.st})
     ;
 
-//TODO rstoll TINS-248 translate procedural - catch header
-/*
 tryCatch
     :   ^('try' blockConditional catchBlocks+=catchBlock+)
         -> tryCatch(tryBlock={$blockConditional.instructions}, catchBlocks={$catchBlocks})
     ;
     
 catchBlock
-    :   ^('catch'
-            ^(VARIABLE_DECLARATION_LIST
-                ^(TYPE TYPE_MODIFIER TYPE_NAME)
-                VariableId
-            )
-            blockConditional
-        )
-        -> catchBlock(type={$TYPE_NAME.text}, variableId={$VariableId.text}, block={$blockConditional.instructions})
+    :   ^('catch' TYPE_NAME VariableId blockConditional)
+        
+        -> catchBlock(
+            type={$TYPE_NAME.text}, 
+            variableId={$VariableId.text},
+            variableIdTemp={tempVariableHelper.getTempVariableName($VariableId)},
+            block={$blockConditional.instructions})
     ;
-*/
-
 
 expression
     :   atom                       -> {$atom.st}

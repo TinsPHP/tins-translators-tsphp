@@ -186,6 +186,19 @@ do {
 } while (<condition>);
 >>
 
+tryCatch(tryBlock, catchBlocks) ::= <<
+try {
+    <tryBlock; separator="\n">
+} <catchBlocks; separator=" ">
+>>
+
+catchBlock(type, variableId, variableIdTemp, block) ::= <<
+catch (<type> <variableIdTemp>) {
+    <variableId> = <variableIdTemp>;
+    <block; separator="\n">
+}
+>>
+
 return(expression) ::= <<
 return<if(expression)> <expression><endif>;
 >>
