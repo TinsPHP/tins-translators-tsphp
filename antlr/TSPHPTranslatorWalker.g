@@ -33,6 +33,7 @@ import java.util.HashSet;
 import ch.tsphp.common.ITSPHPAst;
 import ch.tsphp.common.symbols.ISymbol;
 import ch.tsphp.common.symbols.ITypeSymbol;
+import ch.tsphp.tinsphp.common.symbols.IArrayTypeSymbol;
 import ch.tsphp.tinsphp.common.translation.IPrecedenceHelper;
 import ch.tsphp.tinsphp.common.translation.ITempVariableHelper;
 import ch.tsphp.tinsphp.translators.tsphp.antlrmod.ParameterDto;
@@ -580,23 +581,21 @@ foreachLoop
             blockConditional
         )
         {
-            ITSPHPAst keyVarId = $keyVariableId;
-            String keyVarIdTemp = keyVarId != null ? tempVariableHelper.getTempVariableName(keyVarId) : null;
-            ISymbol keyVarIdSymbol = keyVarId != null ? keyVarId.getSymbol() : null;
-            String keyVarIdType = keyVarIdSymbol != null ? keyVarIdSymbol.getType().getName() : "?";
-            ITSPHPAst valueVarId = $valueVariableId;
-            ISymbol valueVarIdSymbol = valueVarId.getSymbol();
-            String valueVarIdType = valueVarIdSymbol != null ? valueVarIdSymbol.getType().getName() : "?";
+            IArrayTypeSymbol arrayTypeSymbol = (IArrayTypeSymbol) $expression.start.getEvalType();
             
+            String keyVariableIdType = arrayTypeSymbol != null ? arrayTypeSymbol.getKeyTypeSymbol().getAbsoluteName() : "?";
+            String keyVariableIdTemp = $keyVariableId != null ? tempVariableHelper.getTempVariableName($keyVariableId) : null;
+            String valueVariableIdType = arrayTypeSymbol != null ? arrayTypeSymbol.getValueTypeSymbol().getAbsoluteName() : "?";
+            String valueVariableIdTemp = tempVariableHelper.getTempVariableName($valueVariableId);
         }
         -> foreach(
             array={$expression.st}, 
-            keyVariableIdType={keyVarIdType},
-            keyVariableId={keyVarId != null ? keyVarId.getText() : null}, 
-            keyVariableIdTemp={keyVarIdTemp}, 
-            valueVariableIdType={valueVarIdType},            
-            valueVariableId={valueVarId.getText()},
-            valueVariableIdTemp={tempVariableHelper.getTempVariableName(valueVarId)},
+            keyVariableIdType={keyVariableIdType},
+            keyVariableId={$keyVariableId != null ? $keyVariableId.getText() : null}, 
+            keyVariableIdTemp={keyVariableIdTemp}, 
+            valueVariableIdType={valueVariableIdType},            
+            valueVariableId={$valueVariableId.getText()},
+            valueVariableIdTemp={valueVariableIdTemp},
             block={$blockConditional.instructions})
     ;
 
