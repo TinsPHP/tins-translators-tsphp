@@ -102,7 +102,7 @@ binaryOperator(operator, left, right, needParentheses) ::= <<
 >>
 
 ternaryOperator(cond, ifCase, elseCase, needParentheses) ::= <<
-<if(needParentheses)>(<endif><cond> ? <ifCase> : <elseCase><if(needParentheses)>)<endif>
+<if(needParentheses)>(<endif>(<cond>) ? <ifCase> : <elseCase><if(needParentheses)>)<endif>
 >>
 
 instanceof(expression, type, needParentheses) ::= <<

@@ -111,21 +111,25 @@ public class ExpressionHelper
                         "$a = $b += $c -= $d *= $e /= $f &= $g |= $h ^= $i %= $j .= $k <<= $l >>= $m"
                 },
 
-                {"true ? $a : $b", "true ? $a : $b"},
-                {"true ? ($a ? $b : $c) : $d", "true ? $a ? $b : $c : $d"},
-                {"true ? $a : ($b ? $c : $d)", "true ? $a : $b ? $c : $d"},
-                {"$a = true ? $c += $d : ($e -= $f)", "$a = true ? ($c += $d) : ($e -= $f)"},
+                {"true ? $a : $b", "(true) ? $a : $b"},
+                {"true ? ($a ? $b : $c) : $d", "(true) ? ($a) ? $b : $c : $d"},
+                {"true ? $a : ($b ? $c : $d)", "(true) ? $a : ($b) ? $c : $d"},
+                {"$a = true ? $c += $d : ($e -= $f)", "$a = (true) ? ($c += $d) : ($e -= $f)"},
                 {
                         "($a *= true) ? $c /= $d ? $e &= $f : ($g |= $h) : ($i ^= $j)",
-                        "($a *= true) ? ($c /= $d ? ($e &= $f) : ($g |= $h)) : ($i ^= $j)"
+                        "(($a *= true)) ? ($c /= ($d) ? ($e &= $f) : ($g |= $h)) : ($i ^= $j)"
                 },
                 {
                         "$a %= true ? $c .= $d ? $e <<= $f : ($g >>= $h) : ($i = $j)",
-                        "$a %= true ? ($c .= $d ? ($e <<= $f) : ($g >>= $h)) : ($i = $j)"
+                        "$a %= (true) ? ($c .= ($d) ? ($e <<= $f) : ($g >>= $h)) : ($i = $j)"
                 },
                 // = has lower precedence than ternary
                 // and the following is equal to $a = (true ? $a : $b) = 1
-                {"$a = true ? $a : $b = 1", "$a = true ? $a : $b = 1"},
+                {"$a = true ? $a : $b = 1", "$a = (true) ? $a : $b = 1"},
+                // see TINS-249 ? operator has to stay left associative
+                {"true ? 0 : true ? 1 : 2", "((true) ? 0 : true) ? 1 : 2"},
+                // todo TINS-302 preceding helper could be improved for ternary
+                {"($a *= true) ? $a = 2 : $b && $c ? 1 : 2", "((($a *= true)) ? ($a = 2) : $b && $c) ? 1 : 2"},
 
                 {"$a || $b", "$a || $b"},
                 {"$a || $b || $c", "$a || $b || $c"},
@@ -133,7 +137,7 @@ public class ExpressionHelper
                 {"$a && $b && $c", "$a && $b && $c"},
                 {"$a && $b || $c", "$a && $b || $c"},
                 {"$a || $b && $c", "$a || $b && $c"},
-                {"$a || $b && $c ? $d : $e", "$a || $b && $c ? $d : $e"},
+                {"$a || $b && $c ? $d : $e", "($a || $b && $c) ? $d : $e"},
 
                 {"$a | $b", "$a | $b"},
                 {"$a | $b | $c", "$a | $b | $c"},
@@ -155,7 +159,7 @@ public class ExpressionHelper
                 {"$a >= $b", "$a >= $b"},
                 {
                         "$a == $b | $c < $d & $e ? $f != $g : $h === $i",
-                        "$a == $b | $c < $d & $e ? $f != $g : $h === $i"
+                        "($a == $b | $c < $d & $e) ? $f != $g : $h === $i"
                 },
                 {"1 << 2", "1 << 2"},
                 {"1 << 2 << 3", "1 << 2 << 3"},
