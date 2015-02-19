@@ -16,7 +16,7 @@ import ch.tsphp.common.ITSPHPAstAdaptor;
 import ch.tsphp.common.TSPHPAstAdaptor;
 import ch.tsphp.common.exceptions.TSPHPException;
 import ch.tsphp.tinsphp.common.ITranslator;
-import ch.tsphp.tinsphp.common.ITranslatorFactory;
+import ch.tsphp.tinsphp.common.ITranslatorInitialiser;
 import ch.tsphp.tinsphp.common.translation.IPrecedenceHelper;
 import ch.tsphp.tinsphp.common.translation.ITempVariableHelper;
 import org.antlr.stringtemplate.StringTemplateGroup;
@@ -30,7 +30,7 @@ import java.io.InputStreamReader;
  * <p/>
  * It loads a StringTemplate which is used by the PHP54Translator.
  */
-public class TSPHPTranslatorFactory implements ITranslatorFactory
+public class TSPHPTranslatorInitialiser implements ITranslatorInitialiser
 {
 
     private StringTemplateGroup templateGroup;
@@ -38,11 +38,11 @@ public class TSPHPTranslatorFactory implements ITranslatorFactory
     private final ITempVariableHelper tempVariableHelper;
     private Exception loadingTemplateException;
 
-    public TSPHPTranslatorFactory() {
+    public TSPHPTranslatorInitialiser() {
         this(new TSPHPAstAdaptor());
     }
 
-    public TSPHPTranslatorFactory(ITSPHPAstAdaptor anAstAdaptor) {
+    public TSPHPTranslatorInitialiser(ITSPHPAstAdaptor anAstAdaptor) {
         precedenceHelper = new TSPHPPrecedenceHelper();
         tempVariableHelper = new TempVariableHelper(anAstAdaptor);
         InputStreamReader streamReader = null;

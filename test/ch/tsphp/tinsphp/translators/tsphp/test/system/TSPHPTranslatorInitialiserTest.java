@@ -13,7 +13,7 @@ import ch.tsphp.tinsphp.common.ITranslator;
 import ch.tsphp.tinsphp.common.issues.EIssueSeverity;
 import ch.tsphp.tinsphp.inference_engine.InferenceEngine;
 import ch.tsphp.tinsphp.parser.ParserFacade;
-import ch.tsphp.tinsphp.translators.tsphp.TSPHPTranslatorFactory;
+import ch.tsphp.tinsphp.translators.tsphp.TSPHPTranslatorInitialiser;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.junit.Test;
 
@@ -22,7 +22,7 @@ import java.util.EnumSet;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
-public class TSPHPTranslatorFactoryTest
+public class TSPHPTranslatorInitialiserTest
 {
     @Test
     public void allFine_DoesNotFindIssues() {
@@ -39,7 +39,7 @@ public class TSPHPTranslatorFactoryTest
 
 
         //act
-        TSPHPTranslatorFactory translatorFactory = new TSPHPTranslatorFactory();
+        TSPHPTranslatorInitialiser translatorFactory = new TSPHPTranslatorInitialiser();
         ITranslator translator = translatorFactory.build();
         String output = translator.translate(commonTreeNodeStream);
 
