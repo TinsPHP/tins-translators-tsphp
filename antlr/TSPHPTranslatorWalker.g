@@ -33,6 +33,7 @@ import java.util.HashSet;
 import ch.tsphp.common.ITSPHPAst;
 import ch.tsphp.common.symbols.ISymbol;
 import ch.tsphp.common.symbols.ITypeSymbol;
+import ch.tsphp.common.symbols.IUnionTypeSymbol;
 import ch.tsphp.tinsphp.common.symbols.IArrayTypeSymbol;
 import ch.tsphp.tinsphp.common.translation.IPrecedenceHelper;
 import ch.tsphp.tinsphp.common.translation.ITempVariableHelper;
@@ -580,7 +581,10 @@ foreachLoop
             blockConditional
         )
         {
-            IArrayTypeSymbol arrayTypeSymbol = (IArrayTypeSymbol) $expression.start.getEvalType();
+            IUnionTypeSymbol evalType = (IUnionTypeSymbol) $expression.start.getEvalType();
+            IArrayTypeSymbol arrayTypeSymbol = evalType != null
+                ? (IArrayTypeSymbol) evalType.getTypeSymbols().values().iterator().next()
+                : null;
             
             String keyVariableIdType = arrayTypeSymbol != null ? arrayTypeSymbol.getKeyTypeSymbol().getAbsoluteName() : "?";
             String keyVariableIdTemp = $keyVariableId != null ? tempVariableHelper.getTempVariableName($keyVariableId) : null;

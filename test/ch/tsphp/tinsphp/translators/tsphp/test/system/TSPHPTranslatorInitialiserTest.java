@@ -32,7 +32,7 @@ public class TSPHPTranslatorInitialiserTest
                 new CommonTreeNodeStream(new TSPHPAstAdaptor(), parserUnitDto.compilationUnit);
         commonTreeNodeStream.setTokenStream(parserUnitDto.tokenStream);
 
-        InferenceEngine inferenceEngine = new InferenceEngine();
+        InferenceEngine inferenceEngine = new InferenceEngine(new TSPHPAstAdaptor());
         inferenceEngine.enrichWithDefinitions(parserUnitDto.compilationUnit, commonTreeNodeStream);
         inferenceEngine.enrichWithReferences(parserUnitDto.compilationUnit, commonTreeNodeStream);
         inferenceEngine.enrichtWithTypes(parserUnitDto.compilationUnit, commonTreeNodeStream);
