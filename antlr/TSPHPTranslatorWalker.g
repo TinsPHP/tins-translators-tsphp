@@ -35,8 +35,8 @@ import ch.tsphp.common.symbols.ISymbol;
 import ch.tsphp.common.symbols.ITypeSymbol;
 import ch.tsphp.tinsphp.common.symbols.IArrayTypeSymbol;
 import ch.tsphp.tinsphp.common.translation.ITranslatorController;
-import ch.tsphp.tinsphp.translators.tsphp.dtos.ParameterDto;
-import ch.tsphp.tinsphp.translators.tsphp.dtos.MethodDto;
+import ch.tsphp.tinsphp.common.translation.dtos.ParameterDto;
+import ch.tsphp.tinsphp.common.translation.dtos.MethodDto;
 
 }
 

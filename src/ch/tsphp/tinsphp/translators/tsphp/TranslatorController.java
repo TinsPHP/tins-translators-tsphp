@@ -15,11 +15,11 @@ import ch.tsphp.tinsphp.common.symbols.IMethodSymbol;
 import ch.tsphp.tinsphp.common.translation.IPrecedenceHelper;
 import ch.tsphp.tinsphp.common.translation.ITempVariableHelper;
 import ch.tsphp.tinsphp.common.translation.ITranslatorController;
+import ch.tsphp.tinsphp.common.translation.dtos.MethodDto;
+import ch.tsphp.tinsphp.common.translation.dtos.ParameterDto;
+import ch.tsphp.tinsphp.common.translation.dtos.TypeDto;
+import ch.tsphp.tinsphp.common.translation.dtos.TypeParameterDto;
 import ch.tsphp.tinsphp.common.utils.Pair;
-import ch.tsphp.tinsphp.translators.tsphp.dtos.MethodDto;
-import ch.tsphp.tinsphp.translators.tsphp.dtos.ParameterDto;
-import ch.tsphp.tinsphp.translators.tsphp.dtos.TypeDto;
-import ch.tsphp.tinsphp.translators.tsphp.dtos.TypeParameterDto;
 
 import java.util.ArrayList;
 import java.util.Arrays;
