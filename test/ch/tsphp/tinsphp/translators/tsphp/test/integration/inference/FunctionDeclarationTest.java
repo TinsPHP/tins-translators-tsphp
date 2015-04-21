@@ -46,11 +46,11 @@ public class FunctionDeclarationTest extends ATranslatorInferenceTest
     public static Collection<Object[]> testStrings() {
         List<Object[]> collection = new ArrayList<>();
         collection.addAll(Arrays.asList(new Object[][]{
-                {"<?php function foo(){} ?>", "namespace{\n    function ? foo() {\n        return null;\n    }\n}"},
+                {"<?php function foo(){} ?>", "namespace{\n    function null foo() {\n        return null;\n    }\n}"},
                 {
                         "<?php function foo(){if(true){return 1;}} ?>",
                         "namespace{" +
-                                "\n    function ? foo() {"
+                                "\n    function null foo() {"
                                 + "\n        if (true) {"
                                 + "\n            return 1;"
                                 + "\n        }"

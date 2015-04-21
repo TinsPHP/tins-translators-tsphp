@@ -4,29 +4,19 @@
  * root folder or visit the project's website http://tsphp.ch/wiki/display/TINS/License
  */
 
-package ch.tsphp.tinsphp.translators.tsphp.antlrmod;
-
-import org.antlr.stringtemplate.StringTemplate;
-
-import java.util.Set;
+package ch.tsphp.tinsphp.translators.tsphp.dtos;
 
 public class ParameterDto
 {
-    public Set<String> prefixModifiers;
-    public StringTemplate type;
-    public Set<String> suffixModifiers;
+    public TypeDto type;
     public String variableId;
     public String defaultValue;
 
     public ParameterDto(
-            Set<String> thePrefixModifiers,
-            StringTemplate theType,
-            Set<String> theSuffixModifiers,
+            TypeDto theType,
             String theVariableId,
             String theDefaultValue) {
-        prefixModifiers = thePrefixModifiers;
         type = theType;
-        suffixModifiers = theSuffixModifiers;
         variableId = theVariableId;
         defaultValue = theDefaultValue;
     }

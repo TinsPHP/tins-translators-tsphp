@@ -44,6 +44,10 @@ assign(id,value) ::=<<
 <id> = <value>
 >>
 
+methods(methods) ::=<<
+<methods; separator="\n\n">
+>>
+
 method(modifier, returnType, identifier, params, body) ::=<<
 <if(modifier)><modifier> <endif>function <returnType> <identifier>(<if(params)><params><endif>) {<if(body)>
 

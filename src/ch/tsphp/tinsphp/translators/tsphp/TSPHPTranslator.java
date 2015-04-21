@@ -18,8 +18,7 @@ import ch.tsphp.tinsphp.common.ITranslator;
 import ch.tsphp.tinsphp.common.issues.EIssueSeverity;
 import ch.tsphp.tinsphp.common.issues.IIssueLogger;
 import ch.tsphp.tinsphp.common.issues.IssueReporterHelper;
-import ch.tsphp.tinsphp.common.translation.IPrecedenceHelper;
-import ch.tsphp.tinsphp.common.translation.ITempVariableHelper;
+import ch.tsphp.tinsphp.common.translation.ITranslatorController;
 import ch.tsphp.tinsphp.translators.tsphp.antlrmod.ErrorReportingTSPHPTranslatorWalker;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.TreeNodeStream;
@@ -34,22 +33,20 @@ import java.util.EnumSet;
  */
 public class TSPHPTranslator implements ITranslator, IIssueLogger
 {
+    public static final String TRANSLATOR_ID = "tsphp";
 
     private final StringTemplateGroup templateGroup;
-    private final IPrecedenceHelper precedenceHelper;
-    private final ITempVariableHelper tempVariableHelper;
+    private final ITranslatorController controller;
     private Collection<IIssueLogger> issueLoggers = new ArrayDeque<>();
     private EnumSet<EIssueSeverity> foundIssues = EnumSet.noneOf(EIssueSeverity.class);
     private Exception loadingTemplateException;
 
     public TSPHPTranslator(
             StringTemplateGroup theTemplateGroup,
-            IPrecedenceHelper thePrecedenceHelper,
-            ITempVariableHelper theTempVariableHelper,
+            ITranslatorController theController,
             Exception exception) {
         templateGroup = theTemplateGroup;
-        precedenceHelper = thePrecedenceHelper;
-        tempVariableHelper = theTempVariableHelper;
+        controller = theController;
         loadingTemplateException = exception;
     }
 
@@ -59,7 +56,7 @@ public class TSPHPTranslator implements ITranslator, IIssueLogger
         if (loadingTemplateException == null) {
             stream.reset();
             ErrorReportingTSPHPTranslatorWalker translator =
-                    new ErrorReportingTSPHPTranslatorWalker(stream, precedenceHelper, tempVariableHelper);
+                    new ErrorReportingTSPHPTranslatorWalker(stream, controller);
 
             for (IIssueLogger logger : issueLoggers) {
                 translator.registerIssueLogger(logger);

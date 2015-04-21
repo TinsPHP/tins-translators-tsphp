@@ -12,7 +12,6 @@
 package ch.tsphp.tinsphp.translators.tsphp.test.integration.parser;
 
 import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorParserTest;
-import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ParameterListHelper;
 import org.antlr.runtime.RecognitionException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,9 +42,10 @@ public class FunctionDeclarationTest extends ATranslatorParserTest
         //PHP does not yet support return types
 
         //parameters
-        collection.addAll(ParameterListHelper.getTestStrings(
-                "function set", "{}",
-                "function ? set", " {\n}"));
+        //TODO rstoll TINS-397 translator parser based tests
+//        collection.addAll(ParameterListHelper.getTestStrings(
+//                "function set", "{}",
+//                "function ? set", " {\n}"));
 
         return collection;
 

@@ -33,22 +33,19 @@ import java.util.HashSet;
 import ch.tsphp.common.ITSPHPAst;
 import ch.tsphp.common.symbols.ISymbol;
 import ch.tsphp.common.symbols.ITypeSymbol;
-import ch.tsphp.common.symbols.IUnionTypeSymbol;
 import ch.tsphp.tinsphp.common.symbols.IArrayTypeSymbol;
-import ch.tsphp.tinsphp.common.translation.IPrecedenceHelper;
-import ch.tsphp.tinsphp.common.translation.ITempVariableHelper;
-import ch.tsphp.tinsphp.translators.tsphp.antlrmod.ParameterDto;
+import ch.tsphp.tinsphp.common.translation.ITranslatorController;
+import ch.tsphp.tinsphp.translators.tsphp.dtos.ParameterDto;
+import ch.tsphp.tinsphp.translators.tsphp.dtos.MethodDto;
 
 }
 
 @members{
-private IPrecedenceHelper precedenceHelper;
-private ITempVariableHelper tempVariableHelper;
+private ITranslatorController controller;
 
-public TSPHPTranslatorWalker(TreeNodeStream input, IPrecedenceHelper thePrecedenceHelper, ITempVariableHelper theTempVariableHelper) {
+public TSPHPTranslatorWalker(TreeNodeStream input, ITranslatorController theController) {
     this(input);
-    precedenceHelper = thePrecedenceHelper;
-    tempVariableHelper = theTempVariableHelper;
+    controller = theController;
 }
 
 private String getMethodName(String name) {
@@ -154,11 +151,8 @@ classBodyDefinition
 */    
 
 constDeclarationList
-    :   ^(CONSTANT_DECLARATION_LIST
-            ^(TYPE ^(TYPE_MODIFIER Public Static Final) scalarTypesOrUnknown)
-            identifiers+=constDeclaration+
-        ) 
-        -> const(type={$scalarTypesOrUnknown.st}, identifiers={$identifiers})
+    :   ^(CONSTANT_DECLARATION_LIST type=. identifiers+=constDeclaration+) 
+        -> const(type={"?"}, identifiers={$identifiers})
     ;
     
 constDeclaration
@@ -382,37 +376,6 @@ finalToken
     :   Final -> {%{$Final.text}}
     ;
 */    
-formalParameters
-@init{
-    List<ParameterDto> parameterDtos = new ArrayList<>();
-    List<StringTemplate> declarations = new ArrayList<>();
-}
-    :   ^(PARAMETER_LIST (param=paramDeclaration {parameterDtos.add($param.parameterDto);})*) 
-        {
-
-           boolean canBeDefaultValue = true;
-           for(int i=parameterDtos.size()-1; i >= 0; --i){
-               ParameterDto dto = parameterDtos.get(i);
-               String defaultValue = canBeDefaultValue ? dto.defaultValue : null;
-               canBeDefaultValue &= defaultValue != null; 
-               if(!canBeDefaultValue && !dto.suffixModifiers.contains("?") && dto.defaultValue != null && dto.defaultValue.toLowerCase().equals("null")){
-                   dto.suffixModifiers.add("?");
-               }
-               StringTemplate type = %type(
-                       prefixModifiers={dto.prefixModifiers}, 
-                       type={dto.type},
-                       suffixModifiers={dto.suffixModifiers}
-               );
-               declarations.add(0, %parameter(
-                   type={type},
-                   variableId={dto.variableId}, 
-                   defaultValue={defaultValue}
-               ));
-           }
-        }
-        -> parameterList(declarations={declarations})
-    ;
-
 
 block returns[List<Object> instructions]
     :   ^(BLOCK instr+=instruction*) {$instructions=$instr;}
@@ -475,42 +438,48 @@ interfaceMethodDeclaration
     ;
 */
 
-paramDeclaration returns[ParameterDto parameterDto]
-    :   ^(PARAMETER_DECLARATION
-            ^(TYPE typeModifier allTypesOrUnknown)
-            (   varId=VariableId
-            |   ^(varId=VariableId defaultValue=unaryPrimitiveAtom)
-            )
-        )
-        {
-            $parameterDto = new ParameterDto(
-                $typeModifier.prefixModifiers,
-                $allTypesOrUnknown.st,
-                $typeModifier.suffixModifiers,
-                $varId.text,
-                $defaultValue.text);
-        }
-    ;
-
 functionDeclaration
+@init{
+    List<StringTemplate> methods = new ArrayList<>();
+}
     :   ^('function'
             FUNCTION_MODIFIER
-            ^(TYPE typeModifier returnTypesOrUnknown)
+            typeAst=.
             Identifier
-            formalParameters
+            params=.
             block
-        )    
-        -> method(
-            modifier={null},
-            returnType={%type(
-                prefixModifiers={$typeModifier.prefixModifiers},
-                type={$returnTypesOrUnknown.st},
-                suffixModifiers={$typeModifier.suffixModifiers}
-            )},
-            identifier={getMethodName($Identifier.text)},
-            params={$formalParameters.st},
-            body={$block.instructions}
         )
+        {
+            List<MethodDto> dtos = controller.createMethodDtos($Identifier);
+            for(MethodDto dto : dtos){ 
+               List<StringTemplate> parameters = new ArrayList<>();
+               for(ParameterDto paramDto : dto.parameters){
+                   StringTemplate type = %type(
+                       prefixModifiers={paramDto.type.prefixModifiers}, 
+                       type={paramDto.type.type},
+                       suffixModifiers={paramDto.type.suffixModifiers}
+                   );
+                   parameters.add(%parameter(
+                       type={type},
+                       variableId={paramDto.variableId}, 
+                       defaultValue={paramDto.defaultValue}
+                   ));
+               }
+               StringTemplate returnType = %type(
+                   prefixModifiers={dto.returnType.prefixModifiers},
+                   type={dto.returnType.type},
+                   suffixModifiers={dto.returnType.suffixModifiers}
+               );
+               methods.add(%method(
+                   modifier={null},
+                   returnType={returnType},
+                   identifier={dto.identifier},
+                   params={parameters},
+                   body={$block.instructions}
+               ));
+            }
+        }
+        -> methods(methods={methods})
     ;
 
 instruction
@@ -581,15 +550,11 @@ foreachLoop
             blockConditional
         )
         {
-            IUnionTypeSymbol evalType = (IUnionTypeSymbol) $expression.start.getEvalType();
-            IArrayTypeSymbol arrayTypeSymbol = evalType != null
-                ? (IArrayTypeSymbol) evalType.getTypeSymbols().values().iterator().next()
-                : null;
-            
+            IArrayTypeSymbol arrayTypeSymbol = (IArrayTypeSymbol) $expression.start.getEvalType();            
             String keyVariableIdType = arrayTypeSymbol != null ? arrayTypeSymbol.getKeyTypeSymbol().getAbsoluteName() : "?";
-            String keyVariableIdTemp = $keyVariableId != null ? tempVariableHelper.getTempVariableName($keyVariableId) : null;
+            String keyVariableIdTemp = $keyVariableId != null ? controller.getTempVariableName($keyVariableId) : null;
             String valueVariableIdType = arrayTypeSymbol != null ? arrayTypeSymbol.getValueTypeSymbol().getAbsoluteName() : "?";
-            String valueVariableIdTemp = tempVariableHelper.getTempVariableName($valueVariableId);
+            String valueVariableIdTemp = controller.getTempVariableName($valueVariableId);
         }
         -> foreach(
             array={$expression.st}, 
@@ -623,7 +588,7 @@ catchBlock
         -> catchBlock(
             type={$TYPE_NAME.text}, 
             variableId={$VariableId.text},
-            variableIdTemp={tempVariableHelper.getTempVariableName($VariableId)},
+            variableIdTemp={controller.getTempVariableName($VariableId)},
             block={$blockConditional.instructions})
     ;
 
@@ -698,7 +663,7 @@ operator
             cond={$cond.st},
             ifCase={$ifCase.st},
             elseCase={$elseCase.st},
-            needParentheses={precedenceHelper.needParentheses($QuestionMark)}
+            needParentheses={controller.needParentheses($QuestionMark)}
         )
         
     //TODO rstoll TINS-276 conversions and casts
@@ -710,7 +675,7 @@ operator
         -> instanceof(
             expression={$expr.st},
             type={$type.text},
-            needParentheses={precedenceHelper.needParentheses($Instanceof)}
+            needParentheses={controller.needParentheses($Instanceof)}
         )
 
     //TODO rstoll TINS-271 - translator OOP - expressions
@@ -741,7 +706,7 @@ unaryPostOperator
 binaryOperator returns[boolean needParentheses]
 @after {
     $st = %operator(o={$start.getText()});
-    $needParentheses = precedenceHelper.needParentheses($start);
+    $needParentheses = controller.needParentheses($start);
 }
     :   'or'
     |   'xor'

@@ -21,11 +21,13 @@ import ch.tsphp.common.exceptions.TSPHPException;
 import ch.tsphp.parser.common.ANTLRNoCaseStringStream;
 import ch.tsphp.tinsphp.common.issues.EIssueSeverity;
 import ch.tsphp.tinsphp.common.issues.IIssueLogger;
+import ch.tsphp.tinsphp.common.translation.ITranslatorController;
 import ch.tsphp.tinsphp.parser.antlr.TinsPHPParser;
 import ch.tsphp.tinsphp.parser.antlrmod.ErrorReportingTinsPHPLexer;
 import ch.tsphp.tinsphp.parser.antlrmod.ErrorReportingTinsPHPParser;
 import ch.tsphp.tinsphp.translators.tsphp.TSPHPPrecedenceHelper;
 import ch.tsphp.tinsphp.translators.tsphp.TempVariableHelper;
+import ch.tsphp.tinsphp.translators.tsphp.TranslatorController;
 import ch.tsphp.tinsphp.translators.tsphp.antlrmod.ErrorReportingTSPHPTranslatorWalker;
 import org.antlr.runtime.CharStream;
 import org.antlr.runtime.CommonTokenStream;
@@ -53,6 +55,7 @@ public abstract class ATest implements IIssueLogger
     protected ErrorReportingTSPHPTranslatorWalker translator;
     protected TreeRuleReturnScope result;
     protected ITSPHPAstAdaptor astAdaptor;
+    protected ITranslatorController controller;
 
     public ATest(String theTestString, String theExpectedResult) {
         testString = theTestString;
@@ -85,6 +88,8 @@ public abstract class ATest implements IIssueLogger
         parser.setTreeAdaptor(astAdaptor);
         parser.registerIssueLogger(new WriteExceptionToConsole());
 
+        controller = new TranslatorController(new TSPHPPrecedenceHelper(), new TempVariableHelper(astAdaptor));
+
         ParserRuleReturnScope parserResult = parserRun(parser);
         ast = (ITSPHPAst) parserResult.getTree();
 
@@ -112,8 +117,7 @@ public abstract class ATest implements IIssueLogger
         fr.close();
 
         commonTreeNodeStream.reset();
-        translator = new ErrorReportingTSPHPTranslatorWalker(
-                commonTreeNodeStream, new TSPHPPrecedenceHelper(), new TempVariableHelper(astAdaptor));
+        translator = new ErrorReportingTSPHPTranslatorWalker(commonTreeNodeStream, controller);
         translator.registerIssueLogger(this);
         translator.setTemplateLib(templates);
 

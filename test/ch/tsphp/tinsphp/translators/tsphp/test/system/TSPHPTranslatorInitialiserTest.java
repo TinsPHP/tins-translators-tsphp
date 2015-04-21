@@ -35,7 +35,8 @@ public class TSPHPTranslatorInitialiserTest
         InferenceEngine inferenceEngine = new InferenceEngine(new TSPHPAstAdaptor());
         inferenceEngine.enrichWithDefinitions(parserUnitDto.compilationUnit, commonTreeNodeStream);
         inferenceEngine.enrichWithReferences(parserUnitDto.compilationUnit, commonTreeNodeStream);
-        inferenceEngine.enrichtWithTypes(parserUnitDto.compilationUnit, commonTreeNodeStream);
+        inferenceEngine.solveMethodSymbolConstraints();
+        inferenceEngine.solveGlobalDefaultNamespaceConstraints();
 
 
         //act

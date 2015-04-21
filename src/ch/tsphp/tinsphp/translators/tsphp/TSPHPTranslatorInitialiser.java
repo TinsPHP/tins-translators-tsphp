@@ -19,6 +19,7 @@ import ch.tsphp.tinsphp.common.ITranslator;
 import ch.tsphp.tinsphp.common.ITranslatorInitialiser;
 import ch.tsphp.tinsphp.common.translation.IPrecedenceHelper;
 import ch.tsphp.tinsphp.common.translation.ITempVariableHelper;
+import ch.tsphp.tinsphp.common.translation.ITranslatorController;
 import org.antlr.stringtemplate.StringTemplateGroup;
 
 import java.io.IOException;
@@ -34,8 +35,7 @@ public class TSPHPTranslatorInitialiser implements ITranslatorInitialiser
 {
 
     private StringTemplateGroup templateGroup;
-    private final IPrecedenceHelper precedenceHelper;
-    private final ITempVariableHelper tempVariableHelper;
+    private final ITranslatorController controller;
     private Exception loadingTemplateException;
 
     public TSPHPTranslatorInitialiser() {
@@ -43,8 +43,9 @@ public class TSPHPTranslatorInitialiser implements ITranslatorInitialiser
     }
 
     public TSPHPTranslatorInitialiser(ITSPHPAstAdaptor anAstAdaptor) {
-        precedenceHelper = new TSPHPPrecedenceHelper();
-        tempVariableHelper = new TempVariableHelper(anAstAdaptor);
+        IPrecedenceHelper precedenceHelper = new TSPHPPrecedenceHelper();
+        ITempVariableHelper tempVariableHelper = new TempVariableHelper(anAstAdaptor);
+        controller = new TranslatorController(precedenceHelper, tempVariableHelper);
         InputStreamReader streamReader = null;
         try {
             // LOAD TEMPLATES (via classpath)
@@ -72,6 +73,6 @@ public class TSPHPTranslatorInitialiser implements ITranslatorInitialiser
 
     @Override
     public ITranslator build() {
-        return new TSPHPTranslator(templateGroup, precedenceHelper, tempVariableHelper, loadingTemplateException);
+        return new TSPHPTranslator(templateGroup, controller, loadingTemplateException);
     }
 }
