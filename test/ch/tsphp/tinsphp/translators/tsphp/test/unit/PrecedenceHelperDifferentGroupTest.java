@@ -9,7 +9,7 @@ package ch.tsphp.tinsphp.translators.tsphp.test.unit;
 import ch.tsphp.common.ITSPHPAst;
 import ch.tsphp.tinsphp.common.translation.IPrecedenceHelper;
 import ch.tsphp.tinsphp.symbols.gen.TokenTypes;
-import ch.tsphp.tinsphp.translators.tsphp.TSPHPPrecedenceHelper;
+import ch.tsphp.tinsphp.translators.tsphp.PrecedenceHelper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -23,12 +23,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @RunWith(Parameterized.class)
-public class TSPHPPrecedenceHelperDifferentGroupTest
+public class PrecedenceHelperDifferentGroupTest
 {
     private int first;
     private int second;
 
-    public TSPHPPrecedenceHelperDifferentGroupTest(int theFirst, int theSecond){
+    public PrecedenceHelperDifferentGroupTest(int theFirst, int theSecond) {
         first = theFirst;
         second = theSecond;
     }
@@ -103,6 +103,6 @@ public class TSPHPPrecedenceHelperDifferentGroupTest
     }
 
     protected IPrecedenceHelper createPrecedenceHelper() {
-        return new TSPHPPrecedenceHelper();
+        return new PrecedenceHelper();
     }
 }

@@ -9,7 +9,7 @@ package ch.tsphp.tinsphp.translators.tsphp.test.unit;
 import ch.tsphp.common.ITSPHPAst;
 import ch.tsphp.tinsphp.common.translation.IPrecedenceHelper;
 import ch.tsphp.tinsphp.symbols.gen.TokenTypes;
-import ch.tsphp.tinsphp.translators.tsphp.TSPHPPrecedenceHelper;
+import ch.tsphp.tinsphp.translators.tsphp.PrecedenceHelper;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -17,7 +17,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class TSPHPPrecedenceHelperTest
+public class PrecedenceHelperTest
 {
     @Test
     public void needParentheses_ParentIsNotOperator_ReturnsFalse() {
@@ -34,6 +34,6 @@ public class TSPHPPrecedenceHelperTest
     }
 
     protected IPrecedenceHelper createPrecedenceHelper() {
-        return new TSPHPPrecedenceHelper();
+        return new PrecedenceHelper();
     }
 }

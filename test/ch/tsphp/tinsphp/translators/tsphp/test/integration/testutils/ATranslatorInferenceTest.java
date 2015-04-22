@@ -13,10 +13,16 @@
 package ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils;
 
 
+import ch.tsphp.common.AstHelper;
+import ch.tsphp.common.IAstHelper;
+import ch.tsphp.common.ITSPHPAstAdaptor;
 import ch.tsphp.tinsphp.common.IInferenceEngine;
+import ch.tsphp.tinsphp.common.config.IInferenceEngineInitialiser;
 import ch.tsphp.tinsphp.common.issues.EIssueSeverity;
-import ch.tsphp.tinsphp.inference_engine.InferenceEngine;
+import ch.tsphp.tinsphp.core.config.HardCodedCoreInitialiser;
+import ch.tsphp.tinsphp.inference_engine.config.HardCodedInferenceEngineInitialiser;
 import ch.tsphp.tinsphp.parser.antlr.TinsPHPParser;
+import ch.tsphp.tinsphp.symbols.config.HardCodedSymbolsInitialiser;
 import org.antlr.runtime.ParserRuleReturnScope;
 import org.antlr.runtime.RecognitionException;
 import org.junit.Assert;
@@ -34,7 +40,10 @@ public abstract class ATranslatorInferenceTest extends ATest
 
     @Override
     protected void inferTypes() {
-        IInferenceEngine inferenceEngine = new InferenceEngine(astAdaptor);
+        IAstHelper astHelper = new AstHelper(astAdaptor);
+        IInferenceEngineInitialiser inferenceEngineInitialiser = createInferenceInitialiser(astAdaptor, astHelper);
+
+        IInferenceEngine inferenceEngine = inferenceEngineInitialiser.getEngine();
         inferenceEngine.registerIssueLogger(this);
 
         inferenceEngine.enrichWithDefinitions(ast, commonTreeNodeStream);
@@ -71,5 +80,13 @@ public abstract class ATranslatorInferenceTest extends ATest
     @Override
     protected void run() throws RecognitionException {
         result = translator.compilationUnit();
+    }
+
+    private IInferenceEngineInitialiser createInferenceInitialiser(ITSPHPAstAdaptor astAdaptor, IAstHelper astHelper) {
+
+        HardCodedSymbolsInitialiser symbolsInitialiser = new HardCodedSymbolsInitialiser();
+        HardCodedCoreInitialiser coreInitialiser = new HardCodedCoreInitialiser(astHelper, symbolsInitialiser);
+
+        return new HardCodedInferenceEngineInitialiser(astAdaptor, astHelper, symbolsInitialiser, coreInitialiser);
     }
 }

@@ -19,13 +19,15 @@ import ch.tsphp.common.ITSPHPAstAdaptor;
 import ch.tsphp.common.TSPHPAstAdaptor;
 import ch.tsphp.common.exceptions.TSPHPException;
 import ch.tsphp.parser.common.ANTLRNoCaseStringStream;
+import ch.tsphp.tinsphp.common.inference.constraints.IOverloadBindings;
 import ch.tsphp.tinsphp.common.issues.EIssueSeverity;
 import ch.tsphp.tinsphp.common.issues.IIssueLogger;
+import ch.tsphp.tinsphp.common.scopes.IGlobalNamespaceScope;
 import ch.tsphp.tinsphp.common.translation.ITranslatorController;
 import ch.tsphp.tinsphp.parser.antlr.TinsPHPParser;
 import ch.tsphp.tinsphp.parser.antlrmod.ErrorReportingTinsPHPLexer;
 import ch.tsphp.tinsphp.parser.antlrmod.ErrorReportingTinsPHPParser;
-import ch.tsphp.tinsphp.translators.tsphp.TSPHPPrecedenceHelper;
+import ch.tsphp.tinsphp.translators.tsphp.PrecedenceHelper;
 import ch.tsphp.tinsphp.translators.tsphp.TempVariableHelper;
 import ch.tsphp.tinsphp.translators.tsphp.TranslatorController;
 import ch.tsphp.tinsphp.translators.tsphp.antlrmod.ErrorReportingTSPHPTranslatorWalker;
@@ -42,7 +44,11 @@ import org.junit.Ignore;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.EnumSet;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @Ignore
 public abstract class ATest implements IIssueLogger
@@ -88,7 +94,7 @@ public abstract class ATest implements IIssueLogger
         parser.setTreeAdaptor(astAdaptor);
         parser.registerIssueLogger(new WriteExceptionToConsole());
 
-        controller = new TranslatorController(new TSPHPPrecedenceHelper(), new TempVariableHelper(astAdaptor));
+        controller = new TranslatorController(new PrecedenceHelper(), new TempVariableHelper(astAdaptor));
 
         ParserRuleReturnScope parserResult = parserRun(parser);
         ast = (ITSPHPAst) parserResult.getTree();
@@ -117,7 +123,9 @@ public abstract class ATest implements IIssueLogger
         fr.close();
 
         commonTreeNodeStream.reset();
-        translator = new ErrorReportingTSPHPTranslatorWalker(commonTreeNodeStream, controller);
+        IGlobalNamespaceScope globalDefaultNamespace = mock(IGlobalNamespaceScope.class);
+        when(globalDefaultNamespace.getBindings()).thenReturn(Arrays.asList(mock(IOverloadBindings.class)));
+        translator = new ErrorReportingTSPHPTranslatorWalker(commonTreeNodeStream, controller, globalDefaultNamespace);
         translator.registerIssueLogger(this);
         translator.setTemplateLib(templates);
 

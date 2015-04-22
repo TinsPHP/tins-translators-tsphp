@@ -15,6 +15,8 @@ package ch.tsphp.tinsphp.translators.tsphp.test.unit.testutils;
 import ch.tsphp.common.ITSPHPAst;
 import ch.tsphp.common.TSPHPAst;
 import ch.tsphp.common.TSPHPAstAdaptor;
+import ch.tsphp.tinsphp.common.inference.constraints.IOverloadBindings;
+import ch.tsphp.tinsphp.common.scopes.IGlobalNamespaceScope;
 import ch.tsphp.tinsphp.common.translation.ITranslatorController;
 import ch.tsphp.tinsphp.translators.tsphp.antlrmod.ErrorReportingTSPHPTranslatorWalker;
 import org.antlr.runtime.CommonToken;
@@ -22,7 +24,10 @@ import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.runtime.tree.TreeNodeStream;
 import org.junit.Ignore;
 
+import java.util.Arrays;
+
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @Ignore
 public abstract class AWalkerTest
@@ -33,7 +38,9 @@ public abstract class AWalkerTest
     protected ErrorReportingTSPHPTranslatorWalker createWalker(ITSPHPAst ast) {
         treeNodeStream = createTreeNodeStream(ast);
         controller = mock(ITranslatorController.class);
-        return new ErrorReportingTSPHPTranslatorWalker(treeNodeStream, controller);
+        IGlobalNamespaceScope globalDefaultNamespace = mock(IGlobalNamespaceScope.class);
+        when(globalDefaultNamespace.getBindings()).thenReturn(Arrays.asList(mock(IOverloadBindings.class)));
+        return new ErrorReportingTSPHPTranslatorWalker(treeNodeStream, controller, globalDefaultNamespace);
     }
 
     protected TreeNodeStream createTreeNodeStream(ITSPHPAst ast) {
