@@ -63,11 +63,34 @@ public class FunctionDefinitionTest extends ATranslatorInferenceTest
                                 + "\n}"
                 },
                 //return but without expression
-                //TODO rstoll TINS-404 return without expression and implicit null
-//                {
-//                        "<?php function foo(){ return;} ?>",
-//                        "namespace{\n    function null foo() {\n        return null;\n    }\n}"
-//                },
+                // see TINS-404 return without expression and implicit null
+                {
+                        "<?php function foo(){ return;} ?>",
+                        "namespace{\n    function null foo() {\n        return null;\n    }\n}"
+                },
+                {
+                        "<?php function foo($x){ if($x){ return; } return 1;} ?>",
+                        "namespace{"
+                                + "\n    function (int | null) foo(bool $x) {"
+                                + "\n        if ($x) {"
+                                + "\n            return null;"
+                                + "\n        }"
+                                + "\n        return 1;"
+                                + "\n    }"
+                                + "\n}"
+                },
+                {
+                        "<?php function foo($x){ if($x){ return; } else { return 1;}} ?>",
+                        "namespace{"
+                                + "\n    function (int | null) foo(bool $x) {"
+                                + "\n        if ($x) {"
+                                + "\n            return null;"
+                                + "\n        } else {"
+                                + "\n            return 1;"
+                                + "\n        }"
+                                + "\n    }"
+                                + "\n}"
+                },
         }));
 
         return collection;

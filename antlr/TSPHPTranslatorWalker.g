@@ -534,7 +534,8 @@ instruction
     |   doWhileLoop                     -> {$doWhileLoop.st}
     |   tryCatch                        -> {$tryCatch.st}
     |   ^(EXPRESSION expression?)       -> expression(expression={$expression.st})
-    |   ^('return' expression?)         -> return(expression = {$expression.st})
+    |   ^('return' expression)          -> return(expression = {$expression.st})
+    |   'return'                        -> return(expression = {"null"})
     |   ^('throw' expression)           -> throw(expression = {$expression.st})
     |   ^('echo' exprs+=expression+)    -> echo(expressions = {$exprs})
     |   ^('break' index=Int?)           -> break(index={$index.text})
