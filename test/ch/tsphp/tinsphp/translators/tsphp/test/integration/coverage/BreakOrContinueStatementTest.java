@@ -14,7 +14,8 @@ package ch.tsphp.tinsphp.translators.tsphp.test.integration.coverage;
 
 
 import ch.tsphp.tinsphp.parser.antlr.TinsPHPParser;
-import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorParserTest;
+import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorInferenceTest;
+import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.StatementHelper;
 import org.antlr.runtime.ParserRuleReturnScope;
 import org.antlr.runtime.RecognitionException;
 import org.junit.Test;
@@ -26,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 @RunWith(Parameterized.class)
-public class BreakOrContinueStatementTest extends ATranslatorParserTest
+public class BreakOrContinueStatementTest extends ATranslatorInferenceTest
 {
 
     public BreakOrContinueStatementTest(String testString, String expectedResult) {
@@ -50,10 +51,10 @@ public class BreakOrContinueStatementTest extends ATranslatorParserTest
     public static Collection<Object[]> testStrings() {
         Collection<Object[]> collection = new ArrayList<>();
         //TODO rstoll TINS-397 translator parser based tests
-//        collection.addAll(
-//                StatementHelper.getStatements("<?php break;", "?>", "namespace{\n    break;", "    ", "\n}"));
-//        collection.addAll(
-//                StatementHelper.getStatements("<?php continue;", "?>", "namespace{\n    continue;", "    ", "\n}"));
+        collection.addAll(
+                StatementHelper.getStatements("<?php break;", "?>", "namespace{", "break;", "    ", "\n}"));
+        collection.addAll(
+                StatementHelper.getStatements("<?php continue;", "?>", "namespace{", "continue;", "    ", "\n}"));
         return collection;
     }
 }

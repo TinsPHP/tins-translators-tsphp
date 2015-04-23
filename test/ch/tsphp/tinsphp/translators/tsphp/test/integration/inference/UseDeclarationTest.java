@@ -10,10 +10,10 @@
  * For more information see http://tsphp.ch/wiki/display/TSPHP/License
  */
 
-package ch.tsphp.tinsphp.translators.tsphp.test.integration.parser;
+package ch.tsphp.tinsphp.translators.tsphp.test.integration.inference;
 
 
-import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorParserTest;
+import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorInferenceStatementTest;
 import org.antlr.runtime.RecognitionException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,7 +24,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 @RunWith(Parameterized.class)
-public class UseDeclarationTest extends ATranslatorParserTest
+public class UseDeclarationTest extends ATranslatorInferenceStatementTest
 {
 
     public UseDeclarationTest(String testString, String expectedResult) {
@@ -40,11 +40,11 @@ public class UseDeclarationTest extends ATranslatorParserTest
     public static Collection<Object[]> testStrings() {
         return Arrays.asList(new Object[][]{
                 {"use \\a;", "use \\a as a;"},
-                {"use a as b;", "use a as b;"},
-                {"use a\\b as c;", "use a\\b as c;"},
-                {"use a\\b\\c as d;", "use a\\b\\c as d;"},
-                {"use a\\b;", "use a\\b as b;"},
-                {"use a\\b\\c;", "use a\\b\\c as c;"},
+                {"use a as b;", "use \\a as b;"},
+                {"use a\\b as c;", "use \\a\\b as c;"},
+                {"use a\\b\\c as d;", "use \\a\\b\\c as d;"},
+                {"use a\\b;", "use \\a\\b as b;"},
+                {"use a\\b\\c;", "use \\a\\b\\c as c;"},
                 {"use \\a as b;", "use \\a as b;"},
                 {"use \\a\\b as b;", "use \\a\\b as b;"},
                 {"use \\a\\b\\c as d;", "use \\a\\b\\c as d;"},

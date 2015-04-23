@@ -5,22 +5,21 @@
  */
 
 /*
- * This file is based on the file ATranslatorParserTest from the translator component of the TSPHP project.
+ * This file is based on the file UseTest from the translator component of the TSPHP project.
  * TSPHP is also published under the Apache License 2.0
  * For more information see http://tsphp.ch/wiki/display/TSPHP/License
  */
 
 package ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils;
 
+
 import org.junit.Ignore;
 
 @Ignore
-public abstract class ATranslatorParserTest extends ATest
+public abstract class ATranslatorInferenceStatementTest extends ATranslatorInferenceTest
 {
 
-    public ATranslatorParserTest(String theTestString, String theExpectedResult) {
-        super(theTestString, theExpectedResult);
+    public ATranslatorInferenceStatementTest(String theTestString, String theExpectedResult) {
+        super("<?php " + theTestString + " ?>", "namespace{\n    " + theExpectedResult + "\n}");
     }
-
-  
 }

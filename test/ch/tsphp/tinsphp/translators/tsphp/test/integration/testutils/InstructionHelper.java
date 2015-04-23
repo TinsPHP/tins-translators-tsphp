@@ -15,19 +15,21 @@ public class InstructionHelper
 {
 
     public static Collection<Object[]> getInstructions(String prefix, String appendix,
-            String prefixExpected, String indent, String appendixExpected) {
+            String prefixExpected, String instruction, String indent, String indent2, String appendixExpected) {
 
 
         List<Object[]> collection = new ArrayList<>();
 
         collection.addAll(StatementHelper.getControlStructures(
-                prefix, "$a;", appendix, prefixExpected, indent, "$a;", appendixExpected));
+                prefix, "$a=1;", appendix,
+                prefixExpected + "\n    ? $a;", instruction, indent, indent2, "$a = 1;", appendixExpected));
 
         List<String[]> expressions = ExpressionHelper.getAllExpressions(prefix.length());
         for (Object[] expression : expressions) {
             collection.add(new String[]{
                     prefix + expression[0] + ";" + appendix,
-                    prefixExpected + "\n" + indent + expression[1] + ";" + appendixExpected
+                    prefixExpected + "\n" + indent + instruction
+                            + "\n" + indent2 + expression[1] + ";" + appendixExpected
             });
         }
         return collection;

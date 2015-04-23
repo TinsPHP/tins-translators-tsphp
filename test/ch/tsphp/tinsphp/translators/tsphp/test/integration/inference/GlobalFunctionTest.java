@@ -4,25 +4,23 @@
  * root folder or visit the project's website http://tsphp.ch/wiki/display/TINS/License
  */
 
-package ch.tsphp.tinsphp.translators.tsphp.test.integration.coverage;
+package ch.tsphp.tinsphp.translators.tsphp.test.integration.inference;
 
 import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorInferenceStatementTest;
-import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ExpressionHelper;
 import org.antlr.runtime.RecognitionException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 @RunWith(Parameterized.class)
-public class ArrayKeyValueExpressionTest extends ATranslatorInferenceStatementTest
+public class GlobalFunctionTest extends ATranslatorInferenceStatementTest
 {
 
-    public ArrayKeyValueExpressionTest(String testString, String expectedResult) {
+    public GlobalFunctionTest(String testString, String expectedResult) {
         super(testString, expectedResult);
     }
 
@@ -33,15 +31,14 @@ public class ArrayKeyValueExpressionTest extends ATranslatorInferenceStatementTe
 
     @Parameterized.Parameters
     public static Collection<Object[]> testStrings() {
-        List<Object[]> collection = new ArrayList<>();
-
-        List<String[]> expressions = ExpressionHelper.getAllExpressions(1);
-        for (Object[] expression : expressions) {
-            collection.add(new Object[]{
-                    "[" + expression[0] + "];",
-                    "[" + expression[1] + "];"
-            });
-        }
-        return collection;
+        return Arrays.asList(new Object[][]{
+                {"echo 'hi';", "echo 'hi';"},
+                {"echo 'hi', \"hello\";", "echo 'hi', \"hello\";"},
+                {"exit;", "exit;"},
+                {"exit(1);", "exit(1);"},
+                {"exit('hi');", "exit('hi');"},
+                //TODO TINS-395 add new operator
+//                {"throw new Exception();", "throw new Exception();"}
+        });
     }
 }

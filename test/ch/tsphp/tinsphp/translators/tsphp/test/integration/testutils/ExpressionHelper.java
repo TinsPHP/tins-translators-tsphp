@@ -26,7 +26,7 @@ public class ExpressionHelper
     public static List<String[]> getAllExpressions(int offset) {
         List<String[]> list = new ArrayList<>();
         list.addAll(getCastToTypeExpressions(offset));
-        list.addAll(getExpressions());
+        list.addAll(getConstantExpressions());
         return list;
     }
 
@@ -72,94 +72,55 @@ public class ExpressionHelper
         });
     }
 
-
-    public static List<String[]> getExpressions() {
-        List<String[]> list = new ArrayList<>();
-        list.addAll(getExpressionsWithoutUnaryPrimary());
-        list.addAll(ExpressionHelper.getUnaryPrimaryExpressions());
-        return list;
-    }
-
-    public static List<String[]> getExpressionsWithoutUnaryPrimary() {
-
+    public static List<String[]> getConstantExpressions() {
 
         return Arrays.asList(new String[][]{
+                {"true or false", "true or false"},
+                {"true or false or true", "true or false or true"},
+                {"true xor false", "true xor false"},
+                {"true xor false xor true", "true xor false xor true"},
+                {"true and false", "true and false"},
+                {"true and false and true", "true and false and true"},
+                {"true and false or true xor false", "true and false or true xor false"},
+                {"true or false and true xor false", "true or false and true xor false"},
 
-                {"$a or $b", "$a or $b"},
-                {"$a or $b or $c", "$a or $b or $c"},
-                {"$a xor $b", "$a xor $b"},
-                {"$a xor $b xor $c", "$a xor $b xor $c"},
-                {"$a and $b", "$a and $b"},
-                {"$a and $b and $c", "$a and $b and $c"},
-                {"$a and $b or $c xor $d", "$a and $b or $c xor $d"},
-                {"$a or $b and $c xor $d", "$a or $b and $c xor $d"},
+                //assignment above
 
-                {"$a = $b", "$a = $b"},
-                {"$a += $b", "$a += $b"},
-                {"$a -= $b", "$a -= $b"},
-                {"$a *= $b", "$a *= $b"},
-                {"$a /= $b", "$a /= $b"},
-                {"$a &= $b", "$a &= $b"},
-                {"$a |= $b", "$a |= $b"},
-                {"$a ^= $b", "$a ^= $b"},
-                {"$a %= $b", "$a %= $b"},
-                {"$a .= $b", "$a .= $b"},
-                {"$a <<= $b", "$a <<= $b"},
-                {"$a >>= $b", "$a >>= $b"},
-                {
-                        "$a = $b += $c -= $d *= $e /= $f &= $g |= $h ^= $i %= $j .= $k <<= $l >>= $m",
-                        "$a = $b += $c -= $d *= $e /= $f &= $g |= $h ^= $i %= $j .= $k <<= $l >>= $m"
-                },
-
-                {"true ? $a : $b", "(true) ? $a : $b"},
-                {"true ? ($a ? $b : $c) : $d", "(true) ? ($a) ? $b : $c : $d"},
-                {"true ? $a : ($b ? $c : $d)", "(true) ? $a : ($b) ? $c : $d"},
-                {"$a = true ? $c += $d : ($e -= $f)", "$a = (true) ? ($c += $d) : ($e -= $f)"},
-                {
-                        "($a *= true) ? $c /= $d ? $e &= $f : ($g |= $h) : ($i ^= $j)",
-                        "(($a *= true)) ? ($c /= ($d) ? ($e &= $f) : ($g |= $h)) : ($i ^= $j)"
-                },
-                {
-                        "$a %= true ? $c .= $d ? $e <<= $f : ($g >>= $h) : ($i = $j)",
-                        "$a %= (true) ? ($c .= ($d) ? ($e <<= $f) : ($g >>= $h)) : ($i = $j)"
-                },
-                // = has lower precedence than ternary
-                // and the following is equal to $a = (true ? $a : $b) = 1
-                {"$a = true ? $a : $b = 1", "$a = (true) ? $a : $b = 1"},
+                {"true ? 1 : 2", "(true) ? 1 : 2"},
+                {"true ? (false ? 2 : 3) : 4", "(true) ? (false) ? 2 : 3 : 4"},
+                {"true ? 1 : (false ? 2 : 3)", "(true) ? 1 : (false) ? 2 : 3"},
                 // see TINS-249 ? operator has to stay left associative
                 {"true ? 0 : true ? 1 : 2", "((true) ? 0 : true) ? 1 : 2"},
-                // todo TINS-302 preceding helper could be improved for ternary
-                {"($a *= true) ? $a = 2 : $b && $c ? 1 : 2", "((($a *= true)) ? ($a = 2) : $b && $c) ? 1 : 2"},
 
-                {"$a || $b", "$a || $b"},
-                {"$a || $b || $c", "$a || $b || $c"},
-                {"$a && $b", "$a && $b"},
-                {"$a && $b && $c", "$a && $b && $c"},
-                {"$a && $b || $c", "$a && $b || $c"},
-                {"$a || $b && $c", "$a || $b && $c"},
-                {"$a || $b && $c ? $d : $e", "($a || $b && $c) ? $d : $e"},
+                {"false || true", "false || true"},
+                {"false || true || false", "false || true || false"},
+                {"false && true", "false && true"},
+                {"false && true && false", "false && true && false"},
+                {"false && true || false", "false && true || false"},
+                {"false || true && false", "false || true && false"},
+                {"false || true && false ? true : false", "(false || true && false) ? true : false"},
 
-                {"$a | $b", "$a | $b"},
-                {"$a | $b | $c", "$a | $b | $c"},
-                {"$a ^ $b", "$a ^ $b"},
-                {"$a ^ $b ^ $c", "$a ^ $b ^ $c"},
-                {"$a & $b", "$a & $b"},
-                {"$a & $b & $c", "$a & $b & $c"},
-                {"$a & $b | $c ^ $d", "$a & $b | $c ^ $d"},
-                {"($a | $b) & $c ^ $d", "($a | $b) & $c ^ $d"},
+                {"1 | 2", "1 | 2"},
+                {"1 | 2 | 3", "1 | 2 | 3"},
+                {"1 ^ 2", "1 ^ 2"},
+                {"1 ^ 2 ^ 3", "1 ^ 2 ^ 3"},
+                {"1 & 2", "1 & 2"},
+                {"1 & 2 & 3", "1 & 2 & 3"},
+                {"1 & 2 | 3 ^ 4", "1 & 2 | 3 ^ 4"},
+                {"(1 | 2) & 3 ^ 4", "(1 | 2) & 3 ^ 4"},
 
-                {"$a == $b", "$a == $b"},
-                {"$a === $b", "$a === $b"},
-                {"$a != $b", "$a != $b"},
-                {"$a !== $b", "$a !== $b"},
+                {"1 == 2", "1 == 2"},
+                {"1 === 2", "1 === 2"},
+                {"1 != 2", "1 != 2"},
+                {"1 !== 2", "1 !== 2"},
 
-                {"$a < $b", "$a < $b"},
-                {"$a <= $b", "$a <= $b"},
-                {"$a > $b", "$a > $b"},
-                {"$a >= $b", "$a >= $b"},
+                {"1 < 2", "1 < 2"},
+                {"1 <= 2", "1 <= 2"},
+                {"1 > 2", "1 > 2"},
+                {"1 >= 2", "1 >= 2"},
                 {
-                        "$a == $b | $c < $d & $e ? $f != $g : $h === $i",
-                        "($a == $b | $c < $d & $e) ? $f != $g : $h === $i"
+                        "1 == 2 | 3 < 4 & 5 ? 6 != 7 : 8 === 9",
+                        "(1 == 2 | 3 < 4 & 5) ? 6 != 7 : 8 === 9"
                 },
                 {"1 << 2", "1 << 2"},
                 {"1 << 2 << 3", "1 << 2 << 3"},
@@ -171,26 +132,21 @@ public class ExpressionHelper
                 {"1 + 2 + 3", "1 + 2 + 3"},
                 {"1 - 2", "1 - 2"},
                 {"1 - 2 - 3", "1 - 2 - 3"},
-                {"$a . $b", "$a . $b"},
-                {"$a . $b . $c", "$a . $b . $c"},
-                {"$a + $b . $c + $d - $f", "$a + $b . $c + $d - $f"},
+                {"'hi' . \"hello\"", "'hi' . \"hello\""},
+                {"'hi' . \"hello\" . 'ciao'", "'hi' . \"hello\" . 'ciao'"},
+                //TODO rstoll TINS-276 conversions and casts
+//                {"$a + $b . $c + $d - $f", "$a + $b . $c + $d - $f"},
 
-                {"$a * $b", "$a * $b"},
-                {"$a * $b * $c", "$a * $b * $c"},
-                {"$a / $b", "$a / $b"},
-                {"$a / $b / $c", "$a / $b / $c"},
-                {"$a % $b", "$a % $b"},
-                {"$a % $b % $c", "$a % $b % $c"},
-                {"$a % $b / $c % $d * $f", "$a % $b / $c % $d * $f"},
+                {"1 * 2", "1 * 2"},
+                {"1 * 2 * 3", "1 * 2 * 3"},
+                {"1 / 2", "1 / 2"},
+                //TODO rstoll TINS-276 conversions and casts
+//                {"1 / 2 / 3", "1 / 2 / 3"},
+                {"1 % 2", "1 % 2"},
+                //TODO rstoll TINS-276 conversions and casts
+//                {"1 % 2 % 3", "1 % 2 % 3"},
+//                {"1 % 2 / 3 % 4 * 5", "1 % 2 / 3 % 4 * 5"},
 
-                {"$a instanceof MyClass", "$a instanceof MyClass"},
-                {"$a instanceof $b", "$a instanceof $b"},
-        });
-
-    }
-
-    public static List<String[]> getUnaryPrimaryExpressions() {
-        return Arrays.asList(new String[][]{
                 //TODO rstoll TINS-276 conversions and casts
 //                {
 //                        "(Type) $a",
@@ -203,50 +159,21 @@ public class ExpressionHelper
 //                                + " : null)"
 //                },
 
-                {"~$a", "~$a"},
-                {"@$a", "@$a"},
-                {"!$a", "!$a"},
-                {"!!$a", "!!$a"},
-                {"!!! $a", "!!!$a"},
-                {"+$a", "+$a"},
+                {"~1", "~1"},
+                {"@1", "@1"},
+                {"!true", "!true"},
+                {"!!true", "!!true"},
+                {"!!! true", "!!!true"},
                 {"+1", "+1"},
-                {"-$a", "-$a"},
                 {"-2", "-2"},
-                {"+$a + $b", "+$a + $b"},
-                {"-$a - $b", "-$a - $b"},
-                {"clone $a", "clone $a"},
-                //TODO rstoll TINS-271 - translator OOP - expressions
-//                {"clone $a->a", "clone $a->a"},
-//                {"new Type", "new Type()"},
-//                {"new Type()", "new Type()"},
-//                {"new Type(1,$a,'hello')", "new Type(1, $a, 'hello')"},
+                {"+1 + 2", "+1 + 2"},
+                {"-3 - 4", "-3 - 4"},
+
+
                 {"exit", "exit"},
                 {"exit(1)", "exit(1)"},
-                {"($a)", "$a"},
-                {"$a++", "$a++"},
-                {"$a--", "$a--"},
-                {"++$a", "++$a"},
-                {"--$a", "--$a"},
-                {"$_GET", "$_GET"},
-                {"$a[0]", "$a[0]"},
+                {"(2)", "2"},
                 //TODO rstoll TINS-271 - translator OOP - expressions
-//                {"$a->a", "$a->a"},
-//                {"$a->foo()", "$a->foo()"},
-//                {"$a->foo(true || false,123*9)", "$a->foo(true || false, 123 * 9)"},
-                {"foo()", "foo()"},
-                {"\\foo(1,1+2,3)", "\\foo(1, 1 + 2, 3)"},
-                {"\\a\\foo()", "\\a\\foo()"},
-                //TODO rstoll TINS-271 - translator OOP - expressions
-//                {"self::foo()", "self::foo()"},
-//                {"parent::foo()", "parent::foo()"},
-//                {"Foo::foo()", "Foo::foo()"},
-//                {"self::$a", "self::$a"},
-//                {"parent::$a", "parent::$a"},
-//                {"Foo::$a", "Foo::$a"},
-//                {"self::a", "self::a"},
-//                {"parent::a", "parent::a"},
-//                {"Foo::a", "Foo::a"},
-//                {"a\\Foo::a", "a\\Foo::a"},
                 {"null", "null"},
                 {"true", "true"},
                 {"false", "false"},
@@ -255,13 +182,9 @@ public class ExpressionHelper
                 {"'a'", "'a'"},
                 {"\"asdf\"", "\"asdf\""},
                 {"[1,2,'a'=>3]", "[1, 2, 'a' => 3]"},
-                {"a\\b", "a\\b"},
-                {"$a", "$a"},
-                {"(-$a + $b) * $c", "(-$a + $b) * $c"},
-                {
-                        "!($a instanceof Type) || $a < $b+$c == ~(1 | 3 & 12)",
-                        "!($a instanceof Type) || $a < $b + $c == ~(1 | 3 & 12)"
-                }
         });
+
     }
+
 }
+

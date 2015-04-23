@@ -4,9 +4,15 @@
  * root folder or visit the project's website http://tsphp.ch/wiki/display/TINS/License
  */
 
-package ch.tsphp.tinsphp.translators.tsphp.test.integration.parser;
+/*
+ * This file is based on the file ReturnTest from the translator component of the TSPHP project.
+ * TSPHP is also published under the Apache License 2.0
+ * For more information see http://tsphp.ch/wiki/display/TSPHP/License
+ */
 
-import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorParserTest;
+package ch.tsphp.tinsphp.translators.tsphp.test.integration.inference;
+
+import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorInferenceStatementTest;
 import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ExpressionHelper;
 import org.antlr.runtime.RecognitionException;
 import org.junit.Test;
@@ -19,10 +25,10 @@ import java.util.Collection;
 import java.util.List;
 
 @RunWith(Parameterized.class)
-public class ExitTest extends ATranslatorParserTest
+public class ReturnTest extends ATranslatorInferenceStatementTest
 {
 
-    public ExitTest(String testString, String expectedResult) {
+    public ReturnTest(String testString, String expectedResult) {
         super(testString, expectedResult);
     }
 
@@ -35,13 +41,12 @@ public class ExitTest extends ATranslatorParserTest
     public static Collection<Object[]> testStrings() {
         List<Object[]> collection = new ArrayList<>();
 
-        List<String[]> expressions = ExpressionHelper.getAllExpressions(5);
-        for (Object[] expression : expressions) {
-            collection.add(new Object[]{
-                    "exit(" + expression[0] + ");",
-                    "exit(" + expression[1] + ");"
-            });
+        List<String[]> expressions = ExpressionHelper.getAllExpressions(7);
+        for (String[] expression : expressions) {
+            collection.add(new Object[]{"return " + expression[0] + ";", "return " + expression[1] + ";"});
         }
+
         return collection;
     }
+
 }

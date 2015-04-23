@@ -22,162 +22,179 @@ public class StatementHelper
     }
 
     public static List<Object[]> getStatements(String prefix, String appendix,
-            String prefixExpected, String indent, String appendixExpected) {
+            String prefixExpected, String instruction, String indent, String appendixExpected) {
         List<Object[]> collection = new ArrayList<>();
 
-        collection.addAll(getControlStructures(prefix, "$a;", appendix,
-                prefixExpected, indent, "$a;", appendixExpected));
+        collection.addAll(getControlStructures(prefix, "$a=1;", appendix,
+                prefixExpected + "\n" + indent + "? $a;", instruction, indent, indent, "$a = 1;", appendixExpected));
 
         collection.addAll(Arrays.asList(new Object[][]{
-                //localVariableDeclartion not possible to define via PHP
-//                {prefix + "int $a;" + appendix, prefixExpected + "\n" + indent + "$a;" + appendixExpected},
-                {prefix + ";" + appendix, prefixExpected + appendixExpected},
-                {prefix + "return;" + appendix, prefixExpected + "\n" + indent + "return;" + appendixExpected},
-                {
-                        prefix + "throw $a;" + appendix,
-                        prefixExpected + "\n" + indent + "throw $a;" + appendixExpected
-                },
-                {prefix + "break;" + appendix, prefixExpected + "\n" + indent + "break;" + appendixExpected},
-                {prefix + "continue;" + appendix, prefixExpected + "\n" + indent + "continue;" + appendixExpected},
+                //localVariableDeclaration not possible to define via PHP
+//                {prefix + "int $a;" + appendix, prefixExpected + "\n" + indent + instruction +"\n"+indent +"$a;" +
+// appendixExpected},
+                {prefix + ";" + appendix, prefixExpected + "\n" + indent + instruction + appendixExpected},
+                {prefix + "return;" + appendix, prefixExpected + "\n" + indent + instruction + "\n" + indent
+                        + "return null;" + appendixExpected},
+                //TODO rstoll TINS-395 add new operator
+//                {
+//                        prefix + "throw new Exception();" + appendix,
+//                        prefixExpected + "\n" + indent + instruction +"\n"+indent+ "throw new Exception();" +
+// appendixExpected
+//                },
+                {prefix + "break;" + appendix, prefixExpected + "\n" + indent + instruction + "\n" + indent + "break;"
+                        + "" + appendixExpected},
+                {prefix + "continue;" + appendix, prefixExpected + "\n" + indent + instruction + "\n" + indent
+                        + "continue;" + appendixExpected},
                 {
                         prefix + "echo 'hello';" + appendix,
-                        prefixExpected + "\n" + indent + "echo 'hello';" + appendixExpected
+                        prefixExpected + "\n" + indent + instruction + "\n" + indent
+                                + "echo 'hello';" + appendixExpected
                 },
                 {
                         prefix + "const a=1;" + appendix,
-                        prefixExpected + "\n" + indent + "const ? a = 1;" + appendixExpected
+                        prefixExpected + "\n" + indent + instruction + "\n" + indent
+                                + "const int a = 1;" + appendixExpected
                 },
                 //TODO rstoll TINS-267 translator OOP - classes
 //                {
 //                        prefix + "class A{}" + appendix,
-//                        prefixExpected + "\n" + indent + "class A {}" + appendixExpected
+//                        prefixExpected + "\n" + indent + instruction +"\n"+indent +"class A {}" + appendixExpected
 //                },
                 {
-                        prefix + "function foo(){}" + appendix,
-                        prefixExpected + "\n" + indent + "function ? foo() {\n" + indent + "}" + appendixExpected
+                        prefix + "function foo(){return;}" + appendix,
+                        prefixExpected + "\n" + indent + instruction + "\n" + indent
+                                + "function null foo() {\n" + indent + indent + "return null;\n" + indent + "}"
+                                + appendixExpected
                 },
                 //TODO rstoll TINS-268 translator OOP - interfaces
 //                {
 //                        prefix + "interface A{}" + appendix,
-//                        prefixExpected + "\n" + indent + "interface A {}" + appendixExpected
+//                        prefixExpected + "\n" + indent + instruction +"\n"+indent+ "interface A {}" + appendixExpected
 //                },
                 {
                         prefix + "use \\A;" + appendix,
-                        prefixExpected + "\n" + indent + "use \\A as A;" + appendixExpected
+                        prefixExpected + "\n" + indent + instruction + "\n" + indent + "use \\A as A;"
+                                + appendixExpected
                 }
         }));
 
-        List<String[]> expressions = ExpressionHelper.getExpressions();
+        List<String[]> expressions = ExpressionHelper.getConstantExpressions();
         for (String[] expression : expressions) {
             collection.add(new Object[]{
                     prefix + expression[0] + ";" + appendix,
-                    prefixExpected + "\n" + indent + expression[1] + ";" + appendixExpected
+                    prefixExpected + "\n" + indent + instruction
+                            + "\n" + indent + expression[1] + ";" + appendixExpected
             });
         }
         return collection;
     }
 
 
-    public static List<Object[]> getControlStructures(String prefix, String instruction, String appendix,
-            String prefixExpected, String indent, String instructionExpected, String appendixExpected) {
+    public static List<Object[]> getControlStructures(String scopePrefix, String instruction, String scopeAppendix,
+            String scopePrefixExpected, String prefixExpected, String indent, String indent2,
+            String instructionExpected,
+            String scopeAppendixExpected) {
         return Arrays.asList(new Object[][]{
                 {
-                        prefix + instruction + appendix,
-                        prefixExpected + "\n" + indent + instructionExpected + appendixExpected
+                        scopePrefix + instruction + scopeAppendix,
+                        scopePrefixExpected + "\n" + indent + prefixExpected + "\n" + indent2
+                                + instructionExpected + scopeAppendixExpected
                 },
                 {
-                        prefix + "{" + instruction + "}" + appendix,
-                        prefixExpected + "\n" + indent + instructionExpected + appendixExpected
+                        scopePrefix + "{" + instruction + "}" + scopeAppendix,
+                        scopePrefixExpected + "\n" + indent + prefixExpected + "\n" + indent2
+                                + instructionExpected + scopeAppendixExpected
                 },
                 {
-                        prefix + "{ {" + instruction + "} }" + appendix,
-                        prefixExpected + "\n" + indent + instructionExpected + appendixExpected
+                        scopePrefix + "{ {" + instruction + "} }" + scopeAppendix,
+                        scopePrefixExpected + "\n" + indent + prefixExpected + "\n" + indent2
+                                + instructionExpected + scopeAppendixExpected
                 },
                 {
-                        prefix + "if($a)" + instruction + appendix,
-                        prefixExpected + "\n" + indent
-                                + "if ($a) {\n" + indent + "    " + instructionExpected + "\n" + indent + "}"
-                                + appendixExpected
+                        scopePrefix + "if(true)" + instruction + scopeAppendix,
+                        scopePrefixExpected + "\n" + indent + prefixExpected + "\n" + indent2
+                                + "if (true) {\n" + indent2 + "    " + instructionExpected + "\n" + indent2 + "}"
+                                + scopeAppendixExpected
                 },
                 {
-                        prefix + "if($a){" + instruction + "}" + appendix,
-                        prefixExpected + "\n" + indent
-                                + "if ($a) {\n" + indent + "    " + instructionExpected + "\n" + indent + "}"
-                                + appendixExpected
+                        scopePrefix + "if(true){" + instruction + "}" + scopeAppendix,
+                        scopePrefixExpected + "\n" + indent + prefixExpected + "\n" + indent2
+                                + "if (true) {\n" + indent2 + "    " + instructionExpected + "\n" + indent2 + "}"
+                                + scopeAppendixExpected
                 },
                 {
-                        prefix + "if($a) $a=1; else " + instruction + appendix,
-                        prefixExpected + "\n" + indent
-                                + "if ($a) {\n"
-                                + indent + "    $a = 1;\n"
-                                + indent + "} else {\n"
-                                + indent + "    " + instructionExpected + "\n"
-                                + indent + "}"
-                                + appendixExpected
+                        scopePrefix + "if(true) 1; else " + instruction + scopeAppendix,
+                        scopePrefixExpected + "\n" + indent + prefixExpected + "\n" + indent2
+                                + "if (true) {\n"
+                                + indent2 + "    1;\n"
+                                + indent2 + "} else {\n"
+                                + indent2 + "    " + instructionExpected + "\n"
+                                + indent2 + "}"
+                                + scopeAppendixExpected
                 },
 
                 {
-                        prefix + "if($a){$a=1;}else{" + instruction + "}" + appendix,
-                        prefixExpected + "\n" + indent
-                                + "if ($a) {\n"
-                                + indent + "    $a = 1;\n"
-                                + indent + "} else {\n"
-                                + indent + "    " + instructionExpected + "\n"
-                                + indent + "}"
-                                + appendixExpected
+                        scopePrefix + "if(true){1;}else{" + instruction + "}" + scopeAppendix,
+                        scopePrefixExpected + "\n" + indent + prefixExpected + "\n" + indent2
+                                + "if (true) {\n"
+                                + indent2 + "    1;\n"
+                                + indent2 + "} else {\n"
+                                + indent2 + "    " + instructionExpected + "\n"
+                                + indent2 + "}"
+                                + scopeAppendixExpected
                 },
                 {
-                        prefix + "switch($a){case 1: " + instruction + "}" + appendix,
-                        prefixExpected + "\n" + indent
-                                + "switch ($a) {\n"
-                                + indent + "    case 1:\n"
-                                + indent + "        " + instructionExpected + "\n"
-                                + indent + "}"
-                                + appendixExpected
+                        scopePrefix + "switch(1){case 1: " + instruction + "}" + scopeAppendix,
+                        scopePrefixExpected + "\n" + indent + prefixExpected + "\n" + indent2
+                                + "switch (1) {\n"
+                                + indent2 + "    case 1:\n"
+                                + indent2 + "        " + instructionExpected + "\n"
+                                + indent2 + "}"
+                                + scopeAppendixExpected
                 },
                 {
-                        prefix + "switch($a){"
-                                + "    case 1: $a=1; " + instruction
-                                + "    default: $a=2; " + instruction
-                                + "}" + appendix,
-                        prefixExpected + "\n" + indent
-                                + "switch ($a) {\n"
-                                + indent + "    case 1:\n"
-                                + indent + "        $a = 1;\n"
-                                + indent + "        " + instructionExpected + "\n"
-                                + indent + "    default:\n"
-                                + indent + "        $a = 2;\n"
-                                + indent + "        " + instructionExpected + "\n"
-                                + indent + "}"
-                                + appendixExpected
+                        scopePrefix + "switch(1){"
+                                + "    case 1: 2; " + instruction
+                                + "    default: 3; " + instruction
+                                + "}" + scopeAppendix,
+                        scopePrefixExpected + "\n" + indent + prefixExpected + "\n" + indent2
+                                + "switch (1) {\n"
+                                + indent2 + "    case 1:\n"
+                                + indent2 + "        2;\n"
+                                + indent2 + "        " + instructionExpected + "\n"
+                                + indent2 + "    default:\n"
+                                + indent2 + "        3;\n"
+                                + indent2 + "        " + instructionExpected + "\n"
+                                + indent2 + "}"
+                                + scopeAppendixExpected
                 },
                 {
-                        prefix + "switch($a){"
-                                + "    case 1:{ $a=1; " + instruction + "}"
-                                + "    default: $a=2; { " + instruction + "} "
-                                + "}" + appendix,
-                        prefixExpected + "\n" + indent
-                                + "switch ($a) {\n"
-                                + indent + "    case 1:\n"
-                                + indent + "        $a = 1;\n"
-                                + indent + "        " + instructionExpected + "\n"
-                                + indent + "    default:\n"
-                                + indent + "        $a = 2;\n"
-                                + indent + "        " + instructionExpected + "\n"
-                                + indent + "}"
-                                + appendixExpected
+                        scopePrefix + "switch(1){"
+                                + "    case 1:{ 3; " + instruction + "}"
+                                + "    default: 4; { " + instruction + "} "
+                                + "}" + scopeAppendix,
+                        scopePrefixExpected + "\n" + indent + prefixExpected + "\n" + indent2
+                                + "switch (1) {\n"
+                                + indent2 + "    case 1:\n"
+                                + indent2 + "        3;\n"
+                                + indent2 + "        " + instructionExpected + "\n"
+                                + indent2 + "    default:\n"
+                                + indent2 + "        4;\n"
+                                + indent2 + "        " + instructionExpected + "\n"
+                                + indent2 + "}"
+                                + scopeAppendixExpected
                 },
                 {
-                        prefix + "for(;;) " + instruction + appendix,
-                        prefixExpected + "\n" + indent
-                                + "for (; ; ) {\n" + indent + "    " + instructionExpected + "\n" + indent + "}"
-                                + appendixExpected
+                        scopePrefix + "for(;;) " + instruction + scopeAppendix,
+                        scopePrefixExpected + "\n" + indent + prefixExpected + "\n" + indent2
+                                + "for (; ; ) {\n" + indent2 + "    " + instructionExpected + "\n" + indent2 + "}"
+                                + scopeAppendixExpected
                 },
                 {
-                        prefix + "for(;;){ " + instruction + "}" + appendix,
-                        prefixExpected + "\n" + indent
-                                + "for (; ; ) {\n" + indent + "    " + instructionExpected + "\n" + indent + "}"
-                                + appendixExpected
+                        scopePrefix + "for(;;){ " + instruction + "}" + scopeAppendix,
+                        scopePrefixExpected + "\n" + indent + prefixExpected + "\n" + indent2
+                                + "for (; ; ) {\n" + indent2 + "    " + instructionExpected + "\n" + indent2 + "}"
+                                + scopeAppendixExpected
                 },
                 //TODO rstoll TINS-247 translate procedural - foreach header
 //                {
@@ -195,28 +212,28 @@ public class StatementHelper
 //                                + appendixExpected
 //                },
                 {
-                        prefix + "while(true)" + instruction + appendix,
-                        prefixExpected + "\n" + indent
-                                + "while (true) {\n" + indent + "    " + instructionExpected + "\n" + indent + "}"
-                                + appendixExpected
+                        scopePrefix + "while(true)" + instruction + scopeAppendix,
+                        scopePrefixExpected + "\n" + indent + prefixExpected + "\n" + indent2
+                                + "while (true) {\n" + indent2 + "    " + instructionExpected + "\n" + indent2 + "}"
+                                + scopeAppendixExpected
                 },
                 {
-                        prefix + "while(true){" + instruction + "}" + appendix,
-                        prefixExpected + "\n" + indent
-                                + "while (true) {\n" + indent + "    " + instructionExpected + "\n" + indent + "}"
-                                + appendixExpected
+                        scopePrefix + "while(true){" + instruction + "}" + scopeAppendix,
+                        scopePrefixExpected + "\n" + indent + prefixExpected + "\n" + indent2
+                                + "while (true) {\n" + indent2 + "    " + instructionExpected + "\n" + indent2 + "}"
+                                + scopeAppendixExpected
                 },
                 {
-                        prefix + "do " + instruction + " while(true);" + appendix,
-                        prefixExpected + "\n" + indent
-                                + "do {\n" + indent + "    " + instructionExpected + "\n" + indent + "} while (true);"
-                                + appendixExpected
+                        scopePrefix + "do " + instruction + " while(true);" + scopeAppendix,
+                        scopePrefixExpected + "\n" + indent + prefixExpected + "\n" + indent2
+                                + "do {\n" + indent2 + "    " + instructionExpected + "\n" + indent2 + "} while (true);"
+                                + scopeAppendixExpected
                 },
                 {
-                        prefix + "do{ " + instruction + "}while(true);" + appendix,
-                        prefixExpected + "\n" + indent
-                                + "do {\n" + indent + "    " + instructionExpected + "\n" + indent + "} while (true);"
-                                + appendixExpected
+                        scopePrefix + "do{ " + instruction + "}while(true);" + scopeAppendix,
+                        scopePrefixExpected + "\n" + indent + prefixExpected + "\n" + indent2
+                                + "do {\n" + indent2 + "    " + instructionExpected + "\n" + indent2 + "} while (true);"
+                                + scopeAppendixExpected
                 },
                 //TODO rstoll TINS-248 translate procedural - catch header
 //                {

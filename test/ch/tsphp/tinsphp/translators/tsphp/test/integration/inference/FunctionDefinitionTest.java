@@ -14,6 +14,7 @@ package ch.tsphp.tinsphp.translators.tsphp.test.integration.inference;
 
 
 import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorInferenceTest;
+import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ParameterListHelper;
 import org.antlr.runtime.RecognitionException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,6 +42,11 @@ public class FunctionDefinitionTest extends ATranslatorInferenceTest
     @Parameterized.Parameters
     public static Collection<Object[]> testStrings() {
         List<Object[]> collection = new ArrayList<>();
+
+        collection.addAll(ParameterListHelper.getTestStrings(
+                "<?php function set", "{return 1;}?>",
+                "namespace{\n    function int set", " {\n        return 1;\n    }\n}"));
+
         collection.addAll(Arrays.asList(new Object[][]{
                 {
                         "<?php function foo($x){return $x;} ?>",

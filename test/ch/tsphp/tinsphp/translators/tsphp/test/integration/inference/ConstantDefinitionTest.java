@@ -10,10 +10,10 @@
  * For more information see http://tsphp.ch/wiki/display/TSPHP/License
  */
 
-package ch.tsphp.tinsphp.translators.tsphp.test.integration.parser;
+package ch.tsphp.tinsphp.translators.tsphp.test.integration.inference;
 
 
-import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorInferenceTest;
+import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorInferenceStatementTest;
 import org.antlr.runtime.RecognitionException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,11 +24,11 @@ import java.util.Arrays;
 import java.util.Collection;
 
 @RunWith(Parameterized.class)
-public class ConstantDefinitionTest extends ATranslatorInferenceTest
+public class ConstantDefinitionTest extends ATranslatorInferenceStatementTest
 {
 
-    public ConstantDefinitionTest(String testString, String expectedResult) {
-        super("<?php " + testString + " ?>", "namespace{\n    " + expectedResult + "\n}");
+    public ConstantDefinitionTest(String theTestString, String theExpectedResult) {
+        super(theTestString, theExpectedResult);
     }
 
     @Test
@@ -48,8 +48,6 @@ public class ConstantDefinitionTest extends ATranslatorInferenceTest
                 {"const b = 1; const a = b;", "const int b = 1;\n    const int a = b;"},
                 {"const a = [1,2,3];", "const array a = [1, 2, 3];"},
                 {"const a = ['a'=> 1, 'b' =>2, 2 => 3];", "const array a = ['a' => 1, 'b' => 2, 2 => 3];"},
-                // multiple constants -> here in same line since we do not use inference engine which would split
-                // the constants according its type
                 {"const a = 1, b = 2;", "const int a = 1;\n    const int b = 2;"},
                 {
                         "const a = false, b = true, c=1, d=2.1, e='hi', f=null, g=f, i=[1,2], j=['a'=>'b'];",

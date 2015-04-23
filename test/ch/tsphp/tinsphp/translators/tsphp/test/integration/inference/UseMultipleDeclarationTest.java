@@ -10,11 +10,11 @@
  * For more information see http://tsphp.ch/wiki/display/TSPHP/License
  */
 
-package ch.tsphp.tinsphp.translators.tsphp.test.integration.parser;
+package ch.tsphp.tinsphp.translators.tsphp.test.integration.inference;
 
 
 import ch.tsphp.tinsphp.parser.antlr.TinsPHPParser;
-import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorParserTest;
+import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorInferenceTest;
 import org.antlr.runtime.ParserRuleReturnScope;
 import org.antlr.runtime.RecognitionException;
 import org.junit.Test;
@@ -26,7 +26,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 @RunWith(Parameterized.class)
-public class UseMultipleDeclarationTest extends ATranslatorParserTest
+public class UseMultipleDeclarationTest extends ATranslatorInferenceTest
 {
 
     public UseMultipleDeclarationTest(String testString, String expectedResult) {

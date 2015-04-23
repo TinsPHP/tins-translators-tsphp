@@ -18,10 +18,10 @@ import java.io.IOException;
 import java.util.Collection;
 
 @RunWith(Parameterized.class)
-public class BlockInstructionTest extends ATranslatorInferenceTest
+public class ReturnInstructionTest extends ATranslatorInferenceTest
 {
 
-    public BlockInstructionTest(String testString, String expectedResult) {
+    public ReturnInstructionTest(String testString, String expectedResult) {
         super(testString, expectedResult);
     }
 
@@ -33,7 +33,7 @@ public class BlockInstructionTest extends ATranslatorInferenceTest
     @Parameterized.Parameters
     public static Collection<Object[]> testStrings() {
         return InstructionHelper.getInstructions(
-                "<?php do{", "}while(true); ?>",
-                "namespace{", "do {", "    ", "        ", "\n    } while (true);\n}");
+                "<?php return;", "?>",
+                "namespace{", "return null;", "    ", "    ", "\n}");
     }
 }

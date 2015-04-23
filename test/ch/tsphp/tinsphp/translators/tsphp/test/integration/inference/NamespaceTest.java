@@ -10,11 +10,9 @@
  * For more information see http://tsphp.ch/wiki/display/TSPHP/License
  */
 
-package ch.tsphp.tinsphp.translators.tsphp.test.integration.parser;
+package ch.tsphp.tinsphp.translators.tsphp.test.integration.inference;
 
-import ch.tsphp.tinsphp.parser.antlr.TinsPHPParser;
-import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorParserTest;
-import org.antlr.runtime.ParserRuleReturnScope;
+import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorInferenceTest;
 import org.antlr.runtime.RecognitionException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,7 +23,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 @RunWith(Parameterized.class)
-public class NamespaceTest extends ATranslatorParserTest
+public class NamespaceTest extends ATranslatorInferenceTest
 {
 
     public NamespaceTest(String testString, String expectedResult) {
@@ -35,16 +33,6 @@ public class NamespaceTest extends ATranslatorParserTest
     @Test
     public void test() throws RecognitionException, IOException {
         translate();
-    }
-
-    @Override
-    public ParserRuleReturnScope parserRun(TinsPHPParser parser) throws RecognitionException {
-        return parser.compilationUnit();
-    }
-
-    @Override
-    public void run() throws RecognitionException {
-        result = translator.compilationUnit();
     }
 
     @Parameterized.Parameters

@@ -10,10 +10,10 @@
  * For more information see http://tsphp.ch/wiki/display/TSPHP/License
  */
 
-package ch.tsphp.tinsphp.translators.tsphp.test.integration.parser;
+package ch.tsphp.tinsphp.translators.tsphp.test.integration.inference;
 
 
-import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorParserTest;
+import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorInferenceStatementTest;
 import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ExpressionHelper;
 import org.antlr.runtime.RecognitionException;
 import org.junit.Test;
@@ -27,7 +27,7 @@ import java.util.Collection;
 import java.util.List;
 
 @RunWith(Parameterized.class)
-public class ForTest extends ATranslatorParserTest
+public class ForTest extends ATranslatorInferenceStatementTest
 {
 
     public ForTest(String testString, String expectedResult) {
@@ -44,46 +44,47 @@ public class ForTest extends ATranslatorParserTest
         List<Object[]> collection = new ArrayList<>();
         collection.addAll(Arrays.asList(new Object[][]{
                 {
-                        "for($a=1     ; true ; ++$i  ) $a=1;",
-                        "for ($a = 1; true; ++$i) {\n    $a = 1;\n}"
+                        "for($i=1     ; true ; ++$i  ) $i=1;",
+                        "? $i;\n    for ($i = 1; true; ++$i) {\n        $i = 1;\n    }"
                 },
                 {
-                        "for(         ; true ; ++$i  ) $a=1;",
-                        "for (; true; ++$i) {\n    $a = 1;\n}"
+                        "$i = 0;for(         ; true ; ++$i  ) $i=1;",
+                        "? $i;\n    $i = 0;\n    for (; true; ++$i) {\n        $i = 1;\n    }"
                 },
                 {
-                        "for(         ;      ; $i+=1 ) $a=1;",
-                        "for (; ; $i += 1) {\n    $a = 1;\n}"
+                        "$i = 0;for(         ;      ; $i+=1 ) $i=1;",
+                        "? $i;\n    $i = 0;\n    for (; ; $i += 1) {\n        $i = 1;\n    }"
                 },
                 {
                         "for(         ; true ;       ) $a=1;",
-                        "for (; true; ) {\n    $a = 1;\n}"
+                        "? $a;\n    for (; true; ) {\n        $a = 1;\n    }"
                 },
                 {
                         "for(         ;      ;       ) $a=1;",
-                        "for (; ; ) {\n    $a = 1;\n}"
+                        "? $a;\n    for (; ; ) {\n        $a = 1;\n    }"
                 },
                 {
                         "for($i=0;$i<10;++$i){}",
-                        "for ($i = 0; $i < 10; ++$i) {\n}"
+                        "? $i;\n    for ($i = 0; $i < 10; ++$i) {\n    }"
                 }
         }));
 
-        List<String[]> expressions = ExpressionHelper.getExpressions();
+        List<String[]> expressions = ExpressionHelper.getConstantExpressions();
         for (Object[] expression : expressions) {
             collection.add(new Object[]{
-                    "for(" + expression[0] + ";" + expression[0] + ";" + expression[0] + ") $a=1;",
-                    "for (" + expression[1] + "; " + expression[1] + "; " + expression[1] + ") {\n    $a = 1;\n}"
+                    "for(" + expression[0] + ";" + expression[0] + ", true;" + expression[0] + ") $a=1;",
+                    "? $a;\n    for (" + expression[1] + "; " + expression[1] + ", true; " + expression[1] + ") "
+                            + "{\n        $a = 1;\n    }"
             });
             collection.add(new Object[]{
                     "for("
                             + expression[0] + "," + expression[0] + ";"
-                            + expression[0] + "," + expression[0] + ";"
+                            + expression[0] + "," + expression[0] + ", true;"
                             + expression[0] + "," + expression[0] + " "
                             + ") $a=1;",
-                    "for (" + expression[1] + ", " + expression[1] + "; "
-                            + expression[1] + ", " + expression[1] + "; "
-                            + expression[1] + ", " + expression[1] + ") {\n    $a = 1;\n}"
+                    "? $a;\n    for (" + expression[1] + ", " + expression[1] + "; "
+                            + expression[1] + ", " + expression[1] + ", true; "
+                            + expression[1] + ", " + expression[1] + ") {\n        $a = 1;\n    }"
             });
         }
 

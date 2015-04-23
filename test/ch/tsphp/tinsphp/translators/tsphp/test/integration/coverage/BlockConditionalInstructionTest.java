@@ -7,7 +7,7 @@
 package ch.tsphp.tinsphp.translators.tsphp.test.integration.coverage;
 
 
-import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorParserTest;
+import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorInferenceTest;
 import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.InstructionHelper;
 import org.antlr.runtime.RecognitionException;
 import org.junit.Test;
@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.util.Collection;
 
 @RunWith(Parameterized.class)
-public class BlockConditionalInstructionTest extends ATranslatorParserTest
+public class BlockConditionalInstructionTest extends ATranslatorInferenceTest
 {
 
     public BlockConditionalInstructionTest(String testString, String expectedResult) {
@@ -32,6 +32,8 @@ public class BlockConditionalInstructionTest extends ATranslatorParserTest
 
     @Parameterized.Parameters
     public static Collection<Object[]> testStrings() {
-        return InstructionHelper.getInstructions("if(true){", "}", "if (true) {", "    ", "\n}");
+        return InstructionHelper.getInstructions(
+                "<?php if(true){", "}?>",
+                "namespace{", "if (true) {", "    ", "        ", "\n    }\n}");
     }
 }

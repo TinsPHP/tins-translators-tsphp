@@ -10,9 +10,9 @@
  * root folder or visit the project's website http://tsphp.ch/wiki/display/TSPHP/License
  */
 
-package ch.tsphp.tinsphp.translators.tsphp.test.integration.parser;
+package ch.tsphp.tinsphp.translators.tsphp.test.integration.inference;
 
-import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorParserTest;
+import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorInferenceStatementTest;
 import org.antlr.runtime.RecognitionException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,7 +23,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 @RunWith(Parameterized.class)
-public class BreakContinueTest extends ATranslatorParserTest
+public class BreakContinueTest extends ATranslatorInferenceStatementTest
 {
 
     public BreakContinueTest(String testString, String expectedResult) {
@@ -38,10 +38,13 @@ public class BreakContinueTest extends ATranslatorParserTest
     @Parameterized.Parameters
     public static Collection<Object[]> testStrings() {
         return Arrays.asList(new Object[][]{
-                {"switch(true){case 1: break;}", "switch (true) {\n    case 1:\n        break;\n}"},
-                {"switch(true){case 1: break 1;}", "switch (true) {\n    case 1:\n        break 1;\n}"},
-                {"switch(true){case 1: continue;}", "switch (true) {\n    case 1:\n        continue;\n}"},
-                {"switch(true){case 1: continue 1;}", "switch (true) {\n    case 1:\n        continue 1;\n}"},
+                {"switch(true){case 1: break;}", "switch (true) {\n        case 1:\n            break;\n    }"},
+                {"switch(true){case 1: break 1;}", "switch (true) {\n        case 1:\n            break 1;\n    }"},
+                {"switch(true){case 1: continue;}", "switch (true) {\n        case 1:\n            continue;\n    }"},
+                {
+                        "switch(true){case 1: continue 1;}",
+                        "switch (true) {\n        case 1:\n            continue 1;\n    }"
+                },
         });
     }
 }

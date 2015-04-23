@@ -25,8 +25,8 @@ public class ParameterListHelper
     private ParameterListHelper() {
     }
 
-    public static Collection<Object[]> getTestStrings(String prefix, String appendix,
-            String prefixExpected, String appendixExpected) {
+    public static Collection<Object[]> getTestStrings(
+            String prefix, String appendix, String prefixExpected, String appendixExpected) {
 
         collection = new ArrayList<>();
         prefix += "(";
@@ -34,32 +34,27 @@ public class ParameterListHelper
         appendix = ")" + appendix;
         appendixExpected = ")" + appendixExpected;
 
-        String[] types = TypeHelper.getClassInterfaceTypes();
-        for (String type : types) {
-            collection.add(new Object[]{
-                    prefix + type + " $a" + appendix,
-                    prefixExpected + type + " $a" + appendixExpected
-            });
-            collection.add(new Object[]{
-                    prefix + type + " $a, " + type + " $b" + appendix,
-                    prefixExpected + type + " $a, " + type + " $b" + appendixExpected
-            });
-        }
-        collection.add(new Object[]{
-                prefix + "array $a" + appendix,
-                prefixExpected + "array $a" + appendixExpected
-        });
-        collection.add(new Object[]{
-                prefix + "array $a, $b, \\Exception $e" + appendix,
-                prefixExpected + "array $a, ? $b, \\Exception $e" + appendixExpected
-        });
+        collection.addAll(Arrays.asList(new Object[][]{
+                {
+                        prefix + "\\Exception $a" + appendix,
+                        prefixExpected + "mixed $a" + appendixExpected
+                },
+                {prefix + "array $a" + appendix,
+                        prefixExpected + "mixed $a" + appendixExpected
+                },
+                {
+                        prefix + "array $a, $b, \\Exception $e" + appendix,
+                        prefixExpected + "mixed $a, mixed $b, mixed $e" + appendixExpected
+                }
+        }));
 
         //normal
         addVariations(
                 prefix, "\\Exception", appendix,
-                prefixExpected, "\\Exception ", "", appendixExpected);
+                prefixExpected, "mixed ", "", appendixExpected);
 
-        addVariationsForOptional(prefix, appendix, prefixExpected, appendixExpected);
+        //TODO rstoll TINS-392 introduce optional parameters
+//        addVariationsForOptional(prefix, appendix, prefixExpected, appendixExpected);
 
         //empty params
         collection.add(new Object[]{prefix + appendix, prefixExpected + appendixExpected});
@@ -72,8 +67,8 @@ public class ParameterListHelper
 
         String paramStat1 = "$x";
         String paramStat2 = "array $y";
-        String paramStat1Expected = "? $x";
-        String paramStat2Expected = "array $y";
+        String paramStat1Expected = "mixed $x";
+        String paramStat2Expected = "mixed $y";
 
         collection.addAll(Arrays.asList(new Object[][]{
                 {
