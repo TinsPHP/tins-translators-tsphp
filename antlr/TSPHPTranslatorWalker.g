@@ -33,19 +33,31 @@ import java.util.HashSet;
 import ch.tsphp.common.ITSPHPAst;
 import ch.tsphp.common.symbols.ISymbol;
 import ch.tsphp.common.symbols.ITypeSymbol;
+import ch.tsphp.tinsphp.common.inference.constraints.IOverloadBindings;
+import ch.tsphp.tinsphp.common.scopes.IGlobalNamespaceScope;
 import ch.tsphp.tinsphp.common.symbols.IArrayTypeSymbol;
 import ch.tsphp.tinsphp.common.translation.ITranslatorController;
-import ch.tsphp.tinsphp.common.translation.dtos.ParameterDto;
 import ch.tsphp.tinsphp.common.translation.dtos.MethodDto;
+import ch.tsphp.tinsphp.common.translation.dtos.ParameterDto;
+import ch.tsphp.tinsphp.common.translation.dtos.TypeParameterDto;
+import ch.tsphp.tinsphp.common.translation.dtos.VariableDto;
 
 }
 
 @members{
 private ITranslatorController controller;
+private IOverloadBindings currentBindings;
 
-public TSPHPTranslatorWalker(TreeNodeStream input, ITranslatorController theController) {
+public TSPHPTranslatorWalker(
+        TreeNodeStream input, 
+        ITranslatorController theController, 
+        IGlobalNamespaceScope globalDefaultNamespaceScope) {
     this(input);
     controller = theController;
+    List<IOverloadBindings> bindingsList = globalDefaultNamespaceScope.getBindings();
+    if (bindingsList != null && !bindingsList.isEmpty()){
+        currentBindings = bindingsList.get(0);
+    }
 }
 
 private String getMethodName(String name) {
@@ -95,7 +107,7 @@ definition
         //classDeclaration        -> {$classDeclaration.st}
         //TODO rstoll TINS-268 translator OOP - interfaces
     //|   interfaceDeclaration    -> {$interfaceDeclaration.st}
-        functionDeclaration     -> {$functionDeclaration.st}
+        functionDefinition     -> {$functionDefinition.st}
     |   constDeclarationList    -> {$constDeclarationList.st}
     ;
 
@@ -151,13 +163,21 @@ classBodyDefinition
 */    
 
 constDeclarationList
-    :   ^(CONSTANT_DECLARATION_LIST type=. identifiers+=constDeclaration+) 
-        -> const(type={"?"}, identifiers={$identifiers})
+    :   ^(CONSTANT_DECLARATION_LIST type=. identifiers+=constDeclaration+)
+        -> constList(identifiers={$identifiers})
     ;
     
 constDeclaration
     :   ^(Identifier unaryPrimitiveAtom)
-        -> assign(id={$Identifier.text.substring(0,$Identifier.text.length()-1)}, value={$unaryPrimitiveAtom.st})
+        {
+             VariableDto dto = controller.createVariableDtoForConstant(currentBindings, $Identifier);
+             StringTemplate type = %type(
+                 prefixModifiers={dto.type.prefixModifiers}, 
+                 type={dto.type.type},
+                 suffixModifiers={dto.type.suffixModifiers}
+             );
+        }
+        -> const(type={type}, identifier={dto.variableId}, value={$unaryPrimitiveAtom.st})
     ;
     
 unaryPrimitiveAtom
@@ -438,7 +458,7 @@ interfaceMethodDeclaration
     ;
 */
 
-functionDeclaration
+functionDefinition
 @init{
     List<StringTemplate> methods = new ArrayList<>();
 }
@@ -447,38 +467,60 @@ functionDeclaration
             typeAst=.
             Identifier
             params=.
-            block
-        )
-        {
-            List<MethodDto> dtos = controller.createMethodDtos($Identifier);
-            for(MethodDto dto : dtos){ 
-               List<StringTemplate> parameters = new ArrayList<>();
-               for(ParameterDto paramDto : dto.parameters){
-                   StringTemplate type = %type(
-                       prefixModifiers={paramDto.type.prefixModifiers}, 
-                       type={paramDto.type.type},
-                       suffixModifiers={paramDto.type.suffixModifiers}
-                   );
-                   parameters.add(%parameter(
-                       type={type},
-                       variableId={paramDto.variableId}, 
-                       defaultValue={paramDto.defaultValue}
-                   ));
-               }
-               StringTemplate returnType = %type(
-                   prefixModifiers={dto.returnType.prefixModifiers},
-                   type={dto.returnType.type},
-                   suffixModifiers={dto.returnType.suffixModifiers}
-               );
-               methods.add(%method(
-                   modifier={null},
-                   returnType={returnType},
-                   identifier={dto.identifier},
-                   params={parameters},
-                   body={$block.instructions}
-               ));
+            {
+                List<MethodDto> dtos = controller.createMethodDtos($Identifier);
+                for(MethodDto dto : dtos){
+                    int index = input.mark();                
+                     StringTemplate returnType = %type(
+                        prefixModifiers={dto.returnType.prefixModifiers},
+                        type={dto.returnType.type},
+                        suffixModifiers={dto.returnType.suffixModifiers}
+                    );
+                    
+                    List<StringTemplate> typeParameters = null;
+                    if(dto.typeParameters != null){
+                        typeParameters = new ArrayList<>();
+                        for(TypeParameterDto typeParamDto : dto.typeParameters){
+                             typeParameters.add(%typeParameter(
+                                lowerBound={typeParamDto.lowerBound},
+                                typeVariable={typeParamDto.typeVariable},
+                                upperBound={typeParamDto.upperBound}
+                            ));
+                        }
+                    }
+                    
+                    List<StringTemplate> parameters = new ArrayList<>();
+                    for(ParameterDto paramDto : dto.parameters){
+                        StringTemplate type = %type(
+                            prefixModifiers={paramDto.type.prefixModifiers}, 
+                            type={paramDto.type.type},
+                            suffixModifiers={paramDto.type.suffixModifiers}
+                        );
+                        parameters.add(%parameter(
+                            type={type},
+                            variableId={paramDto.variableId}, 
+                            defaultValue={paramDto.defaultValue}
+                        ));
+                    }
+                   
+                   
+                    currentBindings = dto.bindings;
+                    TSPHPTranslatorWalker.block_return block = block();
+                
+                    methods.add(%method(
+                        modifier={null},
+                        returnType={returnType},
+                        identifier={dto.identifier},
+                        typeParams={typeParameters},
+                        params={parameters},
+                        body={block.instructions}
+                    ));
+                    input.rewind(index);
+                }
             }
-        }
+            .
+        )
+        
         -> methods(methods={methods})
     ;
 

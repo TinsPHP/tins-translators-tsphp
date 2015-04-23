@@ -22,13 +22,13 @@ import java.util.Map;
 /**
  * A precedence helper which orients itself by PHP 5.4.
  */
-public class TSPHPPrecedenceHelper implements IPrecedenceHelper
+public class PrecedenceHelper implements IPrecedenceHelper
 {
 
     @SuppressWarnings("checkstyle:magicnumber")
     private Map<Integer, Integer> precedenceRules = new HashMap<>(50);
 
-    public TSPHPPrecedenceHelper() {
+    public PrecedenceHelper() {
         initPrecedenceRules();
     }
 

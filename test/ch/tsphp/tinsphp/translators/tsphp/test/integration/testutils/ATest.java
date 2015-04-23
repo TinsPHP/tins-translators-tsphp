@@ -14,19 +14,24 @@ package ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils;
 
 import ch.tsphp.common.AstHelper;
 import ch.tsphp.common.AstHelperRegistry;
+import ch.tsphp.common.IAstHelper;
 import ch.tsphp.common.ITSPHPAst;
 import ch.tsphp.common.ITSPHPAstAdaptor;
 import ch.tsphp.common.TSPHPAstAdaptor;
 import ch.tsphp.common.exceptions.TSPHPException;
 import ch.tsphp.parser.common.ANTLRNoCaseStringStream;
-import ch.tsphp.tinsphp.common.inference.constraints.IOverloadBindings;
+import ch.tsphp.tinsphp.common.config.ICoreInitialiser;
+import ch.tsphp.tinsphp.common.config.IInferenceEngineInitialiser;
+import ch.tsphp.tinsphp.common.config.ISymbolsInitialiser;
 import ch.tsphp.tinsphp.common.issues.EIssueSeverity;
 import ch.tsphp.tinsphp.common.issues.IIssueLogger;
-import ch.tsphp.tinsphp.common.scopes.IGlobalNamespaceScope;
 import ch.tsphp.tinsphp.common.translation.ITranslatorController;
+import ch.tsphp.tinsphp.core.config.HardCodedCoreInitialiser;
+import ch.tsphp.tinsphp.inference_engine.config.HardCodedInferenceEngineInitialiser;
 import ch.tsphp.tinsphp.parser.antlr.TinsPHPParser;
 import ch.tsphp.tinsphp.parser.antlrmod.ErrorReportingTinsPHPLexer;
 import ch.tsphp.tinsphp.parser.antlrmod.ErrorReportingTinsPHPParser;
+import ch.tsphp.tinsphp.symbols.config.HardCodedSymbolsInitialiser;
 import ch.tsphp.tinsphp.translators.tsphp.PrecedenceHelper;
 import ch.tsphp.tinsphp.translators.tsphp.TempVariableHelper;
 import ch.tsphp.tinsphp.translators.tsphp.TranslatorController;
@@ -44,11 +49,7 @@ import org.junit.Ignore;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.EnumSet;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 @Ignore
 public abstract class ATest implements IIssueLogger
@@ -62,6 +63,7 @@ public abstract class ATest implements IIssueLogger
     protected TreeRuleReturnScope result;
     protected ITSPHPAstAdaptor astAdaptor;
     protected ITranslatorController controller;
+    protected IInferenceEngineInitialiser inferenceEngineInitialiser;
 
     public ATest(String theTestString, String theExpectedResult) {
         testString = theTestString;
@@ -79,6 +81,32 @@ public abstract class ATest implements IIssueLogger
     @Override
     public void log(TSPHPException exception, EIssueSeverity severity) {
         System.err.println(exception.getMessage());
+    }
+
+    public void translate() throws IOException, RecognitionException {
+        parse();
+
+        IAstHelper astHelper = new AstHelper(astAdaptor);
+        inferenceEngineInitialiser = createInferenceInitialiser(astAdaptor, astHelper);
+
+        inferTypes();
+
+        // LOAD TEMPLATES (via classpath)
+        URL url = ClassLoader.getSystemResource("TSPHP.stg");
+        FileReader fr = new FileReader(url.getFile());
+        StringTemplateGroup templates = new StringTemplateGroup(fr);
+        fr.close();
+
+        commonTreeNodeStream.reset();
+
+        translator = new ErrorReportingTSPHPTranslatorWalker(
+                commonTreeNodeStream, controller, inferenceEngineInitialiser.getGlobalDefaultNamespace());
+        translator.registerIssueLogger(this);
+        translator.setTemplateLib(templates);
+
+        run();
+
+        check();
     }
 
     public void parse() throws RecognitionException {
@@ -111,28 +139,6 @@ public abstract class ATest implements IIssueLogger
     protected void inferTypes() {
     }
 
-    public void translate() throws IOException, RecognitionException {
-        parse();
-
-        inferTypes();
-
-        // LOAD TEMPLATES (via classpath)
-        URL url = ClassLoader.getSystemResource("TSPHP.stg");
-        FileReader fr = new FileReader(url.getFile());
-        StringTemplateGroup templates = new StringTemplateGroup(fr);
-        fr.close();
-
-        commonTreeNodeStream.reset();
-        IGlobalNamespaceScope globalDefaultNamespace = mock(IGlobalNamespaceScope.class);
-        when(globalDefaultNamespace.getBindings()).thenReturn(Arrays.asList(mock(IOverloadBindings.class)));
-        translator = new ErrorReportingTSPHPTranslatorWalker(commonTreeNodeStream, controller, globalDefaultNamespace);
-        translator.registerIssueLogger(this);
-        translator.setTemplateLib(templates);
-
-        run();
-
-        check();
-    }
 
     protected ParserRuleReturnScope parserRun(TinsPHPParser parser) throws RecognitionException {
         return parser.statement();
@@ -140,5 +146,14 @@ public abstract class ATest implements IIssueLogger
 
     protected void run() throws RecognitionException {
         result = translator.statement();
+    }
+
+    protected IInferenceEngineInitialiser createInferenceInitialiser(
+            ITSPHPAstAdaptor astAdaptor, IAstHelper astHelper) {
+
+        ISymbolsInitialiser symbolsInitialiser = new HardCodedSymbolsInitialiser();
+        ICoreInitialiser coreInitialiser = new HardCodedCoreInitialiser(astHelper, symbolsInitialiser);
+
+        return new HardCodedInferenceEngineInitialiser(astAdaptor, astHelper, symbolsInitialiser, coreInitialiser);
     }
 }

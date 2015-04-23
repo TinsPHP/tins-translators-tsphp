@@ -133,9 +133,11 @@ public class ForeachTest extends ATranslatorInferenceTest
                         "<?php $v = null;"
                                 + "\n foreach([1,2] as \n$k => \n$v){"
                                 + "\n }"
-                                + "\n if($v != null){"
-                                + "\n   echo $v;"
-                                + "\n }",
+                        //TODO rstoll TINS-306 inference - runtime check insertion
+//                                + "\n if($v != null){"
+//                                + "\n   echo $v;"
+//                                + "\n }"
+                        ,
                         "namespace{"
                                 + "\n    ? $k;"
                                 + "\n    ? $v;"
@@ -144,9 +146,10 @@ public class ForeachTest extends ATranslatorInferenceTest
                                 + "\n        $k = $k3_0;"
                                 + "\n        $v = $v4_0;"
                                 + "\n    }"
-                                + "\n    if ($v != null) {"
-                                + "\n        echo $v;"
-                                + "\n    }"
+                                //TODO rstoll TINS-306 inference - runtime check insertion
+//                                + "\n    if ($v != null) {"
+//                                + "\n        echo $v;"
+//                                + "\n    }"
                                 + "\n}"
                 }
         });

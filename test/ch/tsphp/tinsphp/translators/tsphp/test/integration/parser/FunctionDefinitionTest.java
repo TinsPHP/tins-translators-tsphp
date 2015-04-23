@@ -23,10 +23,10 @@ import java.util.Collection;
 import java.util.List;
 
 @RunWith(Parameterized.class)
-public class FunctionDeclarationTest extends ATranslatorParserTest
+public class FunctionDefinitionTest extends ATranslatorParserTest
 {
 
-    public FunctionDeclarationTest(String testString, String expectedResult) {
+    public FunctionDefinitionTest(String testString, String expectedResult) {
         super(testString, expectedResult);
     }
 

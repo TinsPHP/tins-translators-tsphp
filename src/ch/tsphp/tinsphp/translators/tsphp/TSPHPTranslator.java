@@ -18,6 +18,7 @@ import ch.tsphp.tinsphp.common.ITranslator;
 import ch.tsphp.tinsphp.common.issues.EIssueSeverity;
 import ch.tsphp.tinsphp.common.issues.IIssueLogger;
 import ch.tsphp.tinsphp.common.issues.IssueReporterHelper;
+import ch.tsphp.tinsphp.common.scopes.IGlobalNamespaceScope;
 import ch.tsphp.tinsphp.common.translation.ITranslatorController;
 import ch.tsphp.tinsphp.translators.tsphp.antlrmod.ErrorReportingTSPHPTranslatorWalker;
 import org.antlr.runtime.RecognitionException;
@@ -37,6 +38,7 @@ public class TSPHPTranslator implements ITranslator, IIssueLogger
 
     private final StringTemplateGroup templateGroup;
     private final ITranslatorController controller;
+    private final IGlobalNamespaceScope globalNamespaceScope;
     private Collection<IIssueLogger> issueLoggers = new ArrayDeque<>();
     private EnumSet<EIssueSeverity> foundIssues = EnumSet.noneOf(EIssueSeverity.class);
     private Exception loadingTemplateException;
@@ -44,9 +46,11 @@ public class TSPHPTranslator implements ITranslator, IIssueLogger
     public TSPHPTranslator(
             StringTemplateGroup theTemplateGroup,
             ITranslatorController theController,
+            IGlobalNamespaceScope theGlobalNamespaceScope,
             Exception exception) {
         templateGroup = theTemplateGroup;
         controller = theController;
+        globalNamespaceScope = theGlobalNamespaceScope;
         loadingTemplateException = exception;
     }
 
@@ -56,7 +60,7 @@ public class TSPHPTranslator implements ITranslator, IIssueLogger
         if (loadingTemplateException == null) {
             stream.reset();
             ErrorReportingTSPHPTranslatorWalker translator =
-                    new ErrorReportingTSPHPTranslatorWalker(stream, controller);
+                    new ErrorReportingTSPHPTranslatorWalker(stream, controller, globalNamespaceScope);
 
             for (IIssueLogger logger : issueLoggers) {
                 translator.registerIssueLogger(logger);

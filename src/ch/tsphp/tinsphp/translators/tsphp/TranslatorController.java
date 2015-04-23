@@ -8,10 +8,13 @@ package ch.tsphp.tinsphp.translators.tsphp;
 
 import ch.tsphp.common.ITSPHPAst;
 import ch.tsphp.common.symbols.ISymbol;
+import ch.tsphp.common.symbols.ITypeSymbol;
 import ch.tsphp.tinsphp.common.inference.constraints.IFunctionType;
 import ch.tsphp.tinsphp.common.inference.constraints.IOverloadBindings;
+import ch.tsphp.tinsphp.common.inference.constraints.ITypeVariableReference;
 import ch.tsphp.tinsphp.common.inference.constraints.IVariable;
 import ch.tsphp.tinsphp.common.symbols.IMethodSymbol;
+import ch.tsphp.tinsphp.common.symbols.IVariableSymbol;
 import ch.tsphp.tinsphp.common.translation.IPrecedenceHelper;
 import ch.tsphp.tinsphp.common.translation.ITempVariableHelper;
 import ch.tsphp.tinsphp.common.translation.ITranslatorController;
@@ -19,6 +22,7 @@ import ch.tsphp.tinsphp.common.translation.dtos.MethodDto;
 import ch.tsphp.tinsphp.common.translation.dtos.ParameterDto;
 import ch.tsphp.tinsphp.common.translation.dtos.TypeDto;
 import ch.tsphp.tinsphp.common.translation.dtos.TypeParameterDto;
+import ch.tsphp.tinsphp.common.translation.dtos.VariableDto;
 import ch.tsphp.tinsphp.common.utils.Pair;
 
 import java.util.ArrayList;
@@ -93,50 +97,84 @@ public class TranslatorController implements ITranslatorController
         overload.addRewrittenName(TSPHPTranslator.TRANSLATOR_ID, newName);
         symbols.put(newName, Arrays.asList((ISymbol) methodSymbol));
 
-        MethodDto methodDto = new MethodDto(newName);
-
         Set<String> typeVariablesAdded = new HashSet<>(numberOfParameters + 1);
-        Set<TypeParameterDto> typeParameterDtos = new HashSet<>(numberOfParameters + 1);
-        methodDto.returnType = createTypeDto(
-                overload.getReturnVariable(), bindings, typeParameterDtos, typeVariablesAdded);
+        List<TypeParameterDto> typeParameters = new ArrayList<>(numberOfParameters + 1);
+        TypeDto returnType = createTypeDto(
+                overload.getReturnVariable(), bindings, typeParameters, typeVariablesAdded);
 
         List<ParameterDto> parameterDtos = new ArrayList<>();
         for (IVariable parameter : parameters) {
             parameterDtos.add(new ParameterDto(
-                    createTypeDto(parameter, bindings, typeParameterDtos, typeVariablesAdded),
+                    createTypeDto(parameter, bindings, typeParameters, typeVariablesAdded),
                     parameter.getName(),
                     null
             ));
         }
-        methodDto.parameters = parameterDtos;
 
-        if (!typeParameterDtos.isEmpty()) {
-            methodDto.typeParameters = typeParameterDtos;
+        if (typeParameters.isEmpty()) {
+            typeParameters = null;
         }
+        MethodDto methodDto = new MethodDto(returnType, newName, typeParameters, parameterDtos, bindings);
         return pair(methodDto, numbering);
     }
 
     private TypeDto createTypeDto(
             IVariable variable,
             IOverloadBindings bindings,
-            Set<TypeParameterDto> typeParameterDtos,
+            List<TypeParameterDto> typeParameters,
             Set<String> typeVariablesAdded) {
 
-        String typeVariable = variable.getTypeVariable();
-        String type;
-        if (variable.hasFixedType()) {
-            type = bindings.getLowerTypeBounds(typeVariable).toString();
-        } else {
-            type = typeVariable;
+        TypeDto typeDto = createTypeDto(bindings.getTypeVariableReference(variable.getAbsoluteName()), bindings);
+        if (!variable.hasFixedType()) {
+            String typeVariable = typeDto.type;
             if (!typeVariablesAdded.contains(typeVariable)) {
                 typeVariablesAdded.add(typeVariable);
-                String loweBound = bindings.getLowerTypeBounds(typeVariable).toString();
-                String upperBound = bindings.getUpperTypeBounds(typeVariable).toString();
-                typeParameterDtos.add(new TypeParameterDto(loweBound, typeVariable, upperBound));
+                String lowerBound = null;
+                if (bindings.hasLowerTypeBounds(typeVariable)) {
+                    lowerBound = bindings.getLowerTypeBounds(typeVariable).toString();
+                }
+                String upperBound = null;
+                if (bindings.hasUpperTypeBounds(typeVariable)) {
+                    upperBound = bindings.getUpperTypeBounds(typeVariable).toString();
+                }
+                typeParameters.add(new TypeParameterDto(lowerBound, typeVariable, upperBound));
             }
+        }
+        return typeDto;
+    }
+
+    private TypeDto createTypeDto(ITypeVariableReference reference, IOverloadBindings bindings) {
+        String typeVariable = reference.getTypeVariable();
+        String type;
+        if (reference.hasFixedType()) {
+            ITypeSymbol typeSymbol;
+            if (bindings.hasUpperTypeBounds(typeVariable)) {
+                typeSymbol = bindings.getUpperTypeBounds(typeVariable);
+            } else {
+                typeSymbol = bindings.getLowerTypeBounds(typeVariable);
+            }
+            type = typeSymbol.toString();
+        } else {
+            type = typeVariable;
         }
         //TODO rstoll TINS-379 find least upper bound
         return new TypeDto(null, type, null);
     }
 
+    @Override
+    public VariableDto createVariableDtoForConstant(IOverloadBindings bindings, ITSPHPAst constantId) {
+        IVariableSymbol variableSymbol = (IVariableSymbol) constantId.getSymbol();
+        ITypeVariableReference reference = bindings.getTypeVariableReference(variableSymbol.getAbsoluteName());
+        String name = variableSymbol.getName();
+        name = name.substring(0, name.length() - 1);
+        return new VariableDto(createTypeDto(reference, bindings), name);
+    }
+
+
+    @Override
+    public VariableDto createVariableDto(IOverloadBindings bindings, ITSPHPAst variableId) {
+        IVariableSymbol variableSymbol = (IVariableSymbol) variableId.getSymbol();
+        ITypeVariableReference reference = bindings.getTypeVariableReference(variableSymbol.getAbsoluteName());
+        return new VariableDto(createTypeDto(reference, bindings), variableSymbol.getName());
+    }
 }

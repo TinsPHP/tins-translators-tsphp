@@ -16,6 +16,7 @@ import ch.tsphp.tinsphp.common.issues.EIssueSeverity;
 import ch.tsphp.tinsphp.common.issues.IIssueLogger;
 import ch.tsphp.tinsphp.common.issues.IIssueReporter;
 import ch.tsphp.tinsphp.common.issues.IssueReporterHelper;
+import ch.tsphp.tinsphp.common.scopes.IGlobalNamespaceScope;
 import ch.tsphp.tinsphp.common.translation.ITranslatorController;
 import ch.tsphp.tinsphp.translators.tsphp.antlr.TSPHPTranslatorWalker;
 import org.antlr.runtime.RecognitionException;
@@ -34,8 +35,9 @@ public class ErrorReportingTSPHPTranslatorWalker extends TSPHPTranslatorWalker i
     private Collection<IIssueLogger> errorLoggers = new ArrayDeque<>();
     private boolean hasFoundError;
 
-    public ErrorReportingTSPHPTranslatorWalker(TreeNodeStream input, ITranslatorController controller) {
-        super(input, controller);
+    public ErrorReportingTSPHPTranslatorWalker(
+            TreeNodeStream input, ITranslatorController controller, IGlobalNamespaceScope globalNamespaceScope) {
+        super(input, controller, globalNamespaceScope);
     }
 
     @Override

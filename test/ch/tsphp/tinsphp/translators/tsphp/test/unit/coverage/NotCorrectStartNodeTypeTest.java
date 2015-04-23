@@ -106,7 +106,7 @@ public class NotCorrectStartNodeTypeTest extends AWalkerTest
 //                {"foreachLoop", TokenTypes.Else},
                 {"forLoop", TokenTypes.Else},
                 {"functionCall", TokenTypes.Else},
-                {"functionDeclaration", TokenTypes.Else},
+                {"functionDefinition", TokenTypes.Else},
                 {"ifCondition", TokenTypes.Else},
 //                {"implementsDeclaration", TokenTypes.Else},
                 {"instruction", TokenTypes.Else},

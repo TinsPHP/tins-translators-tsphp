@@ -36,8 +36,12 @@ useDeclaration(type, alias) ::= <<
 <type> as <alias>
 >>
 
-const(type, identifiers) ::=<<
-const <type> <identifiers; separator=", ">;
+constList(identifiers) ::=<<
+<identifiers; separator="\n">
+>>
+
+const(type, identifier, value) ::=<<
+const <type> <identifier> = <value>;
 >>
 
 assign(id,value) ::=<<
@@ -48,8 +52,8 @@ methods(methods) ::=<<
 <methods; separator="\n\n">
 >>
 
-method(modifier, returnType, identifier, params, body) ::=<<
-<if(modifier)><modifier> <endif>function <returnType> <identifier>(<if(params)><params><endif>) {<if(body)>
+method(modifier, returnType, identifier, typeParams, params, body) ::=<<
+<if(modifier)><modifier> <endif>function <returnType> <identifier><if(typeParams)><typeParams; separator=", "><endif>(<if(params)><params; separator=", "><endif>) {<if(body)>
 
     <body; separator="\n">
 
@@ -63,12 +67,12 @@ modifier(modifiers) ::=<<
 <modifiers; separator=" ">
 >>
 
-type(prefixModifiers, type, suffixModifiers) ::= <<
+type(prefixModifiers, type, suffixModifiers) ::=<<
 <if(prefixModifiers)><prefixModifiers> <endif><type><if(suffixModifiers)><suffixModifiers><endif>
 >>
 
-parameterList(declarations) ::= <<
-<declarations; separator=", ">
+typeParameter(lowerBound, typeVariable, upperBound) ::=<<
+[<if(lowerBound)><lowerBound> \< <endif><typeVariable><if(upperBound)> \< <upperBound><endif>]
 >>
 
 parameter(type, variableId, defaultValue) ::=<<
