@@ -92,7 +92,7 @@ public class FunctionDefinitionImplicitReturnTest extends ATranslatorInferenceTe
                 {
                         "<?php function foo(){if(true){return 1;}} ?>",
                         "namespace{" +
-                                "\n    function null foo() {"
+                                "\n    function (int | null) foo() {"
                                 + "\n        if (true) {"
                                 + "\n            return 1;"
                                 + "\n        }"
@@ -104,7 +104,7 @@ public class FunctionDefinitionImplicitReturnTest extends ATranslatorInferenceTe
                 {
                         "<?php function foo($x){if($x){return 1;}} ?>",
                         "namespace{" +
-                                "\n    function null foo(bool $x) {"
+                                "\n    function (int | null) foo(bool $x) {"
                                 + "\n        if ($x) {"
                                 + "\n            return 1;"
                                 + "\n        }"
