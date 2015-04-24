@@ -90,7 +90,7 @@ public class ExpressionHelper
                 {"true ? (false ? 2 : 3) : 4", "(true) ? (false) ? 2 : 3 : 4"},
                 {"true ? 1 : (false ? 2 : 3)", "(true) ? 1 : (false) ? 2 : 3"},
                 // see TINS-249 ? operator has to stay left associative
-                {"true ? 0 : true ? 1 : 2", "((true) ? 0 : true) ? 1 : 2"},
+                {"true ? true : 0 ? 1 : 2", "((true) ? true : 0) ? 1 : 2"},
 
                 {"false || true", "false || true"},
                 {"false || true || false", "false || true || false"},
@@ -119,8 +119,8 @@ public class ExpressionHelper
                 {"1 > 2", "1 > 2"},
                 {"1 >= 2", "1 >= 2"},
                 {
-                        "1 == 2 | 3 < 4 & 5 ? 6 != 7 : 8 === 9",
-                        "(1 == 2 | 3 < 4 & 5) ? 6 != 7 : 8 === 9"
+                        "((1 == 2) + true | (3 < 4) + false & 5) < 1 ? 6 != 7 : 8 === 9",
+                        "(((1 == 2) + true | (3 < 4) + false & 5) < 1) ? 6 != 7 : 8 === 9"
                 },
                 {"1 << 2", "1 << 2"},
                 {"1 << 2 << 3", "1 << 2 << 3"},

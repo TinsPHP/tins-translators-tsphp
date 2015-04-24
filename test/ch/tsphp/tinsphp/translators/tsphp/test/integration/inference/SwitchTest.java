@@ -40,54 +40,54 @@ public class SwitchTest extends ATranslatorInferenceStatementTest
         return Arrays.asList(new Object[][]{
                 {
                         "$a = 1; switch($a){ case 1: $a=1; }",
-                        "? $a;\n    $a = 1;\n    switch ($a) {\n        case 1:\n            $a = 1;\n    }"
+                        "int $a;\n    $a = 1;\n    switch ($a) {\n        case 1:\n            $a = 1;\n    }"
                 },
                 {
                         "$a = 1; switch($a){ case 1: case 2: $a=1; break; }",
-                        "? $a;\n    $a = 1;\n    switch ($a) {\n        case 1:\n        "
+                        "int $a;\n    $a = 1;\n    switch ($a) {\n        case 1:\n        "
                                 + "case 2:\n            $a = 1;\n            break;\n    }"
                 },
                 {
                         "$a = 1; switch($a){ case 1: $a=1; case 2: $a=1;}",
-                        "? $a;\n    $a = 1;\n    switch ($a) {\n        case 1:\n            $a = 1;\n        "
+                        "int $a;\n    $a = 1;\n    switch ($a) {\n        case 1:\n            $a = 1;\n        "
                                 + "case 2:\n            $a = 1;\n    }"
                 },
                 {
                         "$a = 1; switch($a){ case 1: $a=1; case 2: case 3: $a=1; }",
-                        "? $a;\n    $a = 1;\n    switch ($a) {\n        case 1:\n            $a = 1;\n        "
+                        "int $a;\n    $a = 1;\n    switch ($a) {\n        case 1:\n            $a = 1;\n        "
                                 + "case 2:\n        case 3:\n            $a = 1;\n    }"
                 },
                 {
                         "$a = 1; switch($a){ case 1: $a=1; $a=2; }",
-                        "? $a;\n    $a = 1;\n    switch ($a) {\n        case 1:\n            "
+                        "int $a;\n    $a = 1;\n    switch ($a) {\n        case 1:\n            "
                                 + "$a = 1;\n            $a = 2;\n    }"
                 },
                 {
                         "$a = 1; switch($a){ case 1: $a=1; case 2: case 3: $a=2; default: $a=2; }",
-                        "? $a;\n    $a = 1;\n    switch ($a) {\n        case 1:\n            $a = 1;\n        "
+                        "int $a;\n    $a = 1;\n    switch ($a) {\n        case 1:\n            $a = 1;\n        "
                                 + "case 2:\n        case 3:\n            $a = 2;\n        "
                                 + "default:\n            $a = 2;\n    }"
                 },
                 {
                         "$a = 1; switch($a){ case 1: $a=1; case 2: $a=1; default: $a=2; case 3: $a=2; }",
-                        "? $a;\n    $a = 1;\n    switch ($a) {\n        case 1:\n            $a = 1;\n        "
+                        "int $a;\n    $a = 1;\n    switch ($a) {\n        case 1:\n            $a = 1;\n        "
                                 + "case 2:\n            $a = 1;\n        default:\n            $a = 2;\n        "
                                 + "case 3:\n            $a = 2;\n    }"
                 },
                 {
                         "$a = 1; switch($a){ case 1: {$a=1; $a=2; } case 2: case 3: {$a=1;} }",
-                        "? $a;\n    $a = 1;\n    switch ($a) {\n        case 1:\n            $a = 1;\n            "
+                        "int $a;\n    $a = 1;\n    switch ($a) {\n        case 1:\n            $a = 1;\n            "
                                 + "$a = 2;\n        case 2:\n        case 3:\n            $a = 1;\n    }"
                 },
                 {
                         "$a = 1; switch($a){ case 1: {$a=1; $a=2; } {$a=1;} case 2: case 3: {$a=1;} }",
-                        "? $a;\n    $a = 1;\n    switch ($a) {\n        case 1:\n            $a = 1;\n            "
+                        "int $a;\n    $a = 1;\n    switch ($a) {\n        case 1:\n            $a = 1;\n            "
                                 + "$a = 2;\n            $a = 1;\n        case 2:\n        "
                                 + "case 3:\n            $a = 1;\n    }"
                 },
                 {
                         "$a = 1; switch($a){ case 1: $a=1; case 1+1: default: case 2: $a=2; case 2: case 3: {$a=1;} }",
-                        "? $a;\n    $a = 1;\n    switch ($a) {\n        case 1:\n            $a = 1;"
+                        "int $a;\n    $a = 1;\n    switch ($a) {\n        case 1:\n            $a = 1;"
                                 + "\n        case 1 + 1:\n        case 2:\n        default:\n            $a = 2;"
                                 + "\n        case 2:\n        case 3:\n            $a = 1;\n    }"
                 }

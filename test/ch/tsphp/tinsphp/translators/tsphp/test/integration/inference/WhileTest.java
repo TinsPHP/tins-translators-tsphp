@@ -38,17 +38,17 @@ public class WhileTest extends ATranslatorInferenceStatementTest
     @Parameterized.Parameters
     public static Collection<Object[]> testStrings() {
         return Arrays.asList(new Object[][]{
-                {"while( true  ) $a=1;", "? $a;\n    while (true) {\n        $a = 1;\n    }"},
-                {"while( true  ){$a=1;}", "? $a;\n    while (true) {\n        $a = 1;\n    }"},
+                {"while( true  ) $a=1;", "int $a;\n    while (true) {\n        $a = 1;\n    }"},
+                {"while( true  ){$a=1;}", "int $a;\n    while (true) {\n        $a = 1;\n    }"},
                 {
                         "while( true  ){$a=1; $b=2;}",
-                        "? $b;\n    ? $a;\n    while (true) {\n        $a = 1;\n        $b = 2;\n    }"
+                        "int $b;\n    int $a;\n    while (true) {\n        $a = 1;\n        $b = 2;\n    }"
                 },
-                {"do $a=1; while( true  );", "? $a;\n    do {\n        $a = 1;\n    } while (true);"},
-                {"do {$a=1;} while( true  );", "? $a;\n    do {\n        $a = 1;\n    } while (true);"},
+                {"do $a=1; while( true  );", "int $a;\n    do {\n        $a = 1;\n    } while (true);"},
+                {"do {$a=1;} while( true  );", "int $a;\n    do {\n        $a = 1;\n    } while (true);"},
                 {
                         "do {$a=1;$b=2;}while( true  );",
-                        "? $b;\n    ? $a;\n    do {\n        $a = 1;\n        $b = 2;\n    } while (true);"
+                        "int $b;\n    int $a;\n    do {\n        $a = 1;\n        $b = 2;\n    } while (true);"
                 }
         });
     }

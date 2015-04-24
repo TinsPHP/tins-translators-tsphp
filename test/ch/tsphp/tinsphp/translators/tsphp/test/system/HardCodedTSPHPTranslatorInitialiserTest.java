@@ -56,7 +56,7 @@ public class HardCodedTSPHPTranslatorInitialiserTest
         String output = translator.translate(commonTreeNodeStream);
 
 
-        assertThat(output.replaceAll("\r", ""), is("namespace{\n    ? $a;\n    $a = 1;\n}"));
+        assertThat(output.replaceAll("\r", ""), is("namespace{\n    int $a;\n    $a = 1;\n}"));
         assertThat(translator.hasFound(EnumSet.allOf(EIssueSeverity.class)), is(false));
     }
 

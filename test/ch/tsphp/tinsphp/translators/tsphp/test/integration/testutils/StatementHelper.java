@@ -26,7 +26,7 @@ public class StatementHelper
         List<Object[]> collection = new ArrayList<>();
 
         collection.addAll(getControlStructures(prefix, "$a=1;", appendix,
-                prefixExpected + "\n" + indent + "? $a;", instruction, indent, indent, "$a = 1;", appendixExpected));
+                prefixExpected + "\n" + indent + "int $a;", instruction, indent, indent, "$a = 1;", appendixExpected));
 
         collection.addAll(Arrays.asList(new Object[][]{
                 //localVariableDeclaration not possible to define via PHP

@@ -74,7 +74,7 @@ namespace
 @init{String namespaceName = null;}
     :   ^('namespace' (name=TYPE_NAME|DEFAULT_NAMESPACE) namespaceBody)
         {
-            if(name!=null){
+            if(name != null){
                 namespaceName=name.getText().substring(1,name.getText().length()-1);
             }
         }
@@ -164,7 +164,7 @@ classBodyDefinition
 
 constDeclarationList
     :   ^(CONSTANT_DECLARATION_LIST type=. identifiers+=constDeclaration+)
-        -> constList(identifiers={$identifiers})
+        -> list(statements={$identifiers})
     ;
     
 constDeclaration
@@ -177,7 +177,7 @@ constDeclaration
                  suffixModifiers={dto.type.suffixModifiers}
              );
         }
-        -> const(type={type}, identifier={dto.variableId}, value={$unaryPrimitiveAtom.st})
+        -> constant(type={type}, identifier={dto.variableId}, value={$unaryPrimitiveAtom.st})
     ;
     
 unaryPrimitiveAtom
@@ -213,82 +213,22 @@ variableDeclaration
     ;
 */
     
-localVariableDeclarationList
-    :   ^(VARIABLE_DECLARATION_LIST
-            ^(TYPE typeModifier allTypesOrUnknown)
-            variables+=localVariableDeclaration+
-        )
-        -> localVariableDeclarationList(
-            type={%type(
-                prefixModifiers={$typeModifier.prefixModifiers},
-                type={$allTypesOrUnknown.st},
-                suffixModifiers={$typeModifier.suffixModifiers}
-            )},
-            variables={$variables})
+localVariableDefinitionList
+    :   ^(VARIABLE_DECLARATION_LIST type=. variables+=localVariableDefinition+)
+        -> list(statements={$variables})
     ;  
 
-localVariableDeclaration
-    :   VariableId
-        -> {%{$VariableId.text}}
-    |   ^(VariableId defaultValue=unaryPrimitiveAtom)
-         -> assign(id={$VariableId.text}, value={$unaryPrimitiveAtom.st})
-    ;
-    
-typeModifier returns[Set<String> prefixModifiers, Set<String> suffixModifiers]
-@init{
-    $prefixModifiers = new HashSet<String>();
-    $suffixModifiers = new HashSet<String>();
-}
-    :   ^(TYPE_MODIFIER
-            ('cast' {$prefixModifiers.add("cast");})?
-            ('!'    {$suffixModifiers.add("!");})? 
-            ('?'    {$suffixModifiers.add("?");})?
-        )
-    |   TYPE_MODIFIER
-    ;
-  
-returnTypesOrUnknown
-    :   allTypesOrUnknown -> {$allTypesOrUnknown.st}
-    //not yet supported by PHP
-    //|   Void
-    ;
-    
-allTypesOrUnknown
-    :   allTypes -> {$allTypes.st}
-    |   '?'      -> {%{"?"}}
-    ;
-
-allTypes
-    :   primitiveTypes -> {$primitiveTypes.st} 
-    |   TYPE_NAME      -> {%{$TYPE_NAME.text}}
-    ;
-    
-primitiveTypes
-    :   scalarTypes  -> {$scalarTypes.st}
-    |   TypeArray    -> {%{$TypeArray.text}}
-    |   TypeResource -> {%{$TypeResource.text}}
-    |   TypeMixed    -> {%{$TypeMixed.text}}
-    ;
-/*
-primitiveTypesWithoutArray
-    :   scalarTypes     -> {$scalarTypes.st}
-    |   TypeResource    -> {%{$TypeResource.text}}
-    |   TypeMixed       -> {%{$TypeMixed.text}}
-    ;
-*/
-scalarTypesOrUnknown
-    :   scalarTypes -> {$scalarTypes.st}
-    |   '?'         -> {%{"?"}}
-    ;
-
-scalarTypes
-@init{
-    $st = %{$start.getText()};
-}
-    :   TypeBool
-    |   TypeInt
-    |   TypeFloat
-    |   TypeString
+localVariableDefinition
+    :   ^(VariableId defaultValue=unaryPrimitiveAtom?)
+        {
+            VariableDto dto = controller.createVariableDto(currentBindings, $VariableId);
+            StringTemplate type = %type(
+                prefixModifiers={dto.type.prefixModifiers}, 
+                type={dto.type.type},
+                suffixModifiers={dto.type.suffixModifiers}
+            );
+        }
+        -> variable(type={type}, variableId={dto.variableId}, defaultValue={$unaryPrimitiveAtom.st})
     ;
 
 //TODO rstoll TINS-267 translator OOP - classes
@@ -481,10 +421,12 @@ functionDefinition
                     if(dto.typeParameters != null){
                         typeParameters = new ArrayList<>();
                         for(TypeParameterDto typeParamDto : dto.typeParameters){
-                             typeParameters.add(%typeParameter(
-                                lowerBound={typeParamDto.lowerBound},
+                            typeParameters.add(%typeParameter(
+                                lowerBounds={typeParamDto.lowerBounds},
+                                lowerMoreThanOne={typeParamDto.lowerBounds != null && typeParamDto.lowerBounds.size() > 1},
                                 typeVariable={typeParamDto.typeVariable},
-                                upperBound={typeParamDto.upperBound}
+                                upperBounds={typeParamDto.upperBounds},
+                                upperMoreThanOne={typeParamDto.upperBounds != null && typeParamDto.upperBounds.size() > 1}
                             ));
                         }
                     }
@@ -525,7 +467,7 @@ functionDefinition
     ;
 
 instruction
-    :   localVariableDeclarationList    -> {$localVariableDeclarationList.st}
+    :   localVariableDefinitionList    -> {$localVariableDefinitionList.st}
     |   ifCondition                     -> {$ifCondition.st}
     |   switchCondition                 -> {$switchCondition.st}
     |   forLoop                         -> {$forLoop.st}

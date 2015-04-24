@@ -36,11 +36,11 @@ useDeclaration(type, alias) ::= <<
 <type> as <alias>
 >>
 
-constList(identifiers) ::=<<
-<identifiers; separator="\n">
+list(statements) ::=<<
+<statements; separator="\n">
 >>
 
-const(type, identifier, value) ::=<<
+constant(type, identifier, value) ::=<<
 const <type> <identifier> = <value>;
 >>
 
@@ -53,7 +53,7 @@ methods(methods) ::=<<
 >>
 
 method(modifier, returnType, identifier, typeParams, params, body) ::=<<
-<if(modifier)><modifier> <endif>function <returnType> <identifier><if(typeParams)><typeParams; separator=", "><endif>(<if(params)><params; separator=", "><endif>) {<if(body)>
+<if(modifier)><modifier> <endif>function <returnType> <identifier><if(typeParams)>[<typeParams; separator=", ">]<endif>(<if(params)><params; separator=", "><endif>) {<if(body)>
 
     <body; separator="\n">
 
@@ -71,16 +71,17 @@ type(prefixModifiers, type, suffixModifiers) ::=<<
 <if(prefixModifiers)><prefixModifiers> <endif><type><if(suffixModifiers)><suffixModifiers><endif>
 >>
 
-typeParameter(lowerBound, typeVariable, upperBound) ::=<<
-[<if(lowerBound)><lowerBound> \< <endif><typeVariable><if(upperBound)> \< <upperBound><endif>]
+typeParameter(lowerBounds, lowerMoreThanOne, typeVariable, upperBounds, upperMoreThanOne) ::=<<
+<if(lowerBounds)><if(lowerMoreThanOne)>(<endif><lowerBounds; separator=" | "><if(lowerMoreThanOne)>)<endif> \< <endif><typeVariable><if(upperBounds)> \< <if(upperMoreThanOne)>(<endif><upperBounds; separator=" & "><if(upperMoreThanOne)>)<endif><endif>
 >>
 
 parameter(type, variableId, defaultValue) ::=<<
 <type> <variableId><if(defaultValue)> = <defaultValue><endif>
 >>
 
-localVariableDeclarationList(type, variables) ::=<<
-<type> <variables; separator=",">;
+
+variable(type, variableId, defaultValue) ::=<<
+<type> <variableId><if(defaultValue)> = <defaultValue><endif>;
 >>
 
 expression(expression) ::= <<

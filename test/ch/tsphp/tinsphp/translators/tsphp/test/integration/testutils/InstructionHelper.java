@@ -22,7 +22,7 @@ public class InstructionHelper
 
         collection.addAll(StatementHelper.getControlStructures(
                 prefix, "$a=1;", appendix,
-                prefixExpected + "\n    ? $a;", instruction, indent, indent2, "$a = 1;", appendixExpected));
+                prefixExpected + "\n    int $a;", instruction, indent, indent2, "$a = 1;", appendixExpected));
 
         List<String[]> expressions = ExpressionHelper.getAllExpressions(prefix.length());
         for (Object[] expression : expressions) {

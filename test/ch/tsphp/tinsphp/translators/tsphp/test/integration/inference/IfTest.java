@@ -40,18 +40,18 @@ public class IfTest extends ATranslatorInferenceStatementTest
         return Arrays.asList(new Object[][]{
                 {
                         "if(true){$a=1;}",
-                        "? $a;\n    if (true) {\n        $a = 1;\n    }"
+                        "int $a;\n    if (true) {\n        $a = 1;\n    }"
                 },
                 {
-                        "if(true) $a=1; else if(false) $b=1; else $c=2;",
-                        "? $c;\n    ? $b;\n    ? $a;\n    "
-                                + "if (true) {\n        $a = 1;\n    } else {\n        "
+                        "if(true) $a=1.5; else if(false) $b=1; else $c=2;",
+                        "int $c;\n    int $b;\n    float $a;\n    "
+                                + "if (true) {\n        $a = 1.5;\n    } else {\n        "
                                 + "if (false) {\n            $b = 1;\n        } else {\n            $c = 2;\n        }"
                                 + "\n    }"
                 },
                 {
                         "if(true) $a=1; else if(false) $b=1; else if(false && true) $c=2; else $d=1;",
-                        "? $d;\n    ? $c;\n    ? $b;\n    ? $a;\n    "
+                        "int $d;\n    int $c;\n    int $b;\n    int $a;\n    "
                                 + "if (true) {\n        $a = 1;\n    } else {\n        "
                                 + "if (false) {\n            $b = 1;\n        } else {\n            "
                                 + "if (false && true) {\n                $c = 2;\n            } "
@@ -59,7 +59,7 @@ public class IfTest extends ATranslatorInferenceStatementTest
                                 + "\n        }"
                                 + "\n    }"
                 },
-                {"$x = true; if($x){}", "? $x;\n    $x = true;\n    if ($x) {\n    }"}
+                {"$x = true; if($x){}", "true $x;\n    $x = true;\n    if ($x) {\n    }"}
         });
     }
 }

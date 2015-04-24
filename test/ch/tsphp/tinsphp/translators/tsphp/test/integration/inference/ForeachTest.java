@@ -41,9 +41,9 @@ public class ForeachTest extends ATranslatorInferenceTest
                 {
                         "<?php foreach([1,2] as \n$k => \n$v)$a=1;",
                         "namespace{"
-                                + "\n    ? $a;"
-                                + "\n    ? $v;"
-                                + "\n    ? $k;"
+                                + "\n    int $a;"
+                                + "\n    mixed $v;"
+                                + "\n    (int | string) $k;"
                                 + "\n    foreach ([1, 2] as scalar $k2_0 => mixed $v3_0) {"
                                 + "\n        $k = $k2_0;"
                                 + "\n        $v = $v3_0;"
@@ -54,8 +54,8 @@ public class ForeachTest extends ATranslatorInferenceTest
                 {
                         "<?php foreach([1,2] as \n$v) $a=1;",
                         "namespace{"
-                                + "\n    ? $a;"
-                                + "\n    ? $v;"
+                                + "\n    int $a;"
+                                + "\n    mixed $v;"
                                 + "\n    foreach ([1, 2] as mixed $v2_0) {"
                                 + "\n        $v = $v2_0;"
                                 + "\n        $a = 1;"
@@ -65,9 +65,9 @@ public class ForeachTest extends ATranslatorInferenceTest
                 {
                         "<?php foreach([1, 2] as \n$k => \n$v){$a=1;}",
                         "namespace{"
-                                + "\n    ? $a;"
-                                + "\n    ? $v;"
-                                + "\n    ? $k;"
+                                + "\n    int $a;"
+                                + "\n    mixed $v;"
+                                + "\n    (int | string) $k;"
                                 + "\n    foreach ([1, 2] as scalar $k2_0 => mixed $v3_0) {"
                                 + "\n        $k = $k2_0;"
                                 + "\n        $v = $v3_0;"
@@ -78,8 +78,8 @@ public class ForeachTest extends ATranslatorInferenceTest
                 {
                         "<?php foreach([1, 2] as \n$v) {$a=1;}",
                         "namespace{"
-                                + "\n    ? $a;"
-                                + "\n    ? $v;"
+                                + "\n    int $a;"
+                                + "\n    mixed $v;"
                                 + "\n    foreach ([1, 2] as mixed $v2_0) {"
                                 + "\n        $v = $v2_0;"
                                 + "\n        $a = 1;"
@@ -89,10 +89,10 @@ public class ForeachTest extends ATranslatorInferenceTest
                 {
                         "<?php foreach([1, 2] as \n$k=> \n$v){$a=1; $b=2;}",
                         "namespace{"
-                                + "\n    ? $b;"
-                                + "\n    ? $a;"
-                                + "\n    ? $v;"
-                                + "\n    ? $k;"
+                                + "\n    int $b;"
+                                + "\n    int $a;"
+                                + "\n    mixed $v;"
+                                + "\n    (int | string) $k;"
                                 + "\n    foreach ([1, 2] as scalar $k2_0 => mixed $v3_0) {"
                                 + "\n        $k = $k2_0;"
                                 + "\n        $v = $v3_0;"
@@ -104,9 +104,9 @@ public class ForeachTest extends ATranslatorInferenceTest
                 {
                         "<?php foreach([1, 2] as \n$v) {$a=1; $b=3;}",
                         "namespace{"
-                                + "\n    ? $b;"
-                                + "\n    ? $a;"
-                                + "\n    ? $v;"
+                                + "\n    int $b;"
+                                + "\n    int $a;"
+                                + "\n    mixed $v;"
                                 + "\n    foreach ([1, 2] as mixed $v2_0) {"
                                 + "\n        $v = $v2_0;"
                                 + "\n        $a = 1;"
@@ -118,9 +118,9 @@ public class ForeachTest extends ATranslatorInferenceTest
                 {
                         "<?php namespace b; foreach([1, 2] as \n$v) {$a=1; $b=3;}",
                         "namespace b{"
-                                + "\n    ? $b;"
-                                + "\n    ? $a;"
-                                + "\n    ? $v;"
+                                + "\n    int $b;"
+                                + "\n    int $a;"
+                                + "\n    mixed $v;"
                                 + "\n    foreach ([1, 2] as mixed $v2_0) {"
                                 + "\n        $v = $v2_0;"
                                 + "\n        $a = 1;"
@@ -139,8 +139,8 @@ public class ForeachTest extends ATranslatorInferenceTest
 //                                + "\n }"
                         ,
                         "namespace{"
-                                + "\n    ? $k;"
-                                + "\n    ? $v;"
+                                + "\n    (int | string) $k;"
+                                + "\n    mixed $v;"
                                 + "\n    $v = null;"
                                 + "\n    foreach ([1, 2] as scalar $k3_0 => mixed $v4_0) {"
                                 + "\n        $k = $k3_0;"

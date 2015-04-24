@@ -48,26 +48,28 @@ public class ExpressionTest extends ATranslatorInferenceStatementTest
         }
 
         collection.addAll(Arrays.asList(new Object[][]{
-                {"$a = 1;", "? $a;\n    $a = 1;"},
-                {"$a = 1; $a += 1;", "? $a;\n    $a = 1;\n    $a += 1;"},
-                {"$a = 1; $a -= 1;", "? $a;\n    $a = 1;\n    $a -= 1;"},
-                {"$a = 1; $a *= 1;", "? $a;\n    $a = 1;\n    $a *= 1;"},
-                {"$a = 1; $a /= 1;", "? $a;\n    $a = 1;\n    $a /= 1;"},
-                {"$a = 1; $a &= 1;", "? $a;\n    $a = 1;\n    $a &= 1;"},
-                {"$a = 1; $a |= 1;", "? $a;\n    $a = 1;\n    $a |= 1;"},
-                {"$a = 1; $a ^= 1;", "? $a;\n    $a = 1;\n    $a ^= 1;"},
-                {"$a = 1; $a %= 1;", "? $a;\n    $a = 1;\n    $a %= 1;"},
-                {"$a = ''; $a .= 'hi';", "? $a;\n    $a = '';\n    $a .= 'hi';"},
-                {"$a = 1; $a <<= 1;", "? $a;\n    $a = 1;\n    $a <<= 1;"},
-                {"$a = 1; $a >>= 1;", "? $a;\n    $a = 1;\n    $a >>= 1;"},
+                {"$a = 1;", "int $a;\n    $a = 1;"},
+                {"$a = 1; $a += 1;", "int $a;\n    $a = 1;\n    $a += 1;"},
+                {"$a = 1; $a -= 1;", "int $a;\n    $a = 1;\n    $a -= 1;"},
+                {"$a = 1; $a *= 1;", "int $a;\n    $a = 1;\n    $a *= 1;"},
+                {"$a = 1; $a /= 1;", "(int | float) $a;\n    $a = 1;\n    $a /= 1;"},
+                {"$a = 1; $a &= 1;", "int $a;\n    $a = 1;\n    $a &= 1;"},
+                {"$a = 1; $a |= 1;", "int $a;\n    $a = 1;\n    $a |= 1;"},
+                {"$a = 1; $a ^= 1;", "int $a;\n    $a = 1;\n    $a ^= 1;"},
+                {"$a = 1; $a %= 1;", "int $a;\n    $a = 1;\n    $a %= 1;"},
+                {"$a = ''; $a .= 'hi';", "string $a;\n    $a = '';\n    $a .= 'hi';"},
+                {"$a = 1; $a <<= 1;", "int $a;\n    $a = 1;\n    $a <<= 1;"},
+                {"$a = 1; $a >>= 1;", "int $a;\n    $a = 1;\n    $a >>= 1;"},
                 {
                         "$a = 1; $a = true ? $a += 1 : ($a -= 2);",
-                        "? $a;\n    $a = 1;\n    $a = (true) ? ($a += 1) : ($a -= 2);"
+                        "int $a;\n    $a = 1;\n    $a = (true) ? ($a += 1) : ($a -= 2);"
                 },
                 {
-                        "$a = 1; $b = 1; ($a *= 1 == 1) ? $b /= 1 ? $a &= 2 : ($a |= 3) : ($a ^= 4);",
-                        "? $b;\n    ? $a;\n    $a = 1;\n    $b = 1;\n"
-                                + "    (($a *= 1 == 1)) ? ($b /= (1) ? ($a &= 2) : ($a |= 3)) : ($a ^= 4);"
+                        "$a = 1; $b = 1; ($a *= ((1 == 1) + false)) == 1 ? $b /= "
+                                + "true ? $a &= 2 : ($a |= 3) : ($a ^= 4);",
+                        "(int | float) $b;\n    int $a;\n    $a = 1;\n    $b = 1;\n"
+                                + "    (($a *= (1 == 1) + false) == 1) ? "
+                                + "($b /= (true) ? ($a &= 2) : ($a |= 3)) : ($a ^= 4);"
 
                 },
                 //TODO rstoll TINS-276 conversions and casts
@@ -82,22 +84,28 @@ public class ExpressionTest extends ATranslatorInferenceStatementTest
 
                 // = has lower precedence than ternary
                 //; the following is equal to $a = (true ? 1 : ($b = 1))
-                {"$a = true ? 1 : ($b = 1);", "? $b;\n    ? $a;\n    $a = (true) ? 1 : ($b = 1);"},
+                {"$a = true ? 1 : ($b = 1);", "int $b;\n    int $a;\n    $a = (true) ? 1 : ($b = 1);"},
                 // todo TINS-302 preceding helper could be improved for ternary
-                {"true ? $a = 2 : false && true ? 1 : 2;", "? $a;\n    ((true) ? ($a = 2) : false && true) ? 1 : 2;"},
-                {"$a = null; $a instanceof Exception;", "? $a;\n    $a = null;\n    $a instanceof Exception;"},
+                {
+                        "true ? $a = false : false && true ? 1 : 2;",
+                        "false $a;\n    ((true) ? ($a = false) : false && true) ? 1 : 2;"
+                },
+                {
+                        "$a = null; $a instanceof Exception;",
+                        "null $a;\n    $a = null;\n    $a instanceof Exception;"
+                },
                 {
                         "$a = null; $b = null; $a instanceof $b;",
-                        "? $b;\n    ? $a;\n    $a = null;\n    $b = null;\n    $a instanceof $b;"
+                        "null $b;\n    null $a;\n    $a = null;\n    $b = null;\n    $a instanceof $b;"
                 },
-                {"$a = null; clone $a;", "? $a;\n    $a = null;\n    clone $a;"},
-                {"$a = null; $a++;", "? $a;\n    $a = null;\n    $a++;"},
-                {"$a = null; $a--;", "? $a;\n    $a = null;\n    $a--;"},
-                {"$a = null; ++$a;", "? $a;\n    $a = null;\n    ++$a;"},
-                {"$a = null; --$a;", "? $a;\n    $a = null;\n    --$a;"},
+                {"$a = null; clone $a;", "null $a;\n    $a = null;\n    clone $a;"},
+                {"$a = 1; $a++;", "int $a;\n    $a = 1;\n    $a++;"},
+                {"$a = 1; $a--;", "int $a;\n    $a = 1;\n    $a--;"},
+                {"$a = 1; ++$a;", "int $a;\n    $a = 1;\n    ++$a;"},
+                {"$a = 1; --$a;", "int $a;\n    $a = 1;\n    --$a;"},
                 //TODO rstoll TINS-278 $_GET is a type instead of a variable
 //                {"$_GET;", "$_GET;"},
-                {"$a = [1]; $a[0];", "? $a;\n    $a = [1];\n    $a[0];"},
+                {"$a = [1]; $a[0];", "array $a;\n    $a = [1];\n    $a[0];"},
                 //TODO rstoll TINS-271 - translator OOP - expressions
 //                {"clone $a->a;","clone $a->a;"},
 //                {"new Type;","new Type();"},
@@ -124,11 +132,11 @@ public class ExpressionTest extends ATranslatorInferenceStatementTest
                         "namespace{const b = 1;} namespace a{ const b = 1;} namespace{a\\b;} ",
                         "const int b = 1;\n}\nnamespace a{\n    const int b = 1;\n}\nnamespace{\n    a\\b;"
                 },
-                {"$a = 1; $a;", "? $a;\n    $a = 1;\n    $a;"},
-                {"$a = 1; (-$a + $a) * $a;", "? $a;\n    $a = 1;\n    (-$a + $a) * $a;"},
+                {"$a = 1; $a;", "int $a;\n    $a = 1;\n    $a;"},
+                {"$a = 1; (-$a + $a) * $a;", "int $a;\n    $a = 1;\n    (-$a + $a) * $a;"},
                 {
                         "$a = null; !($a instanceof Exception) || $a < 1 + 2 == ~(1 | 3 & 12);",
-                        "? $a;\n    $a = null;\n    !($a instanceof Exception) || $a < 1 + 2 == ~(1 | 3 & 12);"
+                        "null $a;\n    $a = null;\n    !($a instanceof Exception) || $a < 1 + 2 == ~(1 | 3 & 12);"
                 }
         }));
         return collection;

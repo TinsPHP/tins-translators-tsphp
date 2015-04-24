@@ -129,15 +129,22 @@ public class TranslatorController implements ITranslatorController
             String typeVariable = typeDto.type;
             if (!typeVariablesAdded.contains(typeVariable)) {
                 typeVariablesAdded.add(typeVariable);
-                String lowerBound = null;
-                if (bindings.hasLowerTypeBounds(typeVariable)) {
-                    lowerBound = bindings.getLowerTypeBounds(typeVariable).toString();
+                List<String> lowerBounds = null;
+                if (bindings.hasLowerBounds(typeVariable)) {
+                    lowerBounds = new ArrayList<>();
+                    if (bindings.hasLowerTypeBounds(typeVariable)) {
+                        lowerBounds.addAll(bindings.getLowerTypeBounds(typeVariable).getTypeSymbols().keySet());
+                    }
+                    if (bindings.hasLowerRefBounds(typeVariable)) {
+                        lowerBounds.addAll(bindings.getLowerRefBounds(typeVariable));
+                    }
                 }
-                String upperBound = null;
+                List<String> upperBounds = null;
                 if (bindings.hasUpperTypeBounds(typeVariable)) {
-                    upperBound = bindings.getUpperTypeBounds(typeVariable).toString();
+                    upperBounds = new ArrayList<>();
+                    upperBounds.addAll(bindings.getUpperTypeBounds(typeVariable).getTypeSymbols().keySet());
                 }
-                typeParameters.add(new TypeParameterDto(lowerBound, typeVariable, upperBound));
+                typeParameters.add(new TypeParameterDto(lowerBounds, typeVariable, upperBounds));
             }
         }
         return typeDto;

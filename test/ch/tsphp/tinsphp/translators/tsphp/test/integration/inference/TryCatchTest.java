@@ -41,8 +41,8 @@ public class TryCatchTest extends ATranslatorInferenceTest
                 {
                         "<?php try{$a=1;}catch(\\Exception \n$e){}",
                         "namespace{"
-                                + "\n    ? $e;"
-                                + "\n    ? $a;"
+                                + "\n    Exception $e;"
+                                + "\n    int $a;"
                                 + "\n    try {"
                                 + "\n        $a = 1;"
                                 + "\n    } catch (\\Exception $e2_0) {"
@@ -54,9 +54,9 @@ public class TryCatchTest extends ATranslatorInferenceTest
                         "<?php namespace a; try{$a=1;}catch(\\ErrorException \n$e){} catch(\\Exception \n$e){$a=1;" +
                                 "$b=2;}",
                         "namespace a{"
-                                + "\n    ? $b;"
-                                + "\n    ? $e;"
-                                + "\n    ? $a;"
+                                + "\n    int $b;"
+                                + "\n    Exception $e;"
+                                + "\n    int $a;"
                                 + "\n    try {"
                                 + "\n        $a = 1;"
                                 + "\n    } catch (\\ErrorException $e2_0) {"
@@ -74,9 +74,9 @@ public class TryCatchTest extends ATranslatorInferenceTest
                                 + "catch(Exception \n $e){$a=1;$b=2;}"
                                 + "catch(Exception \n  $e){}",
                         "namespace{"
-                                + "\n    ? $b;"
-                                + "\n    ? $e;"
-                                + "\n    ? $a;"
+                                + "\n    int $b;"
+                                + "\n    Exception $e;"
+                                + "\n    int $a;"
                                 + "\n    try {"
                                 + "\n        $a = 1;"
                                 + "\n    } catch (Exception $e2_0) {"
@@ -91,18 +91,19 @@ public class TryCatchTest extends ATranslatorInferenceTest
                                 + "\n}"
                 },
                 //also see TINS-248
-                {
-                        "<?php $e = null; try{}catch(Exception \n$e){} echo $e;",
-                        "namespace{"
-                                + "\n    ? $e;"
-                                + "\n    $e = null;"
-                                + "\n    try {"
-                                + "\n    } catch (Exception $e2_0) {"
-                                + "\n        $e = $e2_0;"
-                                + "\n    }"
-                                + "\n    echo $e;"
-                                + "\n}"
-                }
+                //TODO rstoll TINS-395 add new operator
+//                {
+//                        "<?php $e = new Exception(); try{}catch(Exception \n$e){} throw $e;",
+//                        "namespace{"
+//                                + "\n    Exception $e;"
+//                                + "\n    $e = new Exception();"
+//                                + "\n    try {"
+//                                + "\n    } catch (Exception $e2_0) {"
+//                                + "\n        $e = $e2_0;"
+//                                + "\n    }"
+//                                + "\n    throw $e;"
+//                                + "\n}"
+//                }
         });
     }
 }

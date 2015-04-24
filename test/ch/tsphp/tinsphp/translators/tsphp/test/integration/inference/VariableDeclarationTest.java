@@ -42,16 +42,29 @@ public class VariableDeclarationTest extends ATranslatorInferenceTest
     public static Collection<Object[]> testStrings() {
         List<Object[]> collection = new ArrayList<>();
         collection.addAll(Arrays.asList(new Object[][]{
-                {"<?php $a=1;", "namespace{\n    ? $a;\n    $a = 1;\n}"},
-                {"<?php if(true){$a=1;}", "namespace{\n    ? $a;\n    if (true) {\n        $a = 1;\n    }\n}"},
+                {"<?php $a=null;", "namespace{\n    null $a;\n    $a = null;\n}"},
+                {"<?php $a=false;", "namespace{\n    false $a;\n    $a = false;\n}"},
+                {"<?php $a=true;", "namespace{\n    true $a;\n    $a = true;\n}"},
+                {"<?php $a=1;", "namespace{\n    int $a;\n    $a = 1;\n}"},
+                {"<?php $a=1.2;", "namespace{\n    float $a;\n    $a = 1.2;\n}"},
+                {"<?php $a='hi';", "namespace{\n    string $a;\n    $a = 'hi';\n}"},
+                {"<?php $a=[];", "namespace{\n    array $a;\n    $a = [];\n}"},
+                {"<?php $a=false; $a=true;", "namespace{\n    (true | false) $a;\n    $a = false;\n    $a = true;\n}"},
+                {"<?php $a=1; $a=2.3;", "namespace{\n    (int | float) $a;\n    $a = 1;\n    $a = 2.3;\n}"},
+                {
+                        "<?php $a=false; $a=true; $a=1; $a=1.5; $a='hi';",
+                        "namespace{\n    (int | string | true | false | float) $a;"
+                                + "\n    $a = false;\n    $a = true;\n    $a = 1;\n    $a = 1.5;\n    $a = 'hi';\n}"
+                },
+                {"<?php if(true){$a=1;}", "namespace{\n    int $a;\n    if (true) {\n        $a = 1;\n    }\n}"},
                 {
                         "<?php if(true){}else{$a=1;}",
-                        "namespace{\n    ? $a;\n    if (true) {\n    } else {\n        $a = 1;\n    }\n}"
+                        "namespace{\n    int $a;\n    if (true) {\n    } else {\n        $a = 1;\n    }\n}"
                 },
                 {
                         "<?php if(true){}else{if(true){$a=1;}}",
                         "namespace{\n"
-                                + "    ? $a;\n"
+                                + "    int $a;\n"
                                 + "    if (true) {\n"
                                 + "    } else {\n"
                                 + "        if (true) {\n"

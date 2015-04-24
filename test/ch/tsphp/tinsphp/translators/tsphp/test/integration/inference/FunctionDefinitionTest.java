@@ -97,6 +97,46 @@ public class FunctionDefinitionTest extends ATranslatorInferenceTest
                                 + "\n    }"
                                 + "\n}"
                 },
+                {
+                        "<?php function foo($x, $y){ $x = $y; return $x;}",
+                        "namespace{"
+                                + "\n    function T1 foo[T3 < T1, T3](T1 $x, T3 $y) {"
+                                + "\n        $x = $y;"
+                                + "\n        return $x;"
+                                + "\n    }"
+                                + "\n}"
+                },
+                {
+                        "<?php function foo($x, $y){ $x = 1+$y; return $x;}",
+                        "namespace{"
+                                + "\n    function T4 foo[(int | T1) < T4, int < T1 < num](T4 $x, T1 $y) {"
+                                + "\n        $x = 1 + $y;"
+                                + "\n        return $x;"
+                                + "\n    }"
+                                + "\n}"
+                },
+                {
+                        "<?php function foo($x, $y){ $a = $x+$y; return $a;}",
+                        "namespace{"
+                                + "\n    function T1 foo0[T1 < num](T1 $x, T1 $y) {"
+                                + "\n        T1 $a;"
+                                + "\n        $a = $x + $y;"
+                                + "\n        return $a;"
+                                + "\n    }"
+                                + "\n"
+                                + "\n    function int foo1(bool $x, bool $y) {"
+                                + "\n        int $a;"
+                                + "\n        $a = $x + $y;"
+                                + "\n        return $a;"
+                                + "\n    }"
+                                + "\n"
+                                + "\n    function array foo2(array $x, array $y) {"
+                                + "\n        array $a;"
+                                + "\n        $a = $x + $y;"
+                                + "\n        return $a;"
+                                + "\n    }"
+                                + "\n}"
+                }
         }));
 
         return collection;

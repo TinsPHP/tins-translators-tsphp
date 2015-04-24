@@ -45,27 +45,27 @@ public class ForTest extends ATranslatorInferenceStatementTest
         collection.addAll(Arrays.asList(new Object[][]{
                 {
                         "for($i=1     ; true ; ++$i  ) $i=1;",
-                        "? $i;\n    for ($i = 1; true; ++$i) {\n        $i = 1;\n    }"
+                        "int $i;\n    for ($i = 1; true; ++$i) {\n        $i = 1;\n    }"
                 },
                 {
                         "$i = 0;for(         ; true ; ++$i  ) $i=1;",
-                        "? $i;\n    $i = 0;\n    for (; true; ++$i) {\n        $i = 1;\n    }"
+                        "int $i;\n    $i = 0;\n    for (; true; ++$i) {\n        $i = 1;\n    }"
                 },
                 {
                         "$i = 0;for(         ;      ; $i+=1 ) $i=1;",
-                        "? $i;\n    $i = 0;\n    for (; ; $i += 1) {\n        $i = 1;\n    }"
+                        "int $i;\n    $i = 0;\n    for (; ; $i += 1) {\n        $i = 1;\n    }"
                 },
                 {
                         "for(         ; true ;       ) $a=1;",
-                        "? $a;\n    for (; true; ) {\n        $a = 1;\n    }"
+                        "int $a;\n    for (; true; ) {\n        $a = 1;\n    }"
                 },
                 {
                         "for(         ;      ;       ) $a=1;",
-                        "? $a;\n    for (; ; ) {\n        $a = 1;\n    }"
+                        "int $a;\n    for (; ; ) {\n        $a = 1;\n    }"
                 },
                 {
                         "for($i=0;$i<10;++$i){}",
-                        "? $i;\n    for ($i = 0; $i < 10; ++$i) {\n    }"
+                        "int $i;\n    for ($i = 0; $i < 10; ++$i) {\n    }"
                 }
         }));
 
@@ -73,7 +73,7 @@ public class ForTest extends ATranslatorInferenceStatementTest
         for (Object[] expression : expressions) {
             collection.add(new Object[]{
                     "for(" + expression[0] + ";" + expression[0] + ", true;" + expression[0] + ") $a=1;",
-                    "? $a;\n    for (" + expression[1] + "; " + expression[1] + ", true; " + expression[1] + ") "
+                    "int $a;\n    for (" + expression[1] + "; " + expression[1] + ", true; " + expression[1] + ") "
                             + "{\n        $a = 1;\n    }"
             });
             collection.add(new Object[]{
@@ -82,7 +82,7 @@ public class ForTest extends ATranslatorInferenceStatementTest
                             + expression[0] + "," + expression[0] + ", true;"
                             + expression[0] + "," + expression[0] + " "
                             + ") $a=1;",
-                    "? $a;\n    for (" + expression[1] + ", " + expression[1] + "; "
+                    "int $a;\n    for (" + expression[1] + ", " + expression[1] + "; "
                             + expression[1] + ", " + expression[1] + ", true; "
                             + expression[1] + ", " + expression[1] + ") {\n        $a = 1;\n    }"
             });
