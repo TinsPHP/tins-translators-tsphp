@@ -91,7 +91,7 @@ public class NotCorrectStartNodeTypeTest extends AWalkerTest
 //                {"classStaticAccess", TokenTypes.Else},
                 {"compilationUnit", TokenTypes.Else},
                 {"constantDefinition", TokenTypes.Else},
-                {"constantntDefinitionList", TokenTypes.Else},
+                {"constantDefinitionList", TokenTypes.Else},
 //                {"constructDeclaration", TokenTypes.Else},
 //                {"constructDestructModifier", TokenTypes.Else},
                 {"definition", TokenTypes.Else},

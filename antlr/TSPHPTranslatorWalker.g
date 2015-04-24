@@ -108,7 +108,7 @@ definition
         //TODO rstoll TINS-268 translator OOP - interfaces
     //|   interfaceDeclaration    -> {$interfaceDeclaration.st}
         functionDefinition     -> {$functionDefinition.st}
-    |   constDeclarationList    -> {$constDeclarationList.st}
+    |   constantDefinitionList    -> {$constantDefinitionList.st}
     ;
 
 
@@ -162,12 +162,12 @@ classBodyDefinition
     ;
 */    
 
-constDeclarationList
-    :   ^(CONSTANT_DECLARATION_LIST type=. identifiers+=constDeclaration+)
+constantDefinitionList
+    :   ^(CONSTANT_DECLARATION_LIST type=. identifiers+=constantDefinition+)
         -> list(statements={$identifiers})
     ;
     
-constDeclaration
+constantDefinition
     :   ^(Identifier unaryPrimitiveAtom)
         {
              VariableDto dto = controller.createVariableDtoForConstant(currentBindings, $Identifier);
@@ -444,11 +444,10 @@ functionDefinition
                             defaultValue={paramDto.defaultValue}
                         ));
                     }
-                   
-                   
+                                      
                     currentBindings = dto.bindings;
                     TSPHPTranslatorWalker.block_return block = block();
-                
+
                     methods.add(%method(
                         modifier={null},
                         returnType={returnType},
