@@ -24,6 +24,7 @@ import ch.tsphp.tinsphp.common.translation.dtos.TypeDto;
 import ch.tsphp.tinsphp.common.translation.dtos.TypeParameterDto;
 import ch.tsphp.tinsphp.common.translation.dtos.VariableDto;
 import ch.tsphp.tinsphp.common.utils.Pair;
+import ch.tsphp.tinsphp.symbols.TypeVariableNames;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -99,12 +100,12 @@ public class TranslatorController implements ITranslatorController
         Set<String> typeVariablesAdded = new HashSet<>(numberOfParameters + 1);
         List<TypeParameterDto> typeParameters = new ArrayList<>(numberOfParameters + 1);
         TypeDto returnType = createTypeDto(
-                overload.getReturnVariable(), bindings, typeParameters, typeVariablesAdded);
+                TypeVariableNames.RETURN_VARIABLE_NAME, bindings, typeParameters, typeVariablesAdded);
 
         List<ParameterDto> parameterDtos = new ArrayList<>();
         for (IVariable parameter : parameters) {
             parameterDtos.add(new ParameterDto(
-                    createTypeDto(parameter, bindings, typeParameters, typeVariablesAdded),
+                    createTypeDto(parameter.getAbsoluteName(), bindings, typeParameters, typeVariablesAdded),
                     parameter.getName(),
                     null
             ));
@@ -118,13 +119,14 @@ public class TranslatorController implements ITranslatorController
     }
 
     private TypeDto createTypeDto(
-            IVariable variable,
+            String variableId,
             IOverloadBindings bindings,
             List<TypeParameterDto> typeParameters,
             Set<String> typeVariablesAdded) {
 
-        TypeDto typeDto = createTypeDto(bindings.getTypeVariableReference(variable.getAbsoluteName()), bindings);
-        if (!variable.hasFixedType()) {
+        ITypeVariableReference reference = bindings.getTypeVariableReference(variableId);
+        TypeDto typeDto = createTypeDto(reference, bindings);
+        if (!reference.hasFixedType()) {
             String typeVariable = typeDto.type;
             if (!typeVariablesAdded.contains(typeVariable)) {
                 typeVariablesAdded.add(typeVariable);

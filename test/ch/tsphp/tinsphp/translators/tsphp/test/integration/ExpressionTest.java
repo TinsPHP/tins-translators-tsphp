@@ -52,7 +52,7 @@ public class ExpressionTest extends ATranslatorInferenceStatementTest
                 {"$a = 1; $a += 1;", "int $a;\n    $a = 1;\n    $a += 1;"},
                 {"$a = 1; $a -= 1;", "int $a;\n    $a = 1;\n    $a -= 1;"},
                 {"$a = 1; $a *= 1;", "int $a;\n    $a = 1;\n    $a *= 1;"},
-                {"$a = 1; $a /= 1;", "(int | float) $a;\n    $a = 1;\n    $a /= 1;"},
+                {"$a = 1; $a /= 1;", "(int | false | float) $a;\n    $a = 1;\n    $a /= 1;"},
                 {"$a = 1; $a &= 1;", "int $a;\n    $a = 1;\n    $a &= 1;"},
                 {"$a = 1; $a |= 1;", "int $a;\n    $a = 1;\n    $a |= 1;"},
                 {"$a = 1; $a ^= 1;", "int $a;\n    $a = 1;\n    $a ^= 1;"},
@@ -67,7 +67,7 @@ public class ExpressionTest extends ATranslatorInferenceStatementTest
                 {
                         "$a = 1; $b = 1; ($a *= ((1 == 1) + false)) == 1 ? $b /= "
                                 + "true ? $a &= 2 : ($a |= 3) : ($a ^= 4);",
-                        "(int | float) $b;\n    int $a;\n    $a = 1;\n    $b = 1;\n"
+                        "(int | false | float) $b;\n    int $a;\n    $a = 1;\n    $b = 1;\n"
                                 + "    (($a *= (1 == 1) + false) == 1) ? "
                                 + "($b /= (true) ? ($a &= 2) : ($a |= 3)) : ($a ^= 4);"
 
@@ -137,7 +137,10 @@ public class ExpressionTest extends ATranslatorInferenceStatementTest
                 {
                         "$a = null; !($a instanceof Exception) || $a < 1 + 2 == ~(1 | 3 & 12);",
                         "null $a;\n    $a = null;\n    !($a instanceof Exception) || $a < 1 + 2 == ~(1 | 3 & 12);"
-                }
+                },
+                //see TINS-410 super globals are not in binding
+                {"$_GET;", "$_GET;"},
+                {"E_ALL;", "E_ALL;"}
         }));
         return collection;
     }
