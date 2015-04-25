@@ -36,14 +36,13 @@ import static ch.tsphp.tinsphp.common.utils.Pair.pair;
 
 public class TranslatorController implements ITranslatorController
 {
-    private IPrecedenceHelper precedenceHelper;
-    private ITempVariableHelper tempVariableHelper;
+    private final IPrecedenceHelper precedenceHelper;
+    private final ITempVariableHelper tempVariableHelper;
 
     public TranslatorController(IPrecedenceHelper thePrecedenceHelper, ITempVariableHelper theTempVariableHelper) {
         precedenceHelper = thePrecedenceHelper;
         tempVariableHelper = theTempVariableHelper;
     }
-
 
     @Override
     public boolean needParentheses(ITSPHPAst expression) {
@@ -94,7 +93,7 @@ public class TranslatorController implements ITranslatorController
             }
             newName = name + numbering;
         }
-        overload.addRewrittenName(TSPHPTranslator.TRANSLATOR_ID, newName);
+        overload.addSuffix(TSPHPTranslator.TRANSLATOR_ID, String.valueOf(numbering));
         symbols.put(newName, Arrays.asList((ISymbol) methodSymbol));
 
         Set<String> typeVariablesAdded = new HashSet<>(numberOfParameters + 1);
@@ -183,5 +182,18 @@ public class TranslatorController implements ITranslatorController
         IVariableSymbol variableSymbol = (IVariableSymbol) variableId.getSymbol();
         ITypeVariableReference reference = bindings.getTypeVariableReference(variableSymbol.getAbsoluteName());
         return new VariableDto(createTypeDto(reference, bindings), variableSymbol.getName());
+    }
+
+    @Override
+    public String getOverloadName(IOverloadBindings bindings, ITSPHPAst functionCall, ITSPHPAst identifier) {
+        IFunctionType appliedOverload = bindings.getAppliedOverload(functionCall.getSymbol().getAbsoluteName());
+        String suffix = appliedOverload.getSuffix(TSPHPTranslator.TRANSLATOR_ID);
+
+        String name = identifier.getText();
+        name = name.substring(0, name.length() - 2);
+        if (suffix != null) {
+            name += suffix;
+        }
+        return name;
     }
 }

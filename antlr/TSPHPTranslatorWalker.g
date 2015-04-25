@@ -401,6 +401,7 @@ interfaceMethodDeclaration
 functionDefinition
 @init{
     List<StringTemplate> methods = new ArrayList<>();
+    IOverloadBindings tmp = currentBindings;
 }
     :   ^('function'
             FUNCTION_MODIFIER
@@ -464,6 +465,9 @@ functionDefinition
         
         -> methods(methods={methods})
     ;
+finally{
+    currentBindings = tmp;
+}
 
 instruction
     :   localVariableDefinitionList    -> {$localVariableDefinitionList.st}
@@ -760,7 +764,10 @@ newOperator
 
 functionCall
     :   ^(FUNCTION_CALL identifier=TYPE_NAME actualParameters)
-        -> functionCall(identifier={getMethodName($identifier.text)}, parameters={$actualParameters.parameters})
+        {
+            String overloadName = controller.getOverloadName(currentBindings, $FUNCTION_CALL, $identifier);
+        }
+        -> functionCall(identifier={overloadName}, parameters={$actualParameters.parameters})
     ;
 
 actualParameters returns[List<Object> parameters]

@@ -45,12 +45,13 @@ public class HardCodedTSPHPTranslatorInitialiser implements ITranslatorInitialis
     private StringTemplateGroup templateGroup;
     private Exception loadingTemplateException;
 
-    public HardCodedTSPHPTranslatorInitialiser(ITSPHPAstAdaptor anAstAdaptor, IInferenceEngineInitialiser initialiser) {
+    public HardCodedTSPHPTranslatorInitialiser(
+            ITSPHPAstAdaptor anAstAdaptor, IInferenceEngineInitialiser inferenceEngineInitialiser) {
 
         IPrecedenceHelper precedenceHelper = new PrecedenceHelper();
         ITempVariableHelper tempVariableHelper = new TempVariableHelper(anAstAdaptor);
         controller = new TranslatorController(precedenceHelper, tempVariableHelper);
-        globalDefaultNamespace = initialiser.getGlobalDefaultNamespace();
+        globalDefaultNamespace = inferenceEngineInitialiser.getGlobalDefaultNamespace();
 
         loadStringTemplate();
     }

@@ -64,6 +64,7 @@ public abstract class ATest implements IIssueLogger
     protected ITSPHPAstAdaptor astAdaptor;
     protected ITranslatorController controller;
     protected IInferenceEngineInitialiser inferenceEngineInitialiser;
+    protected ISymbolsInitialiser symbolsInitialiser;
 
     public ATest(String theTestString, String theExpectedResult) {
         testString = theTestString;
@@ -87,8 +88,8 @@ public abstract class ATest implements IIssueLogger
         parse();
 
         IAstHelper astHelper = new AstHelper(astAdaptor);
-        inferenceEngineInitialiser = createInferenceInitialiser(astAdaptor, astHelper);
-
+        symbolsInitialiser = createSymbolsInitialiser();
+        inferenceEngineInitialiser = createInferenceInitialiser(astAdaptor, astHelper, symbolsInitialiser);
         inferTypes();
 
         // LOAD TEMPLATES (via classpath)
@@ -98,6 +99,8 @@ public abstract class ATest implements IIssueLogger
         fr.close();
 
         commonTreeNodeStream.reset();
+
+        controller = new TranslatorController(new PrecedenceHelper(), new TempVariableHelper(astAdaptor));
 
         translator = new ErrorReportingTSPHPTranslatorWalker(
                 commonTreeNodeStream, controller, inferenceEngineInitialiser.getGlobalDefaultNamespace());
@@ -121,8 +124,6 @@ public abstract class ATest implements IIssueLogger
         ErrorReportingTinsPHPParser parser = new ErrorReportingTinsPHPParser(tokens);
         parser.setTreeAdaptor(astAdaptor);
         parser.registerIssueLogger(new WriteExceptionToConsole());
-
-        controller = new TranslatorController(new PrecedenceHelper(), new TempVariableHelper(astAdaptor));
 
         ParserRuleReturnScope parserResult = parserRun(parser);
         ast = (ITSPHPAst) parserResult.getTree();
@@ -149,11 +150,13 @@ public abstract class ATest implements IIssueLogger
     }
 
     protected IInferenceEngineInitialiser createInferenceInitialiser(
-            ITSPHPAstAdaptor astAdaptor, IAstHelper astHelper) {
+            ITSPHPAstAdaptor astAdaptor, IAstHelper astHelper, ISymbolsInitialiser symbolsInitialiser) {
 
-        ISymbolsInitialiser symbolsInitialiser = new HardCodedSymbolsInitialiser();
         ICoreInitialiser coreInitialiser = new HardCodedCoreInitialiser(astHelper, symbolsInitialiser);
-
         return new HardCodedInferenceEngineInitialiser(astAdaptor, astHelper, symbolsInitialiser, coreInitialiser);
+    }
+
+    protected ISymbolsInitialiser createSymbolsInitialiser() {
+        return new HardCodedSymbolsInitialiser();
     }
 }
