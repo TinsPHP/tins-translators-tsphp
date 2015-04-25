@@ -10,7 +10,7 @@
  * For more information see http://tsphp.ch/wiki/display/TSPHP/License
  */
 
-package ch.tsphp.tinsphp.translators.tsphp.test.integration.inference;
+package ch.tsphp.tinsphp.translators.tsphp.test.integration;
 
 import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorInferenceStatementTest;
 import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ExpressionHelper;
