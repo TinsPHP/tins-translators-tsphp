@@ -41,10 +41,13 @@ public class TranslatorController implements ITranslatorController
 {
     private final IPrecedenceHelper precedenceHelper;
     private final ITempVariableHelper tempVariableHelper;
+    private final IOperatorHelper operatorHelper;
 
-    public TranslatorController(IPrecedenceHelper thePrecedenceHelper, ITempVariableHelper theTempVariableHelper) {
+    public TranslatorController(IPrecedenceHelper thePrecedenceHelper, ITempVariableHelper theTempVariableHelper,
+            IOperatorHelper theOperatorHelper) {
         precedenceHelper = thePrecedenceHelper;
         tempVariableHelper = theTempVariableHelper;
+        operatorHelper = theOperatorHelper;
     }
 
     @Override
@@ -95,9 +98,9 @@ public class TranslatorController implements ITranslatorController
                 ++numbering;
             }
             newName = name + numbering;
+            overload.addSuffix(TSPHPTranslator.TRANSLATOR_ID, String.valueOf(numbering));
+            symbols.put(newName, Arrays.asList((ISymbol) methodSymbol));
         }
-        overload.addSuffix(TSPHPTranslator.TRANSLATOR_ID, String.valueOf(numbering));
-        symbols.put(newName, Arrays.asList((ISymbol) methodSymbol));
 
         Set<String> typeVariablesAdded = new HashSet<>(numberOfParameters + 1);
         List<TypeParameterDto> typeParameters = new ArrayList<>(numberOfParameters + 1);
@@ -202,5 +205,11 @@ public class TranslatorController implements ITranslatorController
             name += suffix;
         }
         return name;
+    }
+
+    @Override
+    public String getMigrationFunction(IOverloadBindings bindings, ITSPHPAst operator) {
+        IFunctionType appliedOverload = bindings.getAppliedOverload(operator.getSymbol().getAbsoluteName());
+        return operatorHelper.getMigrationFunction(operator.getType(), appliedOverload);
     }
 }

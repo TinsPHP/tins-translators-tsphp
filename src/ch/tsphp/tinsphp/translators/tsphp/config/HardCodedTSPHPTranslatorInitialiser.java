@@ -17,10 +17,11 @@ import ch.tsphp.common.exceptions.TSPHPException;
 import ch.tsphp.tinsphp.common.ITranslator;
 import ch.tsphp.tinsphp.common.config.IInferenceEngineInitialiser;
 import ch.tsphp.tinsphp.common.config.ITranslatorInitialiser;
-import ch.tsphp.tinsphp.common.scopes.IGlobalNamespaceScope;
 import ch.tsphp.tinsphp.common.translation.IPrecedenceHelper;
 import ch.tsphp.tinsphp.common.translation.ITempVariableHelper;
 import ch.tsphp.tinsphp.common.translation.ITranslatorController;
+import ch.tsphp.tinsphp.translators.tsphp.IOperatorHelper;
+import ch.tsphp.tinsphp.translators.tsphp.OperatorHelper;
 import ch.tsphp.tinsphp.translators.tsphp.PrecedenceHelper;
 import ch.tsphp.tinsphp.translators.tsphp.TSPHPTranslator;
 import ch.tsphp.tinsphp.translators.tsphp.TempVariableHelper;
@@ -40,18 +41,19 @@ public class HardCodedTSPHPTranslatorInitialiser implements ITranslatorInitialis
 {
 
     private final ITranslatorController controller;
-    private final IGlobalNamespaceScope globalDefaultNamespace;
+    private final IInferenceEngineInitialiser inferenceEngineInitialiser;
 
     private StringTemplateGroup templateGroup;
     private Exception loadingTemplateException;
 
     public HardCodedTSPHPTranslatorInitialiser(
-            ITSPHPAstAdaptor anAstAdaptor, IInferenceEngineInitialiser inferenceEngineInitialiser) {
+            ITSPHPAstAdaptor anAstAdaptor, IInferenceEngineInitialiser theInferenceEngineInitialiser) {
+        inferenceEngineInitialiser = theInferenceEngineInitialiser;
 
         IPrecedenceHelper precedenceHelper = new PrecedenceHelper();
         ITempVariableHelper tempVariableHelper = new TempVariableHelper(anAstAdaptor);
-        controller = new TranslatorController(precedenceHelper, tempVariableHelper);
-        globalDefaultNamespace = inferenceEngineInitialiser.getGlobalDefaultNamespace();
+        IOperatorHelper operatorHelper = new OperatorHelper();
+        controller = new TranslatorController(precedenceHelper, tempVariableHelper, operatorHelper);
 
         loadStringTemplate();
     }
@@ -84,7 +86,11 @@ public class HardCodedTSPHPTranslatorInitialiser implements ITranslatorInitialis
 
     @Override
     public ITranslator build() {
-        return new TSPHPTranslator(templateGroup, controller, globalDefaultNamespace, loadingTemplateException);
+        return new TSPHPTranslator(
+                templateGroup,
+                controller,
+                inferenceEngineInitialiser.getGlobalDefaultNamespace(),
+                loadingTemplateException);
     }
 
     @Override

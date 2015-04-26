@@ -32,6 +32,7 @@ import ch.tsphp.tinsphp.parser.antlr.TinsPHPParser;
 import ch.tsphp.tinsphp.parser.antlrmod.ErrorReportingTinsPHPLexer;
 import ch.tsphp.tinsphp.parser.antlrmod.ErrorReportingTinsPHPParser;
 import ch.tsphp.tinsphp.symbols.config.HardCodedSymbolsInitialiser;
+import ch.tsphp.tinsphp.translators.tsphp.OperatorHelper;
 import ch.tsphp.tinsphp.translators.tsphp.PrecedenceHelper;
 import ch.tsphp.tinsphp.translators.tsphp.TempVariableHelper;
 import ch.tsphp.tinsphp.translators.tsphp.TranslatorController;
@@ -100,7 +101,10 @@ public abstract class ATest implements IIssueLogger
 
         commonTreeNodeStream.reset();
 
-        controller = new TranslatorController(new PrecedenceHelper(), new TempVariableHelper(astAdaptor));
+        controller = new TranslatorController(
+                new PrecedenceHelper(),
+                new TempVariableHelper(astAdaptor),
+                new OperatorHelper());
 
         translator = new ErrorReportingTSPHPTranslatorWalker(
                 commonTreeNodeStream, controller, inferenceEngineInitialiser.getGlobalDefaultNamespace());

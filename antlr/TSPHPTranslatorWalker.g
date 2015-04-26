@@ -634,19 +634,44 @@ staticAccess
  
 operator
     :   ^(unaryPreOperator expr=expression)
-        -> unaryPreOperator(operator ={$unaryPreOperator.st}, expression = {$expr.st})
+        {
+            String migrationFunction = controller.getMigrationFunction(currentBindings, $unaryPreOperator.start);
+            if(migrationFunction == null){
+                retval.st = %unaryPreOperator(operator={$unaryPreOperator.st}, expression={$expr.st});
+            }else{
+                retval.st = %functionCall(identifier={migrationFunction}, parameters={$expr.st});
+            }
+        }
 
     |   ^(unaryPostOperator expr=expression)
-        -> unaryPostOperator(operator = {$unaryPostOperator.st}, expression = {$expr.st})
-
+        {
+            String migrationFunction = controller.getMigrationFunction(currentBindings, $unaryPostOperator.start);
+            if(migrationFunction == null){
+                retval.st = %unaryPostOperator(operator={$unaryPostOperator.st}, expression={$expr.st});
+            }else{
+                retval.st = %functionCall(identifier={migrationFunction}, parameters={$expr.st});
+            }
+        }
+    
     |   ^(binaryOperator left=expression right=expression)
-        -> binaryOperator(
-            operator={$binaryOperator.st},
-            left={$left.st}, right={$right.st},
-            needParentheses={$binaryOperator.needParentheses}
-        )
+        {
+            String migrationFunction = controller.getMigrationFunction(currentBindings, $binaryOperator.start);
+            if(migrationFunction == null){
+                retval.st = %binaryOperator(
+                    operator={$binaryOperator.st}, 
+                    left={$left.st}, 
+                    right={$right.st},
+                    needParentheses={$binaryOperator.needParentheses});
+            }else{
+                List<StringTemplate> parameters = new ArrayList<>();
+                parameters.add($left.st);
+                parameters.add($right.st);
+                retval.st = %functionCall(identifier={migrationFunction}, parameters={parameters});
+            }
+        }
 
     |   ^(QuestionMark cond=expression ifCase=expression elseCase=expression)
+        //ternary does not have a migration function
         -> ternaryOperator(
             cond={$cond.st},
             ifCase={$ifCase.st},
@@ -660,6 +685,7 @@ operator
         -> {$castOperator.st}
     */
     |   ^(Instanceof expr=expression (type=TYPE_NAME|type=VariableId))
+        //instanceof does not have a migration function
         -> instanceof(
             expression={$expr.st},
             type={$type.text},
@@ -673,6 +699,7 @@ operator
     */
     
     |   ^('clone' expr=expression)
+        //clone does not have a migration function
         -> clone(expression={$expr.st})
     ;     
 
