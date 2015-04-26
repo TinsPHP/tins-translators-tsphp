@@ -15,8 +15,6 @@ import ch.tsphp.tinsphp.common.inference.constraints.ITypeVariableReference;
 import ch.tsphp.tinsphp.common.inference.constraints.IVariable;
 import ch.tsphp.tinsphp.common.symbols.IMethodSymbol;
 import ch.tsphp.tinsphp.common.symbols.IVariableSymbol;
-import ch.tsphp.tinsphp.common.translation.IPrecedenceHelper;
-import ch.tsphp.tinsphp.common.translation.ITempVariableHelper;
 import ch.tsphp.tinsphp.common.translation.ITranslatorController;
 import ch.tsphp.tinsphp.common.translation.dtos.MethodDto;
 import ch.tsphp.tinsphp.common.translation.dtos.ParameterDto;

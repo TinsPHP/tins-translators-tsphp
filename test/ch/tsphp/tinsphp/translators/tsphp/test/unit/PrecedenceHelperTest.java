@@ -7,8 +7,8 @@
 package ch.tsphp.tinsphp.translators.tsphp.test.unit;
 
 import ch.tsphp.common.ITSPHPAst;
-import ch.tsphp.tinsphp.common.translation.IPrecedenceHelper;
 import ch.tsphp.tinsphp.symbols.gen.TokenTypes;
+import ch.tsphp.tinsphp.translators.tsphp.IPrecedenceHelper;
 import ch.tsphp.tinsphp.translators.tsphp.PrecedenceHelper;
 import org.junit.Test;
 

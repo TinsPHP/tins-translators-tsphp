@@ -13,7 +13,6 @@
 package ch.tsphp.tinsphp.translators.tsphp;
 
 import ch.tsphp.common.ITSPHPAst;
-import ch.tsphp.tinsphp.common.translation.IPrecedenceHelper;
 import ch.tsphp.tinsphp.symbols.gen.TokenTypes;
 
 import java.util.HashMap;
