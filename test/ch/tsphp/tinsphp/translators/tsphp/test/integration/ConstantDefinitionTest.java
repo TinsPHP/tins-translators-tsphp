@@ -39,25 +39,25 @@ public class ConstantDefinitionTest extends ATranslatorInferenceStatementTest
     @Parameterized.Parameters
     public static Collection<Object[]> testStrings() {
         return Arrays.asList(new Object[][]{
-                {"const a = false;", "const false a = false;"},
-                {"const a = true;", "const true a = true;"},
+                {"const a = null;", "const nullType a = null;"},
+                {"const a = false;", "const falseType a = false;"},
+                {"const a = true;", "const trueType a = true;"},
                 {"const a = 1;", "const int a = 1;"},
                 {"const a = 1.2;", "const float a = 1.2;"},
                 {"const a = 'hi';", "const string a = 'hi';"},
-                {"const a = null;", "const null a = null;"},
                 {"const b = 1; const a = b;", "const int b = 1;\n    const int a = b;"},
                 {"const a = [1,2,3];", "const array a = [1, 2, 3];"},
                 {"const a = ['a'=> 1, 'b' =>2, 2 => 3];", "const array a = ['a' => 1, 'b' => 2, 2 => 3];"},
                 {"const a = 1, b = 2;", "const int a = 1;\n    const int b = 2;"},
                 {
-                        "const a = false, b = true, c=1, d=2.1, e='hi', f=null, g=f, i=[1,2], j=['a'=>'b'];",
-                        "const false a = false;"
-                                + "\n    const true b = true;"
-                                + "\n    const int c = 1;"
-                                + "\n    const float d = 2.1;"
-                                + "\n    const string e = 'hi';"
-                                + "\n    const null f = null;"
-                                + "\n    const null g = f;"
+                        "const a = null, b = false, c = true, d=1, e=2.1, f='hi', g=f, i=[1,2], j=['a'=>'b'];",
+                        "const nullType a = null;"
+                                + "\n    const falseType b = false;"
+                                + "\n    const trueType c = true;"
+                                + "\n    const int d = 1;"
+                                + "\n    const float e = 2.1;"
+                                + "\n    const string f = 'hi';"
+                                + "\n    const string g = f;"
                                 + "\n    const array i = [1, 2];"
                                 + "\n    const array j = ['a' => 'b'];"
                 },

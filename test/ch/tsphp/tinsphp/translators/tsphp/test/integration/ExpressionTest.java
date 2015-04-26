@@ -52,7 +52,7 @@ public class ExpressionTest extends ATranslatorInferenceStatementTest
                 {"$a = 1; $a += 1;", "int $a;\n    $a = 1;\n    $a += 1;"},
                 {"$a = 1; $a -= 1;", "int $a;\n    $a = 1;\n    $a -= 1;"},
                 {"$a = 1; $a *= 1;", "int $a;\n    $a = 1;\n    $a *= 1;"},
-                {"$a = 1; $a /= 1;", "(int | false | float) $a;\n    $a = 1;\n    $a /= 1;"},
+                {"$a = 1; $a /= 1;", "(falseType | int | float) $a;\n    $a = 1;\n    $a /= 1;"},
                 {"$a = 1; $a &= 1;", "int $a;\n    $a = 1;\n    $a &= 1;"},
                 {"$a = 1; $a |= 1;", "int $a;\n    $a = 1;\n    $a |= 1;"},
                 {"$a = 1; $a ^= 1;", "int $a;\n    $a = 1;\n    $a ^= 1;"},
@@ -67,7 +67,7 @@ public class ExpressionTest extends ATranslatorInferenceStatementTest
                 {
                         "$a = 1; $b = 1; ($a *= ((1 == 1) + false)) == 1 ? $b /= "
                                 + "true ? $a &= 2 : ($a |= 3) : ($a ^= 4);",
-                        "(int | false | float) $b;\n    int $a;\n    $a = 1;\n    $b = 1;\n"
+                        "(falseType | int | float) $b;\n    int $a;\n    $a = 1;\n    $b = 1;\n"
                                 + "    (($a *= (1 == 1) + false) == 1) ? "
                                 + "($b /= (true) ? ($a &= 2) : ($a |= 3)) : ($a ^= 4);"
 
@@ -88,17 +88,17 @@ public class ExpressionTest extends ATranslatorInferenceStatementTest
                 // todo TINS-302 preceding helper could be improved for ternary
                 {
                         "true ? $a = false : false && true ? 1 : 2;",
-                        "false $a;\n    ((true) ? ($a = false) : false && true) ? 1 : 2;"
+                        "falseType $a;\n    ((true) ? ($a = false) : false && true) ? 1 : 2;"
                 },
                 {
                         "$a = null; $a instanceof Exception;",
-                        "null $a;\n    $a = null;\n    $a instanceof Exception;"
+                        "nullType $a;\n    $a = null;\n    $a instanceof Exception;"
                 },
                 {
                         "$a = null; $b = null; $a instanceof $b;",
-                        "null $b;\n    null $a;\n    $a = null;\n    $b = null;\n    $a instanceof $b;"
+                        "nullType $b;\n    nullType $a;\n    $a = null;\n    $b = null;\n    $a instanceof $b;"
                 },
-                {"$a = null; clone $a;", "null $a;\n    $a = null;\n    clone $a;"},
+                {"$a = null; clone $a;", "nullType $a;\n    $a = null;\n    clone $a;"},
                 {"$a = 1; $a++;", "int $a;\n    $a = 1;\n    $a++;"},
                 {"$a = 1; $a--;", "int $a;\n    $a = 1;\n    $a--;"},
                 {"$a = 1; ++$a;", "int $a;\n    $a = 1;\n    ++$a;"},
@@ -136,7 +136,7 @@ public class ExpressionTest extends ATranslatorInferenceStatementTest
                 {"$a = 1; (-$a + $a) * $a;", "int $a;\n    $a = 1;\n    (-$a + $a) * $a;"},
                 {
                         "$a = null; !($a instanceof Exception) || $a < 1 + 2 == ~(1 | 3 & 12);",
-                        "null $a;\n    $a = null;\n    !($a instanceof Exception) || $a < 1 + 2 == ~(1 | 3 & 12);"
+                        "nullType $a;\n    $a = null;\n    !($a instanceof Exception) || $a < 1 + 2 == ~(1 | 3 & 12);"
                 },
                 //see TINS-410 super globals are not in binding
                 {"$_GET;", "$_GET;"},

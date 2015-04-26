@@ -42,18 +42,19 @@ public class VariableDeclarationTest extends ATranslatorInferenceTest
     public static Collection<Object[]> testStrings() {
         List<Object[]> collection = new ArrayList<>();
         collection.addAll(Arrays.asList(new Object[][]{
-                {"<?php $a=null;", "namespace{\n    null $a;\n    $a = null;\n}"},
-                {"<?php $a=false;", "namespace{\n    false $a;\n    $a = false;\n}"},
-                {"<?php $a=true;", "namespace{\n    true $a;\n    $a = true;\n}"},
+                {"<?php $a=null;", "namespace{\n    nullType $a;\n    $a = null;\n}"},
+                {"<?php $a=false;", "namespace{\n    falseType $a;\n    $a = false;\n}"},
+                {"<?php $a=true;", "namespace{\n    trueType $a;\n    $a = true;\n}"},
                 {"<?php $a=1;", "namespace{\n    int $a;\n    $a = 1;\n}"},
                 {"<?php $a=1.2;", "namespace{\n    float $a;\n    $a = 1.2;\n}"},
                 {"<?php $a='hi';", "namespace{\n    string $a;\n    $a = 'hi';\n}"},
                 {"<?php $a=[];", "namespace{\n    array $a;\n    $a = [];\n}"},
-                {"<?php $a=false; $a=true;", "namespace{\n    (true | false) $a;\n    $a = false;\n    $a = true;\n}"},
+                {"<?php $a=false; $a=true;", "namespace{\n    (falseType | trueType) $a;\n    $a = false;\n    $a = " +
+                        "true;\n}"},
                 {"<?php $a=1; $a=2.3;", "namespace{\n    (int | float) $a;\n    $a = 1;\n    $a = 2.3;\n}"},
                 {
                         "<?php $a=false; $a=true; $a=1; $a=1.5; $a='hi';",
-                        "namespace{\n    (int | string | true | false | float) $a;"
+                        "namespace{\n    (falseType | int | string | trueType | float) $a;"
                                 + "\n    $a = false;\n    $a = true;\n    $a = 1;\n    $a = 1.5;\n    $a = 'hi';\n}"
                 },
                 {"<?php if(true){$a=1;}", "namespace{\n    int $a;\n    if (true) {\n        $a = 1;\n    }\n}"},

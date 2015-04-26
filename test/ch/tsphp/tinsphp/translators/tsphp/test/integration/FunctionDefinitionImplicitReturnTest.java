@@ -61,27 +61,27 @@ public class FunctionDefinitionImplicitReturnTest extends ATranslatorInferenceTe
                 //no return no param
                 {
                         "<?php function foo(){} ?>",
-                        "namespace{\n    function null foo() {\n        return null;\n    }\n}"
+                        "namespace{\n    function nullType foo() {\n        return null;\n    }\n}"
                 },
                 //no return with param
                 {
                         "<?php function foo($x){} ?>",
-                        "namespace{\n    function null foo(mixed $x) {\n        return null;\n    }\n}"
+                        "namespace{\n    function nullType foo(mixed $x) {\n        return null;\n    }\n}"
                 },
                 {
                         "<?php function foo($x, $y){$a = $x + $y;} ?>",
                         "namespace{"
-                                + "\n    function null foo0(num $x, num $y) {"
+                                + "\n    function nullType foo0(num $x, num $y) {"
                                 + "\n        mixed $a;"
                                 + "\n        $a = $x + $y;"
                                 + "\n        return null;"
                                 + "\n    }\n"
-                                + "\n    function null foo1(bool $x, bool $y) {"
+                                + "\n    function nullType foo1(bool $x, bool $y) {"
                                 + "\n        int $a;"
                                 + "\n        $a = $x + $y;"
                                 + "\n        return null;"
                                 + "\n    }\n"
-                                + "\n    function null foo2(array $x, array $y) {"
+                                + "\n    function nullType foo2(array $x, array $y) {"
                                 + "\n        array $a;"
                                 + "\n        $a = $x + $y;"
                                 + "\n        return null;"
@@ -92,7 +92,7 @@ public class FunctionDefinitionImplicitReturnTest extends ATranslatorInferenceTe
                 {
                         "<?php function foo(){if(true){return 1;}} ?>",
                         "namespace{" +
-                                "\n    function (int | null) foo() {"
+                                "\n    function (int | nullType) foo() {"
                                 + "\n        if (true) {"
                                 + "\n            return 1;"
                                 + "\n        }"
@@ -104,7 +104,7 @@ public class FunctionDefinitionImplicitReturnTest extends ATranslatorInferenceTe
                 {
                         "<?php function foo($x){if($x){return 1;}} ?>",
                         "namespace{" +
-                                "\n    function (int | null) foo(bool $x) {"
+                                "\n    function (int | nullType) foo(bool $x) {"
                                 + "\n        if ($x) {"
                                 + "\n            return 1;"
                                 + "\n        }"

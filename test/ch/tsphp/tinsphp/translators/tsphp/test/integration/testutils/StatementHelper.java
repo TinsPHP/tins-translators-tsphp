@@ -63,7 +63,7 @@ public class StatementHelper
                 {
                         prefix + "function foo(){return;}" + appendix,
                         prefixExpected + "\n" + indent + instruction + "\n" + indent
-                                + "function null foo() {\n" + indent + indent + "return null;\n" + indent + "}"
+                                + "function nullType foo() {\n" + indent + indent + "return null;\n" + indent + "}"
                                 + appendixExpected
                 },
                 //TODO rstoll TINS-268 translator OOP - interfaces

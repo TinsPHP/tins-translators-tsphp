@@ -59,7 +59,7 @@ public class IfTest extends ATranslatorInferenceStatementTest
                                 + "\n        }"
                                 + "\n    }"
                 },
-                {"$x = true; if($x){}", "true $x;\n    $x = true;\n    if ($x) {\n    }"}
+                {"$x = true; if($x){}", "trueType $x;\n    $x = true;\n    if ($x) {\n    }"}
         });
     }
 }
