@@ -51,10 +51,10 @@ public class VariableDeclarationTest extends ATranslatorInferenceTest
                 {"<?php $a=[];", "namespace{\n    array $a;\n    $a = [];\n}"},
                 {"<?php $a=false; $a=true;", "namespace{\n    (falseType | trueType) $a;\n    $a = false;\n    $a = " +
                         "true;\n}"},
-                {"<?php $a=1; $a=2.3;", "namespace{\n    (int | float) $a;\n    $a = 1;\n    $a = 2.3;\n}"},
+                {"<?php $a=1; $a=2.3;", "namespace{\n    (float | int) $a;\n    $a = 1;\n    $a = 2.3;\n}"},
                 {
                         "<?php $a=false; $a=true; $a=1; $a=1.5; $a='hi';",
-                        "namespace{\n    (falseType | int | string | trueType | float) $a;"
+                        "namespace{\n    (falseType | float | int | string | trueType) $a;"
                                 + "\n    $a = false;\n    $a = true;\n    $a = 1;\n    $a = 1.5;\n    $a = 'hi';\n}"
                 },
                 {"<?php if(true){$a=1;}", "namespace{\n    int $a;\n    if (true) {\n        $a = 1;\n    }\n}"},

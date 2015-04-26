@@ -47,7 +47,7 @@ public class FunctionCallTest extends ATranslatorInferenceTest
                                 + "$a = foo(false,true); $b = foo(1, 2); $c = foo(1, 2.5); $d = foo([1], [1, 3, 4]);",
                         "namespace{"
                                 + "\n    array $d;"
-                                + "\n    (int | float) $c;"
+                                + "\n    (float | int) $c;"
                                 + "\n    int $b;"
                                 + "\n    int $a;"
                                 + "\n    function T1 foo0[T1 < num](T1 $x, T1 $y) {"

@@ -52,7 +52,7 @@ public class ExpressionTest extends ATranslatorInferenceStatementTest
                 {"$a = 1; $a += 1;", "int $a;\n    $a = 1;\n    $a += 1;"},
                 {"$a = 1; $a -= 1;", "int $a;\n    $a = 1;\n    $a -= 1;"},
                 {"$a = 1; $a *= 1;", "int $a;\n    $a = 1;\n    $a *= 1;"},
-                {"$a = 1; $a /= 1;", "(falseType | int | float) $a;\n    $a = 1;\n    $a /= 1;"},
+                {"$a = 1; $a /= 1;", "(falseType | float | int) $a;\n    $a = 1;\n    $a /= 1;"},
                 {"$a = 1; $a &= 1;", "int $a;\n    $a = 1;\n    $a &= 1;"},
                 {"$a = 1; $a |= 1;", "int $a;\n    $a = 1;\n    $a |= 1;"},
                 {"$a = 1; $a ^= 1;", "int $a;\n    $a = 1;\n    $a ^= 1;"},
@@ -67,7 +67,7 @@ public class ExpressionTest extends ATranslatorInferenceStatementTest
                 {
                         "$a = 1; $b = 1; ($a *= ((1 == 1) + false)) == 1 ? $b /= "
                                 + "true ? $a &= 2 : ($a |= 3) : ($a ^= 4);",
-                        "(falseType | int | float) $b;\n    int $a;\n    $a = 1;\n    $b = 1;\n"
+                        "(falseType | float | int) $b;\n    int $a;\n    $a = 1;\n    $b = 1;\n"
                                 + "    (($a *= (1 == 1) + false) == 1) ? "
                                 + "($b /= (true) ? ($a &= 2) : ($a |= 3)) : ($a ^= 4);"
 
