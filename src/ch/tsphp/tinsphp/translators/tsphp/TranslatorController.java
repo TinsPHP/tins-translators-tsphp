@@ -32,6 +32,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import static ch.tsphp.tinsphp.common.utils.Pair.pair;
 
@@ -134,10 +136,13 @@ public class TranslatorController implements ITranslatorController
                 if (bindings.hasLowerBounds(typeVariable)) {
                     lowerBounds = new ArrayList<>();
                     if (bindings.hasLowerTypeBounds(typeVariable)) {
-                        lowerBounds.addAll(bindings.getLowerTypeBounds(typeVariable).getTypeSymbols().keySet());
+                        SortedSet<String> sortedSet = new TreeSet<>(
+                                bindings.getLowerTypeBounds(typeVariable).getTypeSymbols().keySet());
+                        lowerBounds.addAll(sortedSet);
                     }
                     if (bindings.hasLowerRefBounds(typeVariable)) {
-                        lowerBounds.addAll(bindings.getLowerRefBounds(typeVariable));
+                        SortedSet<String> sortedSet = new TreeSet<>(bindings.getLowerRefBounds(typeVariable));
+                        lowerBounds.addAll(sortedSet);
                     }
                 }
                 List<String> upperBounds = null;

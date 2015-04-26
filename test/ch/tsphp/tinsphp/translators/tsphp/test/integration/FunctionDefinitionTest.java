@@ -136,7 +136,28 @@ public class FunctionDefinitionTest extends ATranslatorInferenceTest
                                 + "\n        return $a;"
                                 + "\n    }"
                                 + "\n}"
-                }
+                },
+                {
+                        "<?php function foo($x){ return $x /= false;}",
+                        "namespace{"
+                                + "\n    function (falseType | int) foo((bool | int) $x) {"
+                                + "\n        return $x /= false;"
+                                + "\n    }"
+                                + "\n}"
+                },
+                {
+                        "<?php function foo($x, $y){ return $x /= $y;}",
+                        "namespace{\n"
+                                + "    function (falseType | int) foo0((bool | int) $x, bool $y) {"
+                                + "\n        return $x /= $y;"
+                                + "\n    }"
+                                + "\n"
+                                + "\n    function T1 foo1[(falseType | float | T3) < T1, float < T3 < num]"
+                                + "(T1 $x, T3 $y) {"
+                                + "\n        return $x /= $y;"
+                                + "\n    }"
+                                + "\n}"
+                },
         }));
 
         return collection;
