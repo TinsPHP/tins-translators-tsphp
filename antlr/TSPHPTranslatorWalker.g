@@ -410,7 +410,7 @@ functionDefinition
             params=.
             {
                 List<MethodDto> dtos = controller.createMethodDtos($Identifier);
-                for(MethodDto dto : dtos){
+                for (MethodDto dto : dtos) {
                     int index = input.mark();                
                      StringTemplate returnType = %type(
                         prefixModifiers={dto.returnType.prefixModifiers},
@@ -418,22 +418,31 @@ functionDefinition
                         suffixModifiers={dto.returnType.suffixModifiers}
                     );
                     
-                    List<StringTemplate> typeParameters = null;
-                    if(dto.typeParameters != null){
+                    List<String> typeParameters = null;
+                    List<StringTemplate> constraints = null;
+                    if (dto.typeParameters != null) {
                         typeParameters = new ArrayList<>();
-                        for(TypeParameterDto typeParamDto : dto.typeParameters){
-                            typeParameters.add(%typeParameter(
-                                lowerBounds={typeParamDto.lowerBounds},
-                                lowerMoreThanOne={typeParamDto.lowerBounds != null && typeParamDto.lowerBounds.size() > 1},
-                                typeVariable={typeParamDto.typeVariable},
-                                upperBounds={typeParamDto.upperBounds},
-                                upperMoreThanOne={typeParamDto.upperBounds != null && typeParamDto.upperBounds.size() > 1}
-                            ));
+                        constraints = new ArrayList<>();
+                        for (TypeParameterDto typeParamDto : dto.typeParameters) {
+                            typeParameters.add(typeParamDto.typeVariable);
+                            if (typeParamDto.lowerBounds != null || typeParamDto.upperBounds != null) {
+                                constraints.add(%typeParameter(
+                                    lowerBounds={typeParamDto.lowerBounds},
+                                    lowerMoreThanOne={
+                                        typeParamDto.lowerBounds != null && typeParamDto.lowerBounds.size() > 1
+                                    },
+                                    typeVariable={typeParamDto.typeVariable},
+                                    upperBounds={typeParamDto.upperBounds},
+                                    upperMoreThanOne={
+                                        typeParamDto.upperBounds != null && typeParamDto.upperBounds.size() > 1
+                                    }
+                                ));
+                            }
                         }
                     }
                     
                     List<StringTemplate> parameters = new ArrayList<>();
-                    for(ParameterDto paramDto : dto.parameters){
+                    for (ParameterDto paramDto : dto.parameters) {
                         StringTemplate type = %type(
                             prefixModifiers={paramDto.type.prefixModifiers}, 
                             type={paramDto.type.type},
@@ -455,6 +464,7 @@ functionDefinition
                         identifier={dto.identifier},
                         typeParams={typeParameters},
                         params={parameters},
+                        constraints={constraints},
                         body={block.instructions}
                     ));
                     input.rewind(index);
