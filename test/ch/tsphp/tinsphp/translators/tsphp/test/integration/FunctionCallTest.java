@@ -50,7 +50,7 @@ public class FunctionCallTest extends ATranslatorInferenceTest
                                 + "\n    (float | int) $c;"
                                 + "\n    int $b;"
                                 + "\n    int $a;"
-                                + "\n    function T1 foo0[T1 < num](T1 $x, T1 $y) {"
+                                + "\n    function T1 foo0<T1>(T1 $x, T1 $y) where [T1 < num] {"
                                 + "\n        return $x + $y;"
                                 + "\n    }"
                                 + "\n"

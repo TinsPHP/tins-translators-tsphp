@@ -50,12 +50,14 @@ public class FunctionDefinitionTest extends ATranslatorInferenceTest
         collection.addAll(Arrays.asList(new Object[][]{
                 {
                         "<?php function foo($x){return $x;} ?>",
-                        "namespace{\n    function T2 foo[T2](T2 $x) {\n        return $x;\n    }\n}"
+                        "namespace{\n    function T2 foo<T2>(T2 $x) {\n        return $x;\n    }\n}"
                 },
                 {
                         "<?php function foo($x, $y){return $x + $y;} ?>",
                         "namespace{"
-                                + "\n    function T1 foo0[T1 < num](T1 $x, T1 $y) {\n        return $x + $y;\n    }"
+                                + "\n    function T1 foo0<T1>(T1 $x, T1 $y) where [T1 < num] {"
+                                + "\n        return $x + $y;"
+                                + "\n    }"
                                 + "\n\n    function int foo1(bool $x, bool $y) {\n        return $x + $y;\n    }"
                                 + "\n\n    function array foo2(array $x, array $y) {\n        return $x + $y;\n    }"
                                 + "\n}"
@@ -63,8 +65,9 @@ public class FunctionDefinitionTest extends ATranslatorInferenceTest
                 {
                         "<?php function foo($x, $y){return $x + $y + 1;} ?>",
                         "namespace{"
-                                + "\n    function T4 foo0[int < T4 < num](T4 $x, T4 $y) {\n        return $x + $y + " +
-                                "1;\n    }"
+                                + "\n    function T4 foo0<T4>(T4 $x, T4 $y) where [int < T4 < num] {"
+                                + "\n        return $x + $y + 1;"
+                                + "\n    }"
                                 + "\n\n    function int foo1(bool $x, bool $y) {\n        return $x + $y + 1;\n    }"
                                 + "\n}"
                 },
@@ -100,7 +103,7 @@ public class FunctionDefinitionTest extends ATranslatorInferenceTest
                 {
                         "<?php function foo($x, $y){ $x = $y; return $x;}",
                         "namespace{"
-                                + "\n    function T1 foo[T3 < T1, T3](T1 $x, T3 $y) {"
+                                + "\n    function T1 foo<T1, T3>(T1 $x, T3 $y) where [T3 < T1, T3] {"
                                 + "\n        $x = $y;"
                                 + "\n        return $x;"
                                 + "\n    }"
@@ -109,7 +112,7 @@ public class FunctionDefinitionTest extends ATranslatorInferenceTest
                 {
                         "<?php function foo($x, $y){ $x = 1+$y; return $x;}",
                         "namespace{"
-                                + "\n    function T4 foo[(int | T1) < T4, int < T1 < num](T4 $x, T1 $y) {"
+                                + "\n    function T4 foo<T4, T1>(T4 $x, T1 $y) where [(int | T1) < T4, int < T1 < num]{"
                                 + "\n        $x = 1 + $y;"
                                 + "\n        return $x;"
                                 + "\n    }"
@@ -118,7 +121,7 @@ public class FunctionDefinitionTest extends ATranslatorInferenceTest
                 {
                         "<?php function foo($x, $y){ $a = $x+$y; return $a;}",
                         "namespace{"
-                                + "\n    function T1 foo0[T1 < num](T1 $x, T1 $y) {"
+                                + "\n    function T1 foo0<T1>(T1 $x, T1 $y) where [T1 < num] {"
                                 + "\n        T1 $a;"
                                 + "\n        $a = $x + $y;"
                                 + "\n        return $a;"
@@ -152,8 +155,8 @@ public class FunctionDefinitionTest extends ATranslatorInferenceTest
                                 + "\n        return $x /= $y;"
                                 + "\n    }"
                                 + "\n"
-                                + "\n    function T1 foo1[(falseType | float | T3) < T1, float < T3 < num]"
-                                + "(T1 $x, T3 $y) {"
+                                + "\n    function T1 foo1<T1, T3>(T1 $x, T3 $y) "
+                                + "where [(falseType | float | T3) < T1, float < T3 < num] {"
                                 + "\n        return $x /= $y;"
                                 + "\n    }"
                                 + "\n}"
