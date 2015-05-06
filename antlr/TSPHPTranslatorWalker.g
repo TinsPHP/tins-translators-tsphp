@@ -554,15 +554,15 @@ expressionList[boolean semicolonAtTheEnd]
 foreachLoop
     :   ^('foreach'
             expression
-            keyVariableId=VariableId?
             valueVariableId=VariableId
+            keyVariableId=VariableId?
             blockConditional
         )
         {
             IArrayTypeSymbol arrayTypeSymbol = (IArrayTypeSymbol) $expression.start.getEvalType();            
-            String keyVariableIdType = arrayTypeSymbol != null ? arrayTypeSymbol.getKeyTypeSymbol().getAbsoluteName() : "?";
+            String keyVariableIdType = arrayTypeSymbol.getKeyTypeSymbol().getAbsoluteName();
             String keyVariableIdTemp = $keyVariableId != null ? controller.getTempVariableName($keyVariableId) : null;
-            String valueVariableIdType = arrayTypeSymbol != null ? arrayTypeSymbol.getValueTypeSymbol().getAbsoluteName() : "?";
+            String valueVariableIdType = arrayTypeSymbol.getValueTypeSymbol().getAbsoluteName();
             String valueVariableIdTemp = controller.getTempVariableName($valueVariableId);
         }
         -> foreach(
