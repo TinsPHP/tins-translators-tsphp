@@ -61,55 +61,63 @@ public class FunctionDefinitionImplicitReturnTest extends ATranslatorInferenceTe
                 //no return no param
                 {
                         "<?php function foo(){} ?>",
-                        "namespace{\n    function nullType foo() {\n        return null;\n    }\n}"
+                        "namespace{\n\n    function nullType foo() {\n        return null;\n    }\n\n}"
                 },
                 //no return with param
                 {
                         "<?php function foo($x){} ?>",
-                        "namespace{\n    function nullType foo(mixed $x) {\n        return null;\n    }\n}"
+                        "namespace{\n\n    function nullType foo(mixed $x) {\n        return null;\n    }\n\n}"
                 },
                 {
                         "<?php function foo($x, $y){$a = $x + $y;} ?>",
                         "namespace{"
+                                + "\n"
                                 + "\n    function nullType foo0(num $x, num $y) {"
                                 + "\n        mixed $a;"
                                 + "\n        $a = $x + $y;"
                                 + "\n        return null;"
-                                + "\n    }\n"
+                                + "\n    }"
+                                + "\n"
                                 + "\n    function nullType foo1(bool $x, bool $y) {"
                                 + "\n        int $a;"
                                 + "\n        $a = $x + $y;"
                                 + "\n        return null;"
-                                + "\n    }\n"
+                                + "\n    }"
+                                + "\n"
                                 + "\n    function nullType foo2(array $x, array $y) {"
                                 + "\n        array $a;"
                                 + "\n        $a = $x + $y;"
                                 + "\n        return null;"
                                 + "\n    }"
+                                + "\n"
                                 + "\n}"
                 },
                 //partial return no param
                 {
                         "<?php function foo(){if(true){return 1;}} ?>",
-                        "namespace{" +
-                                "\n    function (int | nullType) foo() {"
+                        "namespace{"
+                                + "\n"
+                                + "\n    function (int | nullType) foo() {"
                                 + "\n        if (true) {"
                                 + "\n            return 1;"
                                 + "\n        }"
                                 + "\n        return null;"
                                 + "\n    }"
+                                + "\n"
                                 + "\n}"
                 },
                 //partial return with param
                 {
                         "<?php function foo($x){if($x){return 1;}} ?>",
-                        "namespace{" +
-                                "\n    function (int | nullType) foo(bool $x) {"
+                        "namespace{"
+                                + "\n"
+                                + "\n    function (int | nullType) foo(bool $x) {"
                                 + "\n        if ($x) {"
                                 + "\n            return 1;"
                                 + "\n        }"
                                 + "\n        return null;"
                                 + "\n    }"
+                                + "\n"
                                 + "\n}"
                 },
         }));

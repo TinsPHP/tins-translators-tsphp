@@ -45,21 +45,25 @@ public class FunctionDefinitionTest extends ATranslatorInferenceTest
 
         collection.addAll(ParameterListHelper.getTestStrings(
                 "<?php function set", "{return 1;}?>",
-                "namespace{\n    function int set", " {\n        return 1;\n    }\n}"));
+                "namespace{\n\n    function int set", " {\n        return 1;\n    }\n\n}"));
 
         collection.addAll(Arrays.asList(new Object[][]{
                 {
                         "<?php function foo($x){return $x;} ?>",
-                        "namespace{\n    function T2 foo<T2>(T2 $x) {\n        return $x;\n    }\n}"
+                        "namespace{\n\n    function T2 foo<T2>(T2 $x) {\n        return $x;\n    }\n\n}"
                 },
                 {
                         "<?php function foo($x, $y){return $x + $y;} ?>",
                         "namespace{"
+                                + "\n"
                                 + "\n    function T1 foo0<T1>(T1 $x, T1 $y) where [T1 < num] {"
                                 + "\n        return $x + $y;"
                                 + "\n    }"
-                                + "\n\n    function int foo1(bool $x, bool $y) {\n        return $x + $y;\n    }"
-                                + "\n\n    function array foo2(array $x, array $y) {\n        return $x + $y;\n    }"
+                                + "\n"
+                                + "\n    function int foo1(bool $x, bool $y) {\n        return $x + $y;\n    }"
+                                + "\n"
+                                + "\n    function array foo2(array $x, array $y) {\n        return $x + $y;\n    }"
+                                + "\n"
                                 + "\n}"
                 },
                 {
@@ -68,29 +72,34 @@ public class FunctionDefinitionTest extends ATranslatorInferenceTest
                                 + "\n    function T4 foo0<T4>(T4 $x, T4 $y) where [int < T4 < num] {"
                                 + "\n        return $x + $y + 1;"
                                 + "\n    }"
-                                + "\n\n    function int foo1(bool $x, bool $y) {\n        return $x + $y + 1;\n    }"
+                                + "\n"
+                                + "\n    function int foo1(bool $x, bool $y) {\n        return $x + $y + 1;\n    }"
+                                + "\n"
                                 + "\n}"
                 },
                 //return but without expression
                 // see TINS-404 return without expression and implicit null
                 {
                         "<?php function foo(){ return;} ?>",
-                        "namespace{\n    function nullType foo() {\n        return null;\n    }\n}"
+                        "namespace{\n\n    function nullType foo() {\n        return null;\n    }\n\n}"
                 },
                 {
                         "<?php function foo($x){ if($x){ return; } return 1;} ?>",
                         "namespace{"
+                                + "\n"
                                 + "\n    function (int | nullType) foo(bool $x) {"
                                 + "\n        if ($x) {"
                                 + "\n            return null;"
                                 + "\n        }"
                                 + "\n        return 1;"
                                 + "\n    }"
+                                + "\n"
                                 + "\n}"
                 },
                 {
                         "<?php function foo($x){ if($x){ return; } else { return 1;}} ?>",
                         "namespace{"
+                                + "\n"
                                 + "\n    function (int | nullType) foo(bool $x) {"
                                 + "\n        if ($x) {"
                                 + "\n            return null;"
@@ -98,30 +107,36 @@ public class FunctionDefinitionTest extends ATranslatorInferenceTest
                                 + "\n            return 1;"
                                 + "\n        }"
                                 + "\n    }"
+                                + "\n"
                                 + "\n}"
                 },
                 {
                         "<?php function foo($x, $y){ $x = $y; return $x;}",
                         "namespace{"
+                                + "\n"
                                 + "\n    function T1 foo<T1, T3>(T1 $x, T3 $y) where [T3 < T1] {"
                                 + "\n        $x = $y;"
                                 + "\n        return $x;"
                                 + "\n    }"
+                                + "\n"
                                 + "\n}"
                 },
                 {
                         "<?php function foo($x, $y){ $x = 1+$y; return $x;}",
                         "namespace{"
+                                + "\n"
                                 + "\n    function T4 foo<T4, T1>(T4 $x, T1 $y) "
                                 + "where [(int | T1) < T4, int < T1 < num] {"
                                 + "\n        $x = 1 + $y;"
                                 + "\n        return $x;"
                                 + "\n    }"
+                                + "\n"
                                 + "\n}"
                 },
                 {
                         "<?php function foo($x, $y){ $a = $x+$y; return $a;}",
                         "namespace{"
+                                + "\n"
                                 + "\n    function T1 foo0<T1>(T1 $x, T1 $y) where [T1 < num] {"
                                 + "\n        T1 $a;"
                                 + "\n        $a = $x + $y;"
@@ -139,20 +154,24 @@ public class FunctionDefinitionTest extends ATranslatorInferenceTest
                                 + "\n        $a = $x + $y;"
                                 + "\n        return $a;"
                                 + "\n    }"
+                                + "\n"
                                 + "\n}"
                 },
                 {
                         "<?php function foo($x){ return $x /= false;}",
                         "namespace{"
+                                + "\n"
                                 + "\n    function (falseType | int) foo((bool | int) $x) {"
                                 + "\n        return $x /= false;"
                                 + "\n    }"
+                                + "\n"
                                 + "\n}"
                 },
                 {
                         "<?php function foo($x, $y){ return $x /= $y;}",
-                        "namespace{\n"
-                                + "    function (falseType | int) foo0((bool | int) $x, bool $y) {"
+                        "namespace{"
+                                + "\n"
+                                + "\n    function (falseType | int) foo0((bool | int) $x, bool $y) {"
                                 + "\n        return $x /= $y;"
                                 + "\n    }"
                                 + "\n"
@@ -160,8 +179,47 @@ public class FunctionDefinitionTest extends ATranslatorInferenceTest
                                 + "where [(falseType | float | T3) < T1, float < T3 < num] {"
                                 + "\n        return $x /= $y;"
                                 + "\n    }"
+                                + "\n"
                                 + "\n}"
                 },
+                //see TINS-442 blank line around functions
+                {
+                        "<?php function foo(){return 1;} function bar(){return 2;}",
+                        "namespace{"
+                                + "\n"
+                                + "\n    function int foo() {"
+                                + "\n        return 1;"
+                                + "\n    }"
+                                + "\n"
+                                + "\n    function int bar() {"
+                                + "\n        return 2;"
+                                + "\n    }"
+                                + "\n"
+                                + "\n}"
+                },
+                //see TINS-442 blank line around functions
+                {
+                        "<?php function foo(){return 1;} $a = 'hello'; "
+                                + "function bar(){return 2;} function baz(){return 3;}",
+                        "namespace{"
+                                + "\n    string $a;"
+                                + "\n"
+                                + "\n    function int foo() {"
+                                + "\n        return 1;"
+                                + "\n    }"
+                                + "\n"
+                                + "\n    $a = 'hello';"
+                                + "\n"
+                                + "\n    function int bar() {"
+                                + "\n        return 2;"
+                                + "\n    }"
+                                + "\n"
+                                + "\n    function int baz() {"
+                                + "\n        return 3;"
+                                + "\n    }"
+                                + "\n"
+                                + "\n}"
+                }
         }));
 
         return collection;
