@@ -69,6 +69,7 @@ public class FunctionDefinitionTest extends ATranslatorInferenceTest
                 {
                         "<?php function foo($x, $y){return $x + $y + 1;} ?>",
                         "namespace{"
+                                + "\n"
                                 + "\n    function T4 foo0<T4>(T4 $x, T4 $y) where [int < T4 < num] {"
                                 + "\n        return $x + $y + 1;"
                                 + "\n    }"
