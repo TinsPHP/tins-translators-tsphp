@@ -47,6 +47,7 @@ import ch.tsphp.tinsphp.common.translation.dtos.VariableDto;
 @members{
 private ITranslatorController controller;
 private IOverloadBindings currentBindings;
+private boolean isFunctionBefore;
 
 public TSPHPTranslatorWalker(
         TreeNodeStream input, 
@@ -403,12 +404,20 @@ functionDefinition
     List<StringTemplate> methods = new ArrayList<>();
     IOverloadBindings tmp = currentBindings;
 }
-    :   ^('function'
+    :   ^(Function
             FUNCTION_MODIFIER
             typeAst=.
             Identifier
             params=.
             {
+                ITSPHPAst function = $Function;
+                int childIndex = function.getChildIndex();
+                boolean isNotMethodBefore = true;
+                if(childIndex != 0){
+                    ITSPHPAst parent = (ITSPHPAst) function.getParent();
+                    isNotMethodBefore = parent.getChild(childIndex - 1).getType() != Function;
+                }
+
                 List<MethodDto> dtos = controller.createMethodDtos($Identifier);
                 for (MethodDto dto : dtos) {
                     int index = input.mark();                
@@ -465,9 +474,11 @@ functionDefinition
                         typeParams={typeParameters},
                         params={parameters},
                         constraints={constraints},
-                        body={block.instructions}
+                        body={block.instructions},
+                        isNotMethodBefore={isNotMethodBefore}
                     ));
                     input.rewind(index);
+                    isNotMethodBefore = false;
                 }
             }
             .

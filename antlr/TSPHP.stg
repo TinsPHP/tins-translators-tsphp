@@ -49,11 +49,14 @@ assign(id,value) ::=<<
 >>
 
 methods(methods) ::=<<
-<methods; separator="\n\n">
+<methods; separator="\n">
 >>
 
-method(modifier, returnType, identifier, typeParams, params, constraints, body) ::=<<
-<if(modifier)><modifier> <endif>function <returnType> <identifier><if(typeParams)>\<<typeParams; separator=", ">\><endif>(<if(params)><params; separator=", "><endif>)<if(constraints)> where [<constraints; separator=", ">]<endif> {<if(body)>
+method(modifier, returnType, identifier, typeParams, params, constraints, body, isNotMethodBefore) ::=<<
+<if(isNotMethodBefore)>
+
+
+<endif><if(modifier)><modifier> <endif>function <returnType> <identifier><if(typeParams)>\<<typeParams; separator=", ">\><endif>(<if(params)><params; separator=", "><endif>)<if(constraints)> where [<constraints; separator=", ">]<endif> {<if(body)>
 
     <body; separator="\n">
 
@@ -61,6 +64,7 @@ method(modifier, returnType, identifier, typeParams, params, constraints, body) 
 
 
 <endif>}
+
 >>
 
 modifier(modifiers) ::=<<
