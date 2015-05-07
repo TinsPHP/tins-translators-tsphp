@@ -74,12 +74,7 @@
             depends="cp.common, cpt.common, cpt.parser, cp.parser-common, cpt.symbols, cpt.core, cpt.inference-engine"/>
 
     <target name="cpt.inference-engine" depends="" description="copy the inference engine jar to the lib dev folder">
-    <delete>
-            <fileset dir="${libdev}" includes="TinsPHP-inference-engine-*.jar"/>
-        </delete>
-        <copy todir="${libdev}">
-            <fileset dir="${inference-engine.jar}" includes="TinsPHP-inference-engine-*.jar"/>
-        </copy>
+        <copyComponent dir="${inference-engine.jar}" toDir="${libdev}" includes="TinsPHP-inference-engine-*.jar"/>
     </target>
 
 </project>
