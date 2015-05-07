@@ -13,7 +13,7 @@
 package ch.tsphp.tinsphp.translators.tsphp.test.unit.coverage;
 
 import ch.tsphp.common.ITSPHPAst;
-import ch.tsphp.tinsphp.symbols.gen.TokenTypes;
+import ch.tsphp.tinsphp.common.gen.TokenTypes;
 import ch.tsphp.tinsphp.translators.tsphp.antlrmod.ErrorReportingTSPHPTranslatorWalker;
 import ch.tsphp.tinsphp.translators.tsphp.test.unit.testutils.AWalkerTest;
 import org.antlr.runtime.RecognitionException;

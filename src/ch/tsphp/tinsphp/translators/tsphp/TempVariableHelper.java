@@ -16,7 +16,7 @@ import ch.tsphp.common.IScope;
 import ch.tsphp.common.ITSPHPAst;
 import ch.tsphp.common.ITSPHPAstAdaptor;
 import ch.tsphp.common.symbols.ISymbol;
-import ch.tsphp.tinsphp.symbols.gen.TokenTypes;
+import ch.tsphp.tinsphp.common.gen.TokenTypes;
 
 /**
  * A temp variable helper which uses the format "$_t + line + char position".

@@ -13,7 +13,7 @@
 package ch.tsphp.tinsphp.translators.tsphp;
 
 import ch.tsphp.common.ITSPHPAst;
-import ch.tsphp.tinsphp.symbols.gen.TokenTypes;
+import ch.tsphp.tinsphp.common.gen.TokenTypes;
 
 import java.util.HashMap;
 import java.util.Map;
