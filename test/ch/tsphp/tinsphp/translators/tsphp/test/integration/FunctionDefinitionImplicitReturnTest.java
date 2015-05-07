@@ -68,12 +68,13 @@ public class FunctionDefinitionImplicitReturnTest extends ATranslatorInferenceTe
                         "<?php function foo($x){} ?>",
                         "namespace{\n\n    function nullType foo(mixed $x) {\n        return null;\n    }\n\n}"
                 },
+                //see TINS-449 unused ad-hoc polymorphic parameters
                 {
-                        "<?php function foo($x, $y){$a = $x + $y;} ?>",
+                        "<?php function foo($x, $y){$a = $x + $y;}",
                         "namespace{"
                                 + "\n"
                                 + "\n    function nullType foo0(num $x, num $y) {"
-                                + "\n        mixed $a;"
+                                + "\n        num $a;"
                                 + "\n        $a = $x + $y;"
                                 + "\n        return null;"
                                 + "\n    }"
