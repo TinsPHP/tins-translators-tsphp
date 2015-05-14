@@ -13,10 +13,8 @@
 package ch.tsphp.tinsphp.translators.tsphp.test.integration.coverage;
 
 
-import ch.tsphp.tinsphp.parser.antlr.TinsPHPParser;
 import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorInferenceTest;
 import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.StatementHelper;
-import org.antlr.runtime.ParserRuleReturnScope;
 import org.antlr.runtime.RecognitionException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,10 +35,6 @@ public class BreakOrContinueStatementTest extends ATranslatorInferenceTest
     @Test
     public void test() throws RecognitionException, IOException {
         translate();
-    }
-
-    protected ParserRuleReturnScope parserRun(TinsPHPParser parser) throws RecognitionException {
-        return parser.compilationUnit();
     }
 
     protected void run() throws RecognitionException {

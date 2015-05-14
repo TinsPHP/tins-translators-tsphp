@@ -15,12 +15,13 @@ import ch.tsphp.tinsphp.common.IInferenceEngine;
 import ch.tsphp.tinsphp.common.IParser;
 import ch.tsphp.tinsphp.common.ITranslator;
 import ch.tsphp.tinsphp.common.config.IInferenceEngineInitialiser;
+import ch.tsphp.tinsphp.common.config.IParserInitialiser;
 import ch.tsphp.tinsphp.common.config.ISymbolsInitialiser;
 import ch.tsphp.tinsphp.common.config.ITranslatorInitialiser;
 import ch.tsphp.tinsphp.common.issues.EIssueSeverity;
 import ch.tsphp.tinsphp.core.config.HardCodedCoreInitialiser;
 import ch.tsphp.tinsphp.inference_engine.config.HardCodedInferenceEngineInitialiser;
-import ch.tsphp.tinsphp.parser.ParserFacade;
+import ch.tsphp.tinsphp.parser.config.HardCodedParserInitialiser;
 import ch.tsphp.tinsphp.symbols.config.HardCodedSymbolsInitialiser;
 import ch.tsphp.tinsphp.translators.tsphp.config.HardCodedTSPHPTranslatorInitialiser;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
@@ -35,15 +36,15 @@ public class HardCodedTSPHPTranslatorInitialiserTest
 {
     @Test
     public void allFine_DoesNotFindIssues() {
-        IParser parser = new ParserFacade();
+        ITSPHPAstAdaptor astAdaptor = new TSPHPAstAdaptor();
+        IParserInitialiser parserInitialiser = new HardCodedParserInitialiser(astAdaptor);
+        IParser parser = parserInitialiser.getParser();
         ParserUnitDto parserUnitDto = parser.parse("<?php $a = 1;?>");
         CommonTreeNodeStream commonTreeNodeStream =
                 new CommonTreeNodeStream(new TSPHPAstAdaptor(), parserUnitDto.compilationUnit);
         commonTreeNodeStream.setTokenStream(parserUnitDto.tokenStream);
 
-        ITSPHPAstAdaptor astAdaptor = new TSPHPAstAdaptor();
         IAstHelper astHelper = new AstHelper(astAdaptor);
-
         ISymbolsInitialiser symbolsInitialiser = createSymbolsInitialiser();
 
         IInferenceEngineInitialiser inferenceInitialiser = createInferenceInitialiser(

@@ -15,8 +15,6 @@ package ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils;
 
 import ch.tsphp.tinsphp.common.IInferenceEngine;
 import ch.tsphp.tinsphp.common.issues.EIssueSeverity;
-import ch.tsphp.tinsphp.parser.antlr.TinsPHPParser;
-import org.antlr.runtime.ParserRuleReturnScope;
 import org.antlr.runtime.RecognitionException;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -60,11 +58,6 @@ public abstract class ATranslatorInferenceTest extends ATest
     protected void checkInferencePhase(IInferenceEngine inferenceEngine) {
         Assert.assertFalse(testString + " failed. found issue(s) during the inference phase",
                 inferenceEngine.hasFound(EnumSet.allOf(EIssueSeverity.class)));
-    }
-
-    @Override
-    protected ParserRuleReturnScope parserRun(TinsPHPParser parser) throws RecognitionException {
-        return parser.compilationUnit();
     }
 
     @Override

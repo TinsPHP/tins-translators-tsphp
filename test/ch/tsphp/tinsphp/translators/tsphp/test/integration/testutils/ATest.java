@@ -13,33 +13,29 @@
 package ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils;
 
 import ch.tsphp.common.AstHelper;
-import ch.tsphp.common.AstHelperRegistry;
 import ch.tsphp.common.IAstHelper;
 import ch.tsphp.common.ITSPHPAst;
 import ch.tsphp.common.ITSPHPAstAdaptor;
+import ch.tsphp.common.ParserUnitDto;
 import ch.tsphp.common.TSPHPAstAdaptor;
 import ch.tsphp.common.exceptions.TSPHPException;
-import ch.tsphp.parser.common.ANTLRNoCaseStringStream;
+import ch.tsphp.tinsphp.common.IParser;
 import ch.tsphp.tinsphp.common.config.ICoreInitialiser;
 import ch.tsphp.tinsphp.common.config.IInferenceEngineInitialiser;
+import ch.tsphp.tinsphp.common.config.IParserInitialiser;
 import ch.tsphp.tinsphp.common.config.ISymbolsInitialiser;
 import ch.tsphp.tinsphp.common.issues.EIssueSeverity;
 import ch.tsphp.tinsphp.common.issues.IIssueLogger;
 import ch.tsphp.tinsphp.common.translation.ITranslatorController;
 import ch.tsphp.tinsphp.core.config.HardCodedCoreInitialiser;
 import ch.tsphp.tinsphp.inference_engine.config.HardCodedInferenceEngineInitialiser;
-import ch.tsphp.tinsphp.parser.antlr.TinsPHPParser;
-import ch.tsphp.tinsphp.parser.antlrmod.ErrorReportingTinsPHPLexer;
-import ch.tsphp.tinsphp.parser.antlrmod.ErrorReportingTinsPHPParser;
+import ch.tsphp.tinsphp.parser.config.HardCodedParserInitialiser;
 import ch.tsphp.tinsphp.symbols.config.HardCodedSymbolsInitialiser;
 import ch.tsphp.tinsphp.translators.tsphp.OperatorHelper;
 import ch.tsphp.tinsphp.translators.tsphp.PrecedenceHelper;
 import ch.tsphp.tinsphp.translators.tsphp.TempVariableHelper;
 import ch.tsphp.tinsphp.translators.tsphp.TranslatorController;
 import ch.tsphp.tinsphp.translators.tsphp.antlrmod.ErrorReportingTSPHPTranslatorWalker;
-import org.antlr.runtime.CharStream;
-import org.antlr.runtime.CommonTokenStream;
-import org.antlr.runtime.ParserRuleReturnScope;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.runtime.tree.TreeRuleReturnScope;
@@ -52,6 +48,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.EnumSet;
 
+import static org.junit.Assert.assertFalse;
+
 @Ignore
 public abstract class ATest implements IIssueLogger
 {
@@ -63,6 +61,7 @@ public abstract class ATest implements IIssueLogger
     protected ErrorReportingTSPHPTranslatorWalker translator;
     protected TreeRuleReturnScope result;
     protected ITSPHPAstAdaptor astAdaptor;
+    protected IParser parser;
     protected ITranslatorController controller;
     protected IInferenceEngineInitialiser inferenceEngineInitialiser;
     protected ISymbolsInitialiser symbolsInitialiser;
@@ -86,7 +85,17 @@ public abstract class ATest implements IIssueLogger
     }
 
     public void translate() throws IOException, RecognitionException {
-        parse();
+        astAdaptor = new TSPHPAstAdaptor();
+        IParserInitialiser parserInitialiser = new HardCodedParserInitialiser(astAdaptor);
+        parser = parserInitialiser.getParser();
+        parser.registerIssueLogger(new WriteExceptionToConsole());
+        ParserUnitDto parserUnit = parser.parse(testString);
+
+        checkNoIssuesDuringParsing();
+
+        ast = parserUnit.compilationUnit;
+        commonTreeNodeStream = new CommonTreeNodeStream(astAdaptor, ast);
+        commonTreeNodeStream.setTokenStream(parserUnit.tokenStream);
 
         IAstHelper astHelper = new AstHelper(astAdaptor);
         symbolsInitialiser = createSymbolsInitialiser();
@@ -116,37 +125,12 @@ public abstract class ATest implements IIssueLogger
         check();
     }
 
-    public void parse() throws RecognitionException {
-
-        astAdaptor = new TSPHPAstAdaptor();
-        AstHelperRegistry.set(new AstHelper(astAdaptor));
-
-        CharStream stream = new ANTLRNoCaseStringStream(testString);
-        ErrorReportingTinsPHPLexer lexer = new ErrorReportingTinsPHPLexer(stream);
-        CommonTokenStream tokens = new CommonTokenStream(lexer);
-
-        ErrorReportingTinsPHPParser parser = new ErrorReportingTinsPHPParser(tokens);
-        parser.setTreeAdaptor(astAdaptor);
-        parser.registerIssueLogger(new WriteExceptionToConsole());
-
-        ParserRuleReturnScope parserResult = parserRun(parser);
-        ast = (ITSPHPAst) parserResult.getTree();
-
-        Assert.assertFalse(testString.replaceAll("\n", " ") + " failed - lexer throw exception",
-                lexer.hasFound(EnumSet.allOf(EIssueSeverity.class)));
-        Assert.assertFalse(testString.replaceAll("\n", " ") + " failed - parser throw exception",
+    protected void checkNoIssuesDuringParsing() {
+        assertFalse(testString.replaceAll("\n", " ") + " failed - parser throw exception",
                 parser.hasFound(EnumSet.allOf(EIssueSeverity.class)));
-
-        commonTreeNodeStream = new CommonTreeNodeStream(astAdaptor, ast);
-        commonTreeNodeStream.setTokenStream(parser.getTokenStream());
     }
 
     protected void inferTypes() {
-    }
-
-
-    protected ParserRuleReturnScope parserRun(TinsPHPParser parser) throws RecognitionException {
-        return parser.statement();
     }
 
     protected void run() throws RecognitionException {
