@@ -40,8 +40,7 @@ public abstract class ATranslatorInferenceTest extends ATest
         inferenceEngine.enrichWithReferences(ast, commonTreeNodeStream);
         checkReferencePhase(inferenceEngine);
 
-        inferenceEngine.solveMethodSymbolConstraints();
-        inferenceEngine.solveGlobalDefaultNamespaceConstraints();
+        inferenceEngine.solveConstraints();
         checkInferencePhase(inferenceEngine);
     }
 

@@ -53,8 +53,7 @@ public class HardCodedTSPHPTranslatorInitialiserTest
         IInferenceEngine inferenceEngine = inferenceInitialiser.getEngine();
         inferenceEngine.enrichWithDefinitions(parserUnitDto.compilationUnit, commonTreeNodeStream);
         inferenceEngine.enrichWithReferences(parserUnitDto.compilationUnit, commonTreeNodeStream);
-        inferenceEngine.solveMethodSymbolConstraints();
-        inferenceEngine.solveGlobalDefaultNamespaceConstraints();
+        inferenceEngine.solveConstraints();
 
         //act
         ITranslatorInitialiser translatorInitialiser = createTranslatorInitialiser(
