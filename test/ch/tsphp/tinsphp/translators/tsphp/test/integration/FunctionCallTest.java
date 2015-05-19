@@ -68,7 +68,78 @@ public class FunctionCallTest extends ATranslatorInferenceTest
                                 + "\n    $c = foo0(1, 2.5);"
                                 + "\n    $d = foo2([1], [1, 3, 4]);"
                                 + "\n}"
+                },
+                //direct recursive function
+                {
+                        "<?php function fac($n){ return $n > 0 ? $n * fac($n-1): 1;} $a = fac(6); $b = fac(5.4);",
+                        "namespace{"
+                                + "\n    (float | int) $b;"
+                                + "\n    int $a;"
+                                + "\n"
+                                + "\n    function T8 fac<T8>(T8 $n) where [int < T8 < (float | int)] {"
+                                + "\n        return ($n > 0) ? $n * fac($n - 1) : 1;"
+                                + "\n    }"
+                                + "\n"
+                                + "\n    $a = fac(6);"
+                                + "\n    $b = fac(5.4);"
+                                + "\n}"
+                },
+                //indirect recursive function
+                {
+                        "<?php function foo($x){ if($x > 0){return bar($x-1);} return $x;}"
+                                + "function bar($x){ if($x > 0){return foo($x-1);} return $x;}",
+                        "namespace{"
+                                + "\n"
+                                + "\n    function T4 foo<T4>(T4 $x) where [int < T4 < (float | int)] {"
+                                + "\n        if ($x > 0) {"
+                                + "\n            return bar($x - 1);"
+                                + "\n        }"
+                                + "\n        return $x;"
+                                + "\n    }"
+                                + "\n"
+                                + "\n    function T4 bar<T4>(T4 $x) where [int < T4 < (float | int)] {"
+                                + "\n        if ($x > 0) {"
+                                + "\n            return foo($x - 1);"
+                                + "\n        }"
+                                + "\n        return $x;"
+                                + "\n    }"
+                                + "\n"
+                                + "\n}"
                 }
+                //indirect recursive function with multiple overloads
+                //TODO TINS-403 rename TypeVariables to reflect order of parameters - currently not testable since
+                // type variables vary
+//                {
+//                        "<?php function rec1($x, $y){ return $x > 0 ? rec2($x + $y, $y) : $x; }\n"
+//                                + "function rec2($x, $y){ return $x > 10 ? rec1($x + $y, $y) : $y; }"
+//                                + "$i = rec1(5, 8);\n"
+//                                + "$j = rec2([1, 2], [2]);",
+//                        "namespace{\n"
+//                                + "    array $j;\n"
+//                                + "    int $i;\n"
+//                                + "\n"
+//                                + "    function T8 rec10<T8, T2, T5>(T2 $x, T5 $y) "
+//                                + "where [(array | T2 | T5) < T8, T2 < array, T5 < array] {\n"
+//                                + "        return ($x > 0) ? rec2($x + $y, $y) : $x;\n"
+//                                + "    }\n"
+//                                + "\n"
+//                                + "    function T4 rec11<T4>(T4 $x, T4 $y) where [T4 < (float | int)] {\n"
+//                                + "        return ($x > 0) ? rec2($x + $y, $y) : $x;\n"
+//                                + "    }\n"
+//                                + "\n"
+//                                + "    function T4 rec20<T4>(T4 $x, T4 $y) where [T4 < (float | int)] {\n"
+//                                + "        return ($x > 10) ? rec11($x + $y, $y) : $y;\n"
+//                                + "    }\n"
+//                                + "\n"
+//                                + "    function T8 rec21<T8, T5>(array $x, T5 $y) "
+//                                + "where [(array | T5) < T8, T5 < array] {\n"
+//                                + "        return ($x > 10) ? rec10($x + $y, $y) : $y;\n"
+//                                + "    }\n"
+//                                + "\n"
+//                                + "    $i = rec11(5, 8);\n"
+//                                + "    $j = rec21([1, 2], [2]);\n"
+//                                + "}"
+//                },
         }));
 
         return collection;
