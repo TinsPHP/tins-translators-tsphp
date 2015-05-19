@@ -105,10 +105,38 @@ public class FunctionCallTest extends ATranslatorInferenceTest
                                 + "\n    }"
                                 + "\n"
                                 + "\n}"
-                }
-                //indirect recursive function with multiple overloads
+                },
                 //TODO TINS-403 rename TypeVariables to reflect order of parameters - currently not testable since
                 // type variables vary
+//                //indirect recursive function with erroneous overloads (bool x bool -> int) is no longer valid if $y
+//                // is restricted to Ty <: (int|float), Ty <: array respectively.
+//                {
+//                        "<?php function foo($x, $y){ return $x > 0 ?  bar($x + $y, $y) : $x; }"
+//                                + "function bar($x, $y){ return $x > 10 ? foo($x + $y, $y) : $y;}",
+//                        "namespace{"
+//                                + "\n"
+//                                + "\n    function T4 foo0<T4>(T4 $x, T4 $y) where [T4 < (float | int)] {"
+//                                + "\n        return ($x > 0) ? bar1($x + $y, $y) : $x;"
+//                                + "\n    }"
+//                                + "\n"
+//                                + "\n    function T8 foo1<T8, T2, T5>(T2 $x, T5 $y) "
+//                                + "where [(array | T2 | T5) < T8, T2 < array, T5 < array] {"
+//                                + "\n        return ($x > 0) ? bar0($x + $y, $y) : $x;"
+//                                + "\n    }"
+//                                + "\n"
+//                                + "\n    function T8 bar0<T8, T5>(array $x, T5 $y) "
+//                                + "where [(array | T5) < T8, T5 < array] {"
+//                                + "\n        return ($x > 10) ? foo1($x + $y, $y) : $y;"
+//                                + "\n    }"
+//                                + "\n"
+//                                + "\n    function T4 bar1<T4>(T4 $x, T4 $y) where [T4 < (float | int)] {"
+//                                + "\n        return ($x > 10) ? foo0($x + $y, $y) : $y;"
+//                                + "\n    }"
+//                                + "\n"
+//                                + "\n}"
+//                },
+                //indirect recursive function which produces more overloads once the dependent function is known. An
+                // erroneous one (bool x bool -> int) and a valid one (array x array -> array)
 //                {
 //                        "<?php function rec1($x, $y){ return $x > 0 ? rec2($x + $y, $y) : $x; }\n"
 //                                + "function rec2($x, $y){ return $x > 10 ? rec1($x + $y, $y) : $y; }"
@@ -120,11 +148,11 @@ public class FunctionCallTest extends ATranslatorInferenceTest
 //                                + "\n"
 //                                + "    function T8 rec10<T8, T2, T5>(T2 $x, T5 $y) "
 //                                + "where [(array | T2 | T5) < T8, T2 < array, T5 < array] {\n"
-//                                + "        return ($x > 0) ? rec2($x + $y, $y) : $x;\n"
+//                                + "        return ($x > 0) ? rec21($x + $y, $y) : $x;\n"
 //                                + "    }\n"
 //                                + "\n"
 //                                + "    function T4 rec11<T4>(T4 $x, T4 $y) where [T4 < (float | int)] {\n"
-//                                + "        return ($x > 0) ? rec2($x + $y, $y) : $x;\n"
+//                                + "        return ($x > 0) ? rec20($x + $y, $y) : $x;\n"
 //                                + "    }\n"
 //                                + "\n"
 //                                + "    function T4 rec20<T4>(T4 $x, T4 $y) where [T4 < (float | int)] {\n"
