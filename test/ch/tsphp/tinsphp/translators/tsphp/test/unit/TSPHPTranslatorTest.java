@@ -8,9 +8,9 @@ package ch.tsphp.tinsphp.translators.tsphp.test.unit;
 
 import ch.tsphp.common.exceptions.TSPHPException;
 import ch.tsphp.tinsphp.common.ITranslator;
+import ch.tsphp.tinsphp.common.config.IInferenceEngineInitialiser;
 import ch.tsphp.tinsphp.common.issues.EIssueSeverity;
 import ch.tsphp.tinsphp.common.issues.IIssueLogger;
-import ch.tsphp.tinsphp.common.scopes.IGlobalNamespaceScope;
 import ch.tsphp.tinsphp.common.translation.ITranslatorController;
 import ch.tsphp.tinsphp.translators.tsphp.TSPHPTranslator;
 import org.antlr.runtime.tree.TreeNodeStream;
@@ -102,15 +102,16 @@ public class TSPHPTranslatorTest
         return createTranslator(
                 mock(StringTemplateGroup.class),
                 mock(ITranslatorController.class),
-                mock(IGlobalNamespaceScope.class),
+                mock(IInferenceEngineInitialiser.class),
                 exception);
     }
 
     protected ITranslator createTranslator(
             StringTemplateGroup templateGroup,
             ITranslatorController controller,
-            IGlobalNamespaceScope globalNamespaceScope, Exception exception) {
-        return new TSPHPTranslator(templateGroup, controller, globalNamespaceScope, exception);
+            IInferenceEngineInitialiser inferenceEngineInitialiser,
+            Exception exception) {
+        return new TSPHPTranslator(templateGroup, controller, inferenceEngineInitialiser, exception);
     }
 
 }

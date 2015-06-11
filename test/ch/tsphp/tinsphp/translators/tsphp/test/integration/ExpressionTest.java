@@ -56,7 +56,7 @@ public class ExpressionTest extends ATranslatorInferenceStatementTest
                 {"$a = 1; $a &= 1;", "int $a;\n    $a = 1;\n    $a &= 1;"},
                 {"$a = 1; $a |= 1;", "int $a;\n    $a = 1;\n    $a |= 1;"},
                 {"$a = 1; $a ^= 1;", "int $a;\n    $a = 1;\n    $a ^= 1;"},
-                {"$a = 1; $a %= 1;", "int $a;\n    $a = 1;\n    $a %= 1;"},
+                {"$a = 1; $a %= 1;", "(falseType | int) $a;\n    $a = 1;\n    $a %= 1;"},
                 {"$a = ''; $a .= 'hi';", "string $a;\n    $a = '';\n    $a .= 'hi';"},
                 {"$a = 1; $a <<= 1;", "int $a;\n    $a = 1;\n    $a <<= 1;"},
                 {"$a = 1; $a >>= 1;", "int $a;\n    $a = 1;\n    $a >>= 1;"},
@@ -103,8 +103,7 @@ public class ExpressionTest extends ATranslatorInferenceStatementTest
                 {"$a = 1; $a--;", "int $a;\n    $a = 1;\n    $a--;"},
                 {"$a = 1; ++$a;", "int $a;\n    $a = 1;\n    ++$a;"},
                 {"$a = 1; --$a;", "int $a;\n    $a = 1;\n    --$a;"},
-                //TODO rstoll TINS-278 $_GET is a type instead of a variable
-//                {"$_GET;", "$_GET;"},
+                {"$_GET;", "$_GET;"},
                 {"$a = [1]; $a[0];", "array $a;\n    $a = [1];\n    $a[0];"},
                 //TODO rstoll TINS-271 - translator OOP - expressions
 //                {"clone $a->a;","clone $a->a;"},

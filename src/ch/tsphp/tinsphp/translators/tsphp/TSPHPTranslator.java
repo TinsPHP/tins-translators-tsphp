@@ -15,10 +15,10 @@ package ch.tsphp.tinsphp.translators.tsphp;
 
 import ch.tsphp.common.exceptions.TSPHPException;
 import ch.tsphp.tinsphp.common.ITranslator;
+import ch.tsphp.tinsphp.common.config.IInferenceEngineInitialiser;
 import ch.tsphp.tinsphp.common.issues.EIssueSeverity;
 import ch.tsphp.tinsphp.common.issues.IIssueLogger;
 import ch.tsphp.tinsphp.common.issues.IssueReporterHelper;
-import ch.tsphp.tinsphp.common.scopes.IGlobalNamespaceScope;
 import ch.tsphp.tinsphp.common.translation.ITranslatorController;
 import ch.tsphp.tinsphp.translators.tsphp.antlrmod.ErrorReportingTSPHPTranslatorWalker;
 import org.antlr.runtime.RecognitionException;
@@ -38,7 +38,7 @@ public class TSPHPTranslator implements ITranslator, IIssueLogger
 
     private final StringTemplateGroup templateGroup;
     private final ITranslatorController controller;
-    private final IGlobalNamespaceScope globalNamespaceScope;
+    private final IInferenceEngineInitialiser inferenceEngineInitialiser;
     private Collection<IIssueLogger> issueLoggers = new ArrayDeque<>();
     private EnumSet<EIssueSeverity> foundIssues = EnumSet.noneOf(EIssueSeverity.class);
     private Exception loadingTemplateException;
@@ -46,11 +46,11 @@ public class TSPHPTranslator implements ITranslator, IIssueLogger
     public TSPHPTranslator(
             StringTemplateGroup theTemplateGroup,
             ITranslatorController theController,
-            IGlobalNamespaceScope theGlobalNamespaceScope,
+            IInferenceEngineInitialiser theInferenceEngineInitialiser,
             Exception exception) {
         templateGroup = theTemplateGroup;
         controller = theController;
-        globalNamespaceScope = theGlobalNamespaceScope;
+        inferenceEngineInitialiser = theInferenceEngineInitialiser;
         loadingTemplateException = exception;
     }
 
@@ -59,8 +59,10 @@ public class TSPHPTranslator implements ITranslator, IIssueLogger
         String translation = null;
         if (loadingTemplateException == null) {
             stream.reset();
-            ErrorReportingTSPHPTranslatorWalker translator =
-                    new ErrorReportingTSPHPTranslatorWalker(stream, controller, globalNamespaceScope);
+
+            controller.setMethodSymbols(inferenceEngineInitialiser.getMethodSymbols());
+            ErrorReportingTSPHPTranslatorWalker translator = new ErrorReportingTSPHPTranslatorWalker(
+                    stream, controller, inferenceEngineInitialiser.getGlobalDefaultNamespace());
 
             for (IIssueLogger logger : issueLoggers) {
                 translator.registerIssueLogger(logger);

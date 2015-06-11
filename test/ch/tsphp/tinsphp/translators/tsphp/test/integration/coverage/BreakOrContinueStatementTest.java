@@ -44,7 +44,6 @@ public class BreakOrContinueStatementTest extends ATranslatorInferenceTest
     @Parameterized.Parameters
     public static Collection<Object[]> testStrings() {
         Collection<Object[]> collection = new ArrayList<>();
-        //TODO rstoll TINS-397 translator parser based tests
         collection.addAll(
                 StatementHelper.getStatements("<?php break;", "?>", "namespace{", "break;", "    ", "\n}"));
         collection.addAll(

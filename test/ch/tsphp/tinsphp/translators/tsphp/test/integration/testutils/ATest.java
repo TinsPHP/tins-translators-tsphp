@@ -31,6 +31,7 @@ import ch.tsphp.tinsphp.core.config.HardCodedCoreInitialiser;
 import ch.tsphp.tinsphp.inference_engine.config.HardCodedInferenceEngineInitialiser;
 import ch.tsphp.tinsphp.parser.config.HardCodedParserInitialiser;
 import ch.tsphp.tinsphp.symbols.config.HardCodedSymbolsInitialiser;
+import ch.tsphp.tinsphp.translators.tsphp.DtoCreator;
 import ch.tsphp.tinsphp.translators.tsphp.OperatorHelper;
 import ch.tsphp.tinsphp.translators.tsphp.PrecedenceHelper;
 import ch.tsphp.tinsphp.translators.tsphp.TempVariableHelper;
@@ -113,7 +114,9 @@ public abstract class ATest implements IIssueLogger
         controller = new TranslatorController(
                 new PrecedenceHelper(),
                 new TempVariableHelper(astAdaptor),
-                new OperatorHelper());
+                new OperatorHelper(),
+                new DtoCreator());
+        controller.setMethodSymbols(inferenceEngineInitialiser.getMethodSymbols());
 
         translator = new ErrorReportingTSPHPTranslatorWalker(
                 commonTreeNodeStream, controller, inferenceEngineInitialiser.getGlobalDefaultNamespace());

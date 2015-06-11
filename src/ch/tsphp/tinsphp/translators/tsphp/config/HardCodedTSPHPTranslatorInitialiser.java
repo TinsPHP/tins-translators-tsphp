@@ -17,7 +17,9 @@ import ch.tsphp.common.exceptions.TSPHPException;
 import ch.tsphp.tinsphp.common.ITranslator;
 import ch.tsphp.tinsphp.common.config.IInferenceEngineInitialiser;
 import ch.tsphp.tinsphp.common.config.ITranslatorInitialiser;
+import ch.tsphp.tinsphp.common.translation.IDtoCreator;
 import ch.tsphp.tinsphp.common.translation.ITranslatorController;
+import ch.tsphp.tinsphp.translators.tsphp.DtoCreator;
 import ch.tsphp.tinsphp.translators.tsphp.IOperatorHelper;
 import ch.tsphp.tinsphp.translators.tsphp.IPrecedenceHelper;
 import ch.tsphp.tinsphp.translators.tsphp.ITempVariableHelper;
@@ -53,7 +55,12 @@ public class HardCodedTSPHPTranslatorInitialiser implements ITranslatorInitialis
         IPrecedenceHelper precedenceHelper = new PrecedenceHelper();
         ITempVariableHelper tempVariableHelper = new TempVariableHelper(anAstAdaptor);
         IOperatorHelper operatorHelper = new OperatorHelper();
-        controller = new TranslatorController(precedenceHelper, tempVariableHelper, operatorHelper);
+        IDtoCreator dtoCreator = new DtoCreator();
+        controller = new TranslatorController(
+                precedenceHelper,
+                tempVariableHelper,
+                operatorHelper,
+                dtoCreator);
 
         loadStringTemplate();
     }
@@ -89,7 +96,7 @@ public class HardCodedTSPHPTranslatorInitialiser implements ITranslatorInitialis
         return new TSPHPTranslator(
                 templateGroup,
                 controller,
-                inferenceEngineInitialiser.getGlobalDefaultNamespace(),
+                inferenceEngineInitialiser,
                 loadingTemplateException);
     }
 

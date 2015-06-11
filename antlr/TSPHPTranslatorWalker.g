@@ -30,6 +30,7 @@ package ch.tsphp.tinsphp.translators.tsphp.antlr;
 
 import java.util.Set;
 import java.util.HashSet;
+import java.util.Collection;
 import ch.tsphp.common.ITSPHPAst;
 import ch.tsphp.common.symbols.ISymbol;
 import ch.tsphp.common.symbols.ITypeSymbol;
@@ -37,7 +38,7 @@ import ch.tsphp.tinsphp.common.inference.constraints.IOverloadBindings;
 import ch.tsphp.tinsphp.common.scopes.IGlobalNamespaceScope;
 import ch.tsphp.tinsphp.common.symbols.IArrayTypeSymbol;
 import ch.tsphp.tinsphp.common.translation.ITranslatorController;
-import ch.tsphp.tinsphp.common.translation.dtos.MethodDto;
+import ch.tsphp.tinsphp.common.translation.dtos.OverloadDto;
 import ch.tsphp.tinsphp.common.translation.dtos.ParameterDto;
 import ch.tsphp.tinsphp.common.translation.dtos.TypeParameterDto;
 import ch.tsphp.tinsphp.common.translation.dtos.VariableDto;
@@ -418,8 +419,8 @@ functionDefinition
                     isNotMethodBefore = parent.getChild(childIndex - 1).getType() != Function;
                 }
 
-                List<MethodDto> dtos = controller.createMethodDtos($Identifier);
-                for (MethodDto dto : dtos) {
+                Collection<OverloadDto> dtos = controller.getOverloadDtos($Identifier);
+                for (OverloadDto dto : dtos) {
                     int index = input.mark();                
                      StringTemplate returnType = %type(
                         prefixModifiers={dto.returnType.prefixModifiers},
