@@ -111,11 +111,12 @@ public abstract class ATest implements IIssueLogger
 
         commonTreeNodeStream.reset();
 
+        TempVariableHelper tempVariableHelper = new TempVariableHelper(astAdaptor);
         controller = new TranslatorController(
                 new PrecedenceHelper(),
-                new TempVariableHelper(astAdaptor),
+                tempVariableHelper,
                 new OperatorHelper(),
-                new DtoCreator());
+                new DtoCreator(tempVariableHelper));
         controller.setMethodSymbols(inferenceEngineInitialiser.getMethodSymbols());
 
         translator = new ErrorReportingTSPHPTranslatorWalker(

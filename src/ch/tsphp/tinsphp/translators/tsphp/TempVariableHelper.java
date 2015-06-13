@@ -31,22 +31,27 @@ public class TempVariableHelper implements ITempVariableHelper
     }
 
     @Override
+    public String getTempNameIfAlreadyExists(String identifier, IScope scope) {
+        ITSPHPAst tmpVariable = astAdaptor.create(TokenTypes.VariableId, identifier);
+        ISymbol symbol = scope != null ? scope.resolve(tmpVariable) : null;
+        int count = 0;
+        while (symbol != null) {
+            tmpVariable.setText(identifier + "_" + count);
+            symbol = scope.resolve(tmpVariable);
+            ++count;
+        }
+        return tmpVariable.getText();
+    }
+
+    @Override
     public String getTempVariableName(ITSPHPAst expression) {
         String tokenText = "$_t";
         if (expression.getToken().getType() == TokenTypes.VariableId) {
             tokenText = expression.getText();
         }
-        tokenText += expression.getLine() + "_" + expression.getCharPositionInLine();
-        ITSPHPAst tmpVariable = astAdaptor.create(TokenTypes.VariableId, tokenText);
+        tokenText = tokenText + expression.getLine() + "_" + expression.getCharPositionInLine();
         IScope scope = expression.getScope();
-        ISymbol symbol = scope != null ? scope.resolve(tmpVariable) : null;
-        int count = 0;
-        while (symbol != null) {
-            tmpVariable.setText(tokenText + "_" + count);
-            symbol = scope.resolve(tmpVariable);
-            ++count;
-        }
-        return tmpVariable.getText();
+        return getTempNameIfAlreadyExists(tokenText, scope);
     }
 
     @Override

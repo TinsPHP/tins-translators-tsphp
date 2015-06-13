@@ -422,7 +422,7 @@ functionDefinition
                 Collection<OverloadDto> dtos = controller.getOverloadDtos($Identifier);
                 for (OverloadDto dto : dtos) {
                     int index = input.mark();                
-                     StringTemplate returnType = %type(
+                    StringTemplate returnType = %type(
                         prefixModifiers={dto.returnType.prefixModifiers},
                         type={dto.returnType.type},
                         suffixModifiers={dto.returnType.suffixModifiers}
@@ -451,6 +451,10 @@ functionDefinition
                         }
                     }
                     
+                                         
+                    currentBindings = dto.bindings;
+                    List<Object> instructions = block().instructions;
+                    
                     List<StringTemplate> parameters = new ArrayList<>();
                     for (ParameterDto paramDto : dto.parameters) {
                         StringTemplate type = %type(
@@ -460,13 +464,26 @@ functionDefinition
                         );
                         parameters.add(%parameter(
                             type={type},
-                            variableId={paramDto.variableId}, 
+                            variableId={paramDto.parameterId}, 
                             defaultValue={paramDto.defaultValue}
                         ));
+                        
+                        if(paramDto.typeHint != null){
+                            StringTemplate typeHint = %type(
+                                prefixModifiers={paramDto.typeHint.prefixModifiers}, 
+                                type={paramDto.typeHint.type},
+                                suffixModifiers={paramDto.typeHint.suffixModifiers}
+                            );
+                        
+                            StringTemplate localVariable = %variable(
+                                type={typeHint}, 
+                                variableId={paramDto.localVariableId}, 
+                                defaultValue={paramDto.parameterId}
+                            );
+                            instructions.add(0, localVariable);
+                        }
                     }
-                                      
-                    currentBindings = dto.bindings;
-                    TSPHPTranslatorWalker.block_return block = block();
+                 
 
                     methods.add(%method(
                         modifier={null},
@@ -475,7 +492,7 @@ functionDefinition
                         typeParams={typeParameters},
                         params={parameters},
                         constraints={constraints},
-                        body={block.instructions},
+                        body={instructions},
                         isNotMethodBefore={isNotMethodBefore}
                     ));
                     input.rewind(index);

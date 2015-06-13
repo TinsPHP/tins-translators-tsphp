@@ -14,17 +14,14 @@ package ch.tsphp.tinsphp.translators.tsphp.test.integration;
 
 
 import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorInferenceTest;
-import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ParameterListHelper;
 import org.antlr.runtime.RecognitionException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 @RunWith(Parameterized.class)
 public class FunctionDefinitionTest extends ATranslatorInferenceTest
@@ -41,13 +38,7 @@ public class FunctionDefinitionTest extends ATranslatorInferenceTest
 
     @Parameterized.Parameters
     public static Collection<Object[]> testStrings() {
-        List<Object[]> collection = new ArrayList<>();
-
-        collection.addAll(ParameterListHelper.getTestStrings(
-                "<?php function set", "{return 1;}?>",
-                "namespace{\n\n    function int set", " {\n        return 1;\n    }\n\n}"));
-
-        collection.addAll(Arrays.asList(new Object[][]{
+        return Arrays.asList(new Object[][]{
                 {
                         "<?php function foo($x){return $x;} ?>",
                         "namespace{\n\n    function T foo<T>(T $x) {\n        return $x;\n    }\n\n}"
@@ -298,9 +289,31 @@ public class FunctionDefinitionTest extends ATranslatorInferenceTest
                                 + "\n    }"
                                 + "\n"
                                 + "\n}"
+                },
+                //TINS-396 create local variable for parameters with type hints
+                {
+                        "<?php function typeHint(array \n$a){ return 1;}",
+                        "namespace{"
+                                + "\n"
+                                + "\n    function int typeHint(array $a_0) {"
+                                + "\n        mixed $a = $a_0;"
+                                + "\n        return 1;"
+                                + "\n    }"
+                                + "\n"
+                                + "\n}"
+                },
+                {
+                        "<?php function typeHint(array \n$a, array \n$b){return $a + $b;}",
+                        "namespace{"
+                                + "\n"
+                                + "\n    function array typeHint(array $a_0, array $b_0) {"
+                                + "\n        array $b = $b_0;"
+                                + "\n        array $a = $a_0;"
+                                + "\n        return $a + $b;"
+                                + "\n    }"
+                                + "\n"
+                                + "\n}"
                 }
-        }));
-
-        return collection;
+        });
     }
 }

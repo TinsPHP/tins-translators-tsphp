@@ -12,6 +12,7 @@
 
 package ch.tsphp.tinsphp.translators.tsphp;
 
+import ch.tsphp.common.IScope;
 import ch.tsphp.common.ITSPHPAst;
 
 /**
@@ -19,6 +20,8 @@ import ch.tsphp.common.ITSPHPAst;
  */
 public interface ITempVariableHelper
 {
+    String getTempNameIfAlreadyExists(String identifier, IScope scope);
+
     String getTempVariableName(ITSPHPAst expression);
 
     String getTempVariableNameIfNotVariable(ITSPHPAst expression);

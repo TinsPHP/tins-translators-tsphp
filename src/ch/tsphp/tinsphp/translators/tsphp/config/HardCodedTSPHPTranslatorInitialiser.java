@@ -55,7 +55,7 @@ public class HardCodedTSPHPTranslatorInitialiser implements ITranslatorInitialis
         IPrecedenceHelper precedenceHelper = new PrecedenceHelper();
         ITempVariableHelper tempVariableHelper = new TempVariableHelper(anAstAdaptor);
         IOperatorHelper operatorHelper = new OperatorHelper();
-        IDtoCreator dtoCreator = new DtoCreator();
+        IDtoCreator dtoCreator = new DtoCreator(tempVariableHelper);
         controller = new TranslatorController(
                 precedenceHelper,
                 tempVariableHelper,

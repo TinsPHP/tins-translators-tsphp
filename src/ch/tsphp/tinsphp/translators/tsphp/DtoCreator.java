@@ -38,6 +38,11 @@ import static ch.tsphp.tinsphp.common.utils.Pair.pair;
 
 public class DtoCreator implements IDtoCreator
 {
+    private final ITempVariableHelper tempVariableHelper;
+
+    public DtoCreator(ITempVariableHelper theTempVariableHelper) {
+        tempVariableHelper = theTempVariableHelper;
+    }
 
     @Override
     public List<OverloadDto> createOverloadDtos(IMethodSymbol methodSymbol) {
@@ -90,11 +95,33 @@ public class DtoCreator implements IDtoCreator
 
         List<ParameterDto> parameterDtos = new ArrayList<>();
         for (IVariable parameter : parameters) {
-            parameterDtos.add(new ParameterDto(
-                    createTypeDto(parameter.getAbsoluteName(), bindings, typeParameters, typeVariablesAdded),
-                    parameter.getName(),
-                    null
-            ));
+            ParameterDto parameterDto;
+
+            String parameterName = parameter.getName();
+            ITypeSymbol typeSymbol = parameter.getType();
+            String absoluteName = parameter.getAbsoluteName();
+            if (typeSymbol == null) {
+                parameterDto = new ParameterDto(
+                        createTypeDto(absoluteName, bindings, typeParameters, typeVariablesAdded),
+                        parameterName,
+                        null,
+                        null,
+                        null
+                );
+            } else {
+                String tempVariableName
+                        = tempVariableHelper.getTempNameIfAlreadyExists(parameterName + "_0", methodSymbol);
+                parameterDto = new ParameterDto(
+                        new TypeDto(null, typeSymbol.getAbsoluteName(), null),
+                        tempVariableName,
+                        null,
+                        createTypeDto(absoluteName, bindings, typeParameters, typeVariablesAdded),
+                        parameterName
+                );
+            }
+
+
+            parameterDtos.add(parameterDto);
         }
 
         if (typeParameters.isEmpty()) {
