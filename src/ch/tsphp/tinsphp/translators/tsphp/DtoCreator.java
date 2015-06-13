@@ -90,45 +90,76 @@ public class DtoCreator implements IDtoCreator
 
         Set<String> typeVariablesAdded = new HashSet<>(numberOfParameters + 1);
         List<TypeParameterDto> typeParameters = new ArrayList<>(numberOfParameters + 1);
-        TypeDto returnType = createTypeDto(
-                TinsPHPConstants.RETURN_VARIABLE_NAME, bindings, typeParameters, typeVariablesAdded);
 
         List<ParameterDto> parameterDtos = new ArrayList<>();
         for (IVariable parameter : parameters) {
-            ParameterDto parameterDto;
-
-            String parameterName = parameter.getName();
-            ITypeSymbol typeSymbol = parameter.getType();
-            String absoluteName = parameter.getAbsoluteName();
-            if (typeSymbol == null) {
-                parameterDto = new ParameterDto(
-                        createTypeDto(absoluteName, bindings, typeParameters, typeVariablesAdded),
-                        parameterName,
-                        null,
-                        null,
-                        null
-                );
-            } else {
-                String tempVariableName
-                        = tempVariableHelper.getTempNameIfAlreadyExists(parameterName + "_0", methodSymbol);
-                parameterDto = new ParameterDto(
-                        new TypeDto(null, typeSymbol.getAbsoluteName(), null),
-                        tempVariableName,
-                        null,
-                        createTypeDto(absoluteName, bindings, typeParameters, typeVariablesAdded),
-                        parameterName
-                );
-            }
-
-
+            ParameterDto parameterDto = createParameterDto(
+                    methodSymbol, bindings, typeVariablesAdded, typeParameters, parameter);
             parameterDtos.add(parameterDto);
+        }
+
+        Set<String> nonFixedTypeParameters = overload.getNonFixedTypeParameters();
+        VariableDto returnVariable = createReturnVariable(
+                bindings, typeVariablesAdded, typeParameters, nonFixedTypeParameters);
+
+        for (String typeParameter : nonFixedTypeParameters) {
+            if (!typeVariablesAdded.contains(typeParameter)) {
+                TypeParameterDto typeParameterDto = createTypeParameterDto(bindings, typeParameter);
+                typeParameters.add(typeParameterDto);
+            }
         }
 
         if (typeParameters.isEmpty()) {
             typeParameters = null;
         }
-        OverloadDto methodDto = new OverloadDto(returnType, newName, typeParameters, parameterDtos, bindings);
+        OverloadDto methodDto = new OverloadDto(returnVariable, newName, typeParameters, parameterDtos, bindings);
         return pair(methodDto, numbering);
+    }
+
+    private ParameterDto createParameterDto(IMethodSymbol methodSymbol, IOverloadBindings bindings, Set<String>
+            typeVariablesAdded, List<TypeParameterDto> typeParameters, IVariable parameter) {
+        ParameterDto parameterDto;
+        String parameterName = parameter.getName();
+        ITypeSymbol typeSymbol = parameter.getType();
+        String absoluteName = parameter.getAbsoluteName();
+        if (typeSymbol == null) {
+            parameterDto = new ParameterDto(
+                    createTypeDto(absoluteName, bindings, typeParameters, typeVariablesAdded),
+                    parameterName,
+                    null,
+                    null,
+                    null
+            );
+        } else {
+            String tempVariableName
+                    = tempVariableHelper.getTempNameIfAlreadyExists(parameterName + "_0", methodSymbol);
+            parameterDto = new ParameterDto(
+                    new TypeDto(null, typeSymbol.getAbsoluteName(), null),
+                    tempVariableName,
+                    null,
+                    createTypeDto(absoluteName, bindings, typeParameters, typeVariablesAdded),
+                    parameterName
+            );
+        }
+        return parameterDto;
+    }
+
+    private VariableDto createReturnVariable(IOverloadBindings bindings, Set<String> typeVariablesAdded, List
+            <TypeParameterDto> typeParameters, Set<String> nonFixedTypeParameters) {
+        ITypeVariableReference reference = bindings.getTypeVariableReference(TinsPHPConstants.RETURN_VARIABLE_NAME);
+        String returnTypeVariable = reference.getTypeVariable();
+        VariableDto returnVariable;
+        TypeParameterDto typeParamDto = createTypeParameterDto(bindings, returnTypeVariable);
+        if (nonFixedTypeParameters.contains(returnTypeVariable)) {
+            if (!typeVariablesAdded.contains(returnTypeVariable)) {
+                typeVariablesAdded.add(returnTypeVariable);
+                typeParameters.add(typeParamDto);
+            }
+            returnVariable = new VariableDto(null, new TypeDto(null, returnTypeVariable, null), null);
+        } else {
+            returnVariable = new VariableDto(typeParamDto, null, null);
+        }
+        return returnVariable;
     }
 
     private TypeDto createTypeDto(
@@ -195,11 +226,11 @@ public class DtoCreator implements IDtoCreator
         String name = constant.getName();
         name = name.substring(0, name.length() - 1);
 
-        return createVariableDto(bindings, constant, name);
+        return createVariableDto(bindings, constant.getAbsoluteName(), name);
     }
 
-    private VariableDto createVariableDto(IOverloadBindings bindings, IVariable constant, String name) {
-        ITypeVariableReference reference = bindings.getTypeVariableReference(constant.getAbsoluteName());
+    private VariableDto createVariableDto(IOverloadBindings bindings, String absoluteName, String name) {
+        ITypeVariableReference reference = bindings.getTypeVariableReference(absoluteName);
         String typeVariable = reference.getTypeVariable();
         TypeParameterDto typeParameterDto = null;
         TypeDto typeDto = null;
@@ -221,6 +252,6 @@ public class DtoCreator implements IDtoCreator
 
     @Override
     public VariableDto createVariableDto(IOverloadBindings bindings, IVariable variable) {
-        return createVariableDto(bindings, variable, variable.getName());
+        return createVariableDto(bindings, variable.getAbsoluteName(), variable.getName());
     }
 }

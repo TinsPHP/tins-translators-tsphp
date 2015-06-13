@@ -66,6 +66,26 @@ private String getMethodName(String name) {
     return name.substring(0, name.length() - 2);
 }
 
+private StringTemplate getType(VariableDto dto) {
+    StringTemplate type;
+    if(dto.type!=null){
+        type = %type(
+            prefixModifiers={dto.type.prefixModifiers}, 
+            type={dto.type.type},
+            suffixModifiers={dto.type.suffixModifiers}
+        );
+    } else {
+        type = %bound(
+            bounds={dto.typeParameter.lowerBounds},
+            moreThanOne={
+                dto.typeParameter.lowerBounds != null && dto.typeParameter.lowerBounds.size() > 1
+            },
+            sep={" | "}
+        );
+    }
+    return type;  
+}
+
 }
 
 compilationUnit    
@@ -224,22 +244,7 @@ localVariableDefinition
     :   ^(VariableId defaultValue=unaryPrimitiveAtom?)
         {
             VariableDto dto = controller.createVariableDto(currentBindings, $VariableId);
-            StringTemplate type;
-            if(dto.type!=null){
-                type = %type(
-                    prefixModifiers={dto.type.prefixModifiers}, 
-                    type={dto.type.type},
-                    suffixModifiers={dto.type.suffixModifiers}
-                );
-            } else {
-                type = %bound(
-                    bounds={dto.typeParameter.lowerBounds},
-                    moreThanOne={
-                        dto.typeParameter.lowerBounds != null && dto.typeParameter.lowerBounds.size() > 1
-                    },
-                    sep={" | "}
-                );
-            }
+            StringTemplate type = getType(dto);
         }
         -> variable(type={type}, variableId={dto.variableId}, defaultValue={$unaryPrimitiveAtom.st})
     ;
@@ -433,11 +438,7 @@ functionDefinition
                 Collection<OverloadDto> dtos = controller.getOverloadDtos($Identifier);
                 for (OverloadDto dto : dtos) {
                     int index = input.mark();                
-                    StringTemplate returnType = %type(
-                        prefixModifiers={dto.returnType.prefixModifiers},
-                        type={dto.returnType.type},
-                        suffixModifiers={dto.returnType.suffixModifiers}
-                    );
+                    StringTemplate returnType = getType(dto.returnVariable);
                     
                     List<String> typeParameters = null;
                     List<StringTemplate> constraints = null;

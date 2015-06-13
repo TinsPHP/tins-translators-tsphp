@@ -172,7 +172,8 @@ public class FunctionDefinitionTest extends ATranslatorInferenceTest
                                 + "        return $x;\n"
                                 + "    }\n"
                                 + "\n"
-                                + "    function T1 foo2<T1>(T1 $x, {as T2} $y) where [(int | T2) < T1] {\n"
+                                + "    function T1 foo2<T1, T2>(T1 $x, {as T2} $y) " +
+                                "where [(int | T2) < T1, int < T2 < (float | int)] {\n"
                                 + "        $x = 1 + $y;\n"
                                 + "        return $x;\n"
                                 + "    }\n"
@@ -324,7 +325,7 @@ public class FunctionDefinitionTest extends ATranslatorInferenceTest
                                 + "        return $a;\n"
                                 + "    }\n"
                                 + "\n"
-                                + "    function V9 fooK5<V9>({as T} $x, {as T} $y) where [(int | T) < V9] {\n"
+                                + "    function (int | T) fooK5<T>({as T} $x, {as T} $y) where [T < (float | int)] {\n"
                                 + "        (int | T) $a;\n"
                                 + "        $a = 1;\n"
                                 + "        $a = $x + $y;\n"
