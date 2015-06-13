@@ -138,36 +138,41 @@ public class DtoCreator implements IDtoCreator
             Set<String> typeVariablesAdded) {
 
         ITypeVariableReference reference = bindings.getTypeVariableReference(variableId);
-        TypeDto typeDto = createTypeDto(reference, bindings);
+        TypeDto typeDto = createParameterTypeDto(reference, bindings);
         if (!reference.hasFixedType()) {
             String typeVariable = typeDto.type;
             if (!typeVariablesAdded.contains(typeVariable)) {
                 typeVariablesAdded.add(typeVariable);
-                List<String> lowerBounds = null;
-                if (bindings.hasLowerBounds(typeVariable)) {
-                    lowerBounds = new ArrayList<>();
-                    if (bindings.hasLowerTypeBounds(typeVariable)) {
-                        SortedSet<String> sortedSet = new TreeSet<>(
-                                bindings.getLowerTypeBounds(typeVariable).getTypeSymbols().keySet());
-                        lowerBounds.addAll(sortedSet);
-                    }
-                    if (bindings.hasLowerRefBounds(typeVariable)) {
-                        SortedSet<String> sortedSet = new TreeSet<>(bindings.getLowerRefBounds(typeVariable));
-                        lowerBounds.addAll(sortedSet);
-                    }
-                }
-                List<String> upperBounds = null;
-                if (bindings.hasUpperTypeBounds(typeVariable)) {
-                    upperBounds = new ArrayList<>();
-                    upperBounds.addAll(bindings.getUpperTypeBounds(typeVariable).getTypeSymbols().keySet());
-                }
-                typeParameters.add(new TypeParameterDto(lowerBounds, typeVariable, upperBounds));
+                TypeParameterDto typeParameterDto = createTypeParameterDto(bindings, typeVariable);
+                typeParameters.add(typeParameterDto);
             }
         }
         return typeDto;
     }
 
-    private TypeDto createTypeDto(ITypeVariableReference reference, IOverloadBindings bindings) {
+    private TypeParameterDto createTypeParameterDto(IOverloadBindings bindings, String typeVariable) {
+        List<String> lowerBounds = null;
+        if (bindings.hasLowerBounds(typeVariable)) {
+            lowerBounds = new ArrayList<>();
+            if (bindings.hasLowerTypeBounds(typeVariable)) {
+                SortedSet<String> sortedSet = new TreeSet<>(
+                        bindings.getLowerTypeBounds(typeVariable).getTypeSymbols().keySet());
+                lowerBounds.addAll(sortedSet);
+            }
+            if (bindings.hasLowerRefBounds(typeVariable)) {
+                SortedSet<String> sortedSet = new TreeSet<>(bindings.getLowerRefBounds(typeVariable));
+                lowerBounds.addAll(sortedSet);
+            }
+        }
+        List<String> upperBounds = null;
+        if (bindings.hasUpperTypeBounds(typeVariable)) {
+            upperBounds = new ArrayList<>();
+            upperBounds.addAll(bindings.getUpperTypeBounds(typeVariable).getTypeSymbols().keySet());
+        }
+        return new TypeParameterDto(lowerBounds, typeVariable, upperBounds);
+    }
+
+    private TypeDto createParameterTypeDto(ITypeVariableReference reference, IOverloadBindings bindings) {
         String typeVariable = reference.getTypeVariable();
         String type;
         if (reference.hasFixedType()) {
@@ -187,16 +192,35 @@ public class DtoCreator implements IDtoCreator
 
     @Override
     public VariableDto createVariableDtoForConstant(IOverloadBindings bindings, IVariable constant) {
-        ITypeVariableReference reference = bindings.getTypeVariableReference(constant.getAbsoluteName());
         String name = constant.getName();
         name = name.substring(0, name.length() - 1);
-        return new VariableDto(createTypeDto(reference, bindings), name);
+
+        return createVariableDto(bindings, constant, name);
     }
 
+    private VariableDto createVariableDto(IOverloadBindings bindings, IVariable constant, String name) {
+        ITypeVariableReference reference = bindings.getTypeVariableReference(constant.getAbsoluteName());
+        String typeVariable = reference.getTypeVariable();
+        TypeParameterDto typeParameterDto = null;
+        TypeDto typeDto = null;
+        if (typeVariable.startsWith("T")) {
+            typeDto = new TypeDto(null, typeVariable, null);
+        } else if (reference.hasFixedType()) {
+            ITypeSymbol typeSymbol;
+            if (bindings.hasLowerTypeBounds(typeVariable)) {
+                typeSymbol = bindings.getLowerTypeBounds(typeVariable);
+            } else {
+                typeSymbol = bindings.getUpperTypeBounds(typeVariable);
+            }
+            typeDto = new TypeDto(null, typeSymbol.toString(), null);
+        } else {
+            typeParameterDto = createTypeParameterDto(bindings, typeVariable);
+        }
+        return new VariableDto(typeParameterDto, typeDto, name);
+    }
 
     @Override
     public VariableDto createVariableDto(IOverloadBindings bindings, IVariable variable) {
-        ITypeVariableReference reference = bindings.getTypeVariableReference(variable.getAbsoluteName());
-        return new VariableDto(createTypeDto(reference, bindings), variable.getName());
+        return createVariableDto(bindings, variable, variable.getName());
     }
 }

@@ -224,11 +224,22 @@ localVariableDefinition
     :   ^(VariableId defaultValue=unaryPrimitiveAtom?)
         {
             VariableDto dto = controller.createVariableDto(currentBindings, $VariableId);
-            StringTemplate type = %type(
-                prefixModifiers={dto.type.prefixModifiers}, 
-                type={dto.type.type},
-                suffixModifiers={dto.type.suffixModifiers}
-            );
+            StringTemplate type;
+            if(dto.type!=null){
+                type = %type(
+                    prefixModifiers={dto.type.prefixModifiers}, 
+                    type={dto.type.type},
+                    suffixModifiers={dto.type.suffixModifiers}
+                );
+            } else {
+                type = %bound(
+                    bounds={dto.typeParameter.lowerBounds},
+                    moreThanOne={
+                        dto.typeParameter.lowerBounds != null && dto.typeParameter.lowerBounds.size() > 1
+                    },
+                    sep={" | "}
+                );
+            }
         }
         -> variable(type={type}, variableId={dto.variableId}, defaultValue={$unaryPrimitiveAtom.st})
     ;
