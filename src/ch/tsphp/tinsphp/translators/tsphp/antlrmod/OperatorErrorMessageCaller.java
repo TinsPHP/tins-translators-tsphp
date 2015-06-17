@@ -12,7 +12,7 @@ import ch.tsphp.tinsphp.common.translation.ITranslatorController;
 
 public class OperatorErrorMessageCaller implements IErrorMessageCaller
 {
-    ITranslatorController controller;
+    private ITranslatorController controller;
 
     public OperatorErrorMessageCaller(ITranslatorController theController) {
         controller = theController;
