@@ -40,6 +40,9 @@ import ch.tsphp.tinsphp.common.translation.dtos.OverloadDto;
 import ch.tsphp.tinsphp.common.translation.dtos.ParameterDto;
 import ch.tsphp.tinsphp.common.translation.dtos.TypeParameterDto;
 import ch.tsphp.tinsphp.common.translation.dtos.VariableDto;
+import ch.tsphp.tinsphp.translators.tsphp.antlrmod.IErrorMessageCaller;
+import ch.tsphp.tinsphp.translators.tsphp.antlrmod.FunctionErrorMessageCaller;
+import ch.tsphp.tinsphp.translators.tsphp.antlrmod.OperatorErrorMessageCaller;
 
 import java.util.Map;
 import java.util.Set;
