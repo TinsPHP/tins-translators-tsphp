@@ -19,12 +19,12 @@ import ch.tsphp.tinsphp.common.config.IInferenceEngineInitialiser;
 import ch.tsphp.tinsphp.common.config.ITranslatorInitialiser;
 import ch.tsphp.tinsphp.common.translation.IDtoCreator;
 import ch.tsphp.tinsphp.common.translation.ITranslatorController;
-import ch.tsphp.tinsphp.translators.tsphp.DtoCreator;
 import ch.tsphp.tinsphp.translators.tsphp.IOperatorHelper;
 import ch.tsphp.tinsphp.translators.tsphp.IPrecedenceHelper;
 import ch.tsphp.tinsphp.translators.tsphp.ITempVariableHelper;
 import ch.tsphp.tinsphp.translators.tsphp.OperatorHelper;
 import ch.tsphp.tinsphp.translators.tsphp.PrecedenceHelper;
+import ch.tsphp.tinsphp.translators.tsphp.TSPHPDtoCreator;
 import ch.tsphp.tinsphp.translators.tsphp.TSPHPTranslator;
 import ch.tsphp.tinsphp.translators.tsphp.TempVariableHelper;
 import ch.tsphp.tinsphp.translators.tsphp.TranslatorController;
@@ -55,7 +55,7 @@ public class HardCodedTSPHPTranslatorInitialiser implements ITranslatorInitialis
         IPrecedenceHelper precedenceHelper = new PrecedenceHelper();
         ITempVariableHelper tempVariableHelper = new TempVariableHelper(anAstAdaptor);
         IOperatorHelper operatorHelper = new OperatorHelper();
-        IDtoCreator dtoCreator = new DtoCreator(tempVariableHelper);
+        IDtoCreator dtoCreator = new TSPHPDtoCreator(tempVariableHelper);
         controller = new TranslatorController(
                 precedenceHelper,
                 tempVariableHelper,

@@ -262,6 +262,39 @@ public class FunctionCallTest extends ATranslatorInferenceTest
                                 + "    $j = rec20([1, 2], [2]);\n"
                                 + "}"
                 },
+                //soft typing and multiple overloads apply, need to fallback to dynamic version (function call in bar
+                // is fooA)
+                {
+                        "<?php function fooA($x){ return $x + 1;}"
+                                + "\nfunction barA(array $x){ $x = 1; return fooA($x); }"
+                                + "\n$i = fooA(1);"
+                                + "\n$j = barA([1, 2]);",
+                        "namespace{\n"
+                                + "    (float | int) $j;\n"
+                                + "    int $i;\n"
+                                + "\n"
+                                + "    function float fooA0(float $x) {\n"
+                                + "        return $x + 1;\n"
+                                + "    }\n"
+                                + "\n"
+                                + "    function int fooA1(int $x) {\n"
+                                + "        return $x + 1;\n"
+                                + "    }\n"
+                                + "\n"
+                                + "    function T fooA2<T>({as T} $x) where [int < T < (float | int)] {\n"
+                                + "        return $x + 1;\n"
+                                + "    }\n"
+                                + "\n"
+                                + "    function (float | int) barA(array $x_0) {\n"
+                                + "        (array | {as (float | int)}) $x = $x_0;\n"
+                                + "        $x = 1;\n"
+                                + "        return ((float | int)) fooA(({as (float | int)}) $x);\n"
+                                + "    }\n"
+                                + "\n"
+                                + "    $i = fooA1(1);\n"
+                                + "    $j = barA([1, 2]);\n"
+                                + "}"
+                }
         }));
 
         return collection;

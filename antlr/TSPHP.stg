@@ -131,8 +131,12 @@ clone(expression) ::= <<
 clone <expression>
 >>
 
-functionCall(identifier, parameters) ::= <<
-<identifier>(<parameters; separator=", ">)
+functionCall(identifier, arguments) ::= <<
+<identifier>(<arguments; separator=", ">)
+>>
+
+runtimeCheck(expression, type, needParentheses) ::= <<
+<if(needParentheses)>(<endif>(<type>) <expression><if(needParentheses)>)<endif>
 >>
 
 arrayAccess(expression, identifier) ::= <<

@@ -30,7 +30,7 @@ import java.util.Collection;
 import java.util.EnumSet;
 
 /**
- * The translator which translates TSPHP to PHP 5.4.
+ * The translator which translates PHP to TSPHP.
  */
 public class TSPHPTranslator implements ITranslator, IIssueLogger
 {

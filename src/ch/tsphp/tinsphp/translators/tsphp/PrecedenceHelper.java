@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A precedence helper which orients itself by PHP 5.4.
+ * A precedence helper which orients itself by TSPHP.
  */
 public class PrecedenceHelper implements IPrecedenceHelper
 {

@@ -36,11 +36,11 @@ import java.util.TreeSet;
 
 import static ch.tsphp.tinsphp.common.utils.Pair.pair;
 
-public class DtoCreator implements IDtoCreator
+public class TSPHPDtoCreator implements IDtoCreator
 {
     private final ITempVariableHelper tempVariableHelper;
 
-    public DtoCreator(ITempVariableHelper theTempVariableHelper) {
+    public TSPHPDtoCreator(ITempVariableHelper theTempVariableHelper) {
         tempVariableHelper = theTempVariableHelper;
     }
 
@@ -213,11 +213,11 @@ public class DtoCreator implements IDtoCreator
             } else {
                 typeSymbol = bindings.getLowerTypeBounds(typeVariable);
             }
+            //TODO rstoll TINS-379 find least upper bound
             type = typeSymbol.toString();
         } else {
             type = typeVariable;
         }
-        //TODO rstoll TINS-379 find least upper bound
         return new TypeDto(null, type, null);
     }
 

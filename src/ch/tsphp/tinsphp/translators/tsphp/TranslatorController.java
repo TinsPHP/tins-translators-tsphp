@@ -7,14 +7,20 @@
 package ch.tsphp.tinsphp.translators.tsphp;
 
 import ch.tsphp.common.ITSPHPAst;
+import ch.tsphp.common.symbols.ITypeSymbol;
 import ch.tsphp.tinsphp.common.inference.constraints.IFunctionType;
 import ch.tsphp.tinsphp.common.inference.constraints.IOverloadBindings;
 import ch.tsphp.tinsphp.common.inference.constraints.IVariable;
+import ch.tsphp.tinsphp.common.inference.constraints.OverloadApplicationDto;
+import ch.tsphp.tinsphp.common.symbols.IExpressionVariableSymbol;
 import ch.tsphp.tinsphp.common.symbols.IMethodSymbol;
+import ch.tsphp.tinsphp.common.symbols.IMinimalMethodSymbol;
 import ch.tsphp.tinsphp.common.translation.IDtoCreator;
 import ch.tsphp.tinsphp.common.translation.ITranslatorController;
+import ch.tsphp.tinsphp.common.translation.dtos.FunctionApplicationDto;
 import ch.tsphp.tinsphp.common.translation.dtos.OverloadDto;
 import ch.tsphp.tinsphp.common.translation.dtos.VariableDto;
+import ch.tsphp.tinsphp.common.utils.Pair;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -81,21 +87,112 @@ public class TranslatorController implements ITranslatorController
     }
 
     @Override
-    public String getOverloadName(IOverloadBindings bindings, ITSPHPAst functionCall, ITSPHPAst identifier) {
-        IFunctionType appliedOverload = bindings.getAppliedOverload(functionCall.getSymbol().getAbsoluteName());
-        String suffix = appliedOverload.getSuffix(TSPHPTranslator.TRANSLATOR_ID);
+    public FunctionApplicationDto getFunctionApplication(
+            IOverloadBindings bindings, ITSPHPAst functionCall, ITSPHPAst identifier) {
 
-        String name = identifier.getText();
-        name = name.substring(0, name.length() - 2);
-        if (suffix != null) {
-            name += suffix;
+        FunctionApplicationDto dto = null;
+
+        String absoluteName = functionCall.getSymbol().getAbsoluteName();
+        OverloadApplicationDto appliedOverload = bindings.getAppliedOverload(absoluteName);
+        if (appliedOverload != null) {
+
+            String name = identifier.getText();
+            name = name.substring(0, name.length() - 2);
+            if (appliedOverload.overload != null) {
+                String suffix = appliedOverload.overload.getSuffix(TSPHPTranslator.TRANSLATOR_ID);
+                if (suffix != null) {
+                    name += suffix;
+                }
+            }
+
+            Map<Integer, String> runtimeChecks = getRuntimeChecks(appliedOverload);
+            String returnRuntimeCheck = getReturnRuntimeCheck(runtimeChecks);
+            dto = new FunctionApplicationDto(name, runtimeChecks, returnRuntimeCheck);
         }
-        return name;
+
+        return dto;
+    }
+
+    private Map<Integer, String> getRuntimeChecks(OverloadApplicationDto appliedOverload) {
+        Map<Integer, String> runtimeChecks = null;
+        if (appliedOverload.runtimeChecks != null) {
+            runtimeChecks = new HashMap<>();
+            for (Map.Entry<Integer, Pair<ITypeSymbol, List<ITypeSymbol>>> entry
+                    : appliedOverload.runtimeChecks.entrySet()) {
+                runtimeChecks.put(entry.getKey(), entry.getValue().first.getAbsoluteName());
+            }
+        }
+        return runtimeChecks;
     }
 
     @Override
-    public String getMigrationFunction(IOverloadBindings bindings, ITSPHPAst operator) {
-        IFunctionType appliedOverload = bindings.getAppliedOverload(operator.getSymbol().getAbsoluteName());
-        return operatorHelper.getMigrationFunction(operator.getType(), appliedOverload);
+    public FunctionApplicationDto getOperatorApplication(IOverloadBindings bindings, ITSPHPAst operator) {
+        FunctionApplicationDto dto = null;
+
+        String absoluteName = operator.getSymbol().getAbsoluteName();
+        OverloadApplicationDto appliedOverload = bindings.getAppliedOverload(absoluteName);
+        if (appliedOverload != null) {
+
+            String name = operatorHelper.getMigrationFunction(operator.getType(), appliedOverload.overload);
+            Map<Integer, String> runtimeChecks = getRuntimeChecks(appliedOverload);
+            String returnRuntimeCheck = getReturnRuntimeCheck(runtimeChecks);
+            dto = new FunctionApplicationDto(name, runtimeChecks, returnRuntimeCheck);
+        }
+
+        return dto;
+    }
+
+    private String getReturnRuntimeCheck(Map<Integer, String> runtimeChecks) {
+        String returnRuntimeCheck = null;
+        if (runtimeChecks != null) {
+            returnRuntimeCheck = runtimeChecks.remove(-1);
+        }
+        return returnRuntimeCheck;
+    }
+
+    @Override
+    public String getErrMessageFunctionApplication(
+            IOverloadBindings bindings, ITSPHPAst functionCall, ITSPHPAst identifier) {
+        StringBuilder stringBuilder = new StringBuilder("'No applicable overload found for the function ");
+        stringBuilder.append(identifier.getText()).append(".\\n");
+        ITSPHPAst arguments = functionCall.getChild(1);
+        appendArgumentTypes(stringBuilder, bindings, arguments);
+        appendOverloads(stringBuilder, functionCall);
+        stringBuilder.append("'");
+        return stringBuilder.toString();
+    }
+
+    private void appendArgumentTypes(
+            StringBuilder stringBuilder, IOverloadBindings bindings, ITSPHPAst arguments) {
+        stringBuilder.append("Given argument types: ");
+        int numberOfArguments = arguments.getChildCount();
+        if (numberOfArguments == 0) {
+            stringBuilder.append("void");
+        } else {
+            String typeVariable = bindings.getTypeVariable(arguments.getChild(0).getSymbol().getAbsoluteName());
+            stringBuilder.append(bindings.getLowerTypeBounds(typeVariable));
+            for (int i = 1; i < numberOfArguments; ++i) {
+                typeVariable = bindings.getTypeVariable(arguments.getChild(i).getSymbol().getAbsoluteName());
+                stringBuilder.append(" x ").append(bindings.getLowerTypeBounds(typeVariable));
+            }
+        }
+    }
+
+    private void appendOverloads(StringBuilder stringBuilder, ITSPHPAst functionCall) {
+        stringBuilder.append("\\nExisting overloads:");
+        IMinimalMethodSymbol methodSymbol = ((IExpressionVariableSymbol) functionCall.getSymbol()).getMethodSymbol();
+        for (IFunctionType functionType : methodSymbol.getOverloads()) {
+            stringBuilder.append("\\n").append(functionType.getSignature());
+        }
+    }
+
+    @Override
+    public String getErrMessageOperatorApplication(IOverloadBindings bindings, ITSPHPAst operator) {
+        StringBuilder stringBuilder = new StringBuilder("'No applicable overload found for the ")
+                .append(operator.getText()).append(" operator.\\n");
+        appendArgumentTypes(stringBuilder, bindings, operator);
+        appendOverloads(stringBuilder, operator);
+        stringBuilder.append("'");
+        return stringBuilder.toString();
     }
 }

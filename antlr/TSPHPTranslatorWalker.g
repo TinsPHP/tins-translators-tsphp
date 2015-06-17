@@ -28,9 +28,6 @@ options {
 
 package ch.tsphp.tinsphp.translators.tsphp.antlr;
 
-import java.util.Set;
-import java.util.HashSet;
-import java.util.Collection;
 import ch.tsphp.common.ITSPHPAst;
 import ch.tsphp.common.symbols.ISymbol;
 import ch.tsphp.common.symbols.ITypeSymbol;
@@ -38,10 +35,16 @@ import ch.tsphp.tinsphp.common.inference.constraints.IOverloadBindings;
 import ch.tsphp.tinsphp.common.scopes.IGlobalNamespaceScope;
 import ch.tsphp.tinsphp.common.symbols.IArrayTypeSymbol;
 import ch.tsphp.tinsphp.common.translation.ITranslatorController;
+import ch.tsphp.tinsphp.common.translation.dtos.FunctionApplicationDto;
 import ch.tsphp.tinsphp.common.translation.dtos.OverloadDto;
 import ch.tsphp.tinsphp.common.translation.dtos.ParameterDto;
 import ch.tsphp.tinsphp.common.translation.dtos.TypeParameterDto;
 import ch.tsphp.tinsphp.common.translation.dtos.VariableDto;
+
+import java.util.Map;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Collection;
 
 }
 
@@ -49,6 +52,8 @@ import ch.tsphp.tinsphp.common.translation.dtos.VariableDto;
 private ITranslatorController controller;
 private IOverloadBindings currentBindings;
 private boolean isFunctionBefore;
+private IErrorMessageCaller functionErrorMessageCaller;
+private IErrorMessageCaller operatorErrorMessageCaller;
 
 public TSPHPTranslatorWalker(
         TreeNodeStream input, 
@@ -60,6 +65,8 @@ public TSPHPTranslatorWalker(
     if (bindingsList != null && !bindingsList.isEmpty()){
         currentBindings = bindingsList.get(0);
     }
+    functionErrorMessageCaller = new FunctionErrorMessageCaller(controller);
+    operatorErrorMessageCaller = new OperatorErrorMessageCaller(controller);
 }
 
 private String getMethodName(String name) {
@@ -84,6 +91,64 @@ private StringTemplate getType(VariableDto dto) {
         );
     }
     return type;  
+}
+
+private StringTemplate getFunctionApplication(
+        FunctionApplicationDto dto, 
+        List<Object> arguments, 
+        ITSPHPAst functionCall, 
+        ITSPHPAst identifier, 
+        IErrorMessageCaller errorMessageCaller) {
+        
+        return getFunctionApplication(
+                    dto, arguments, functionCall, identifier, errorMessageCaller, null, null, false);
+}
+
+private StringTemplate getFunctionApplication(
+        FunctionApplicationDto dto, 
+        List<Object> arguments, 
+        ITSPHPAst functionCall, 
+        ITSPHPAst identifier, 
+        IErrorMessageCaller errorMessageCaller, 
+        String operatorFunction,
+        StringTemplate operator,
+        boolean needParentheses) {   
+             
+    StringTemplate stringTemplate;
+    if (dto != null) {
+        if (dto.runtimeChecks != null) {
+            for(Map.Entry<Integer, String> entry : dto.runtimeChecks.entrySet()){
+                int index = entry.getKey();
+                StringTemplate check =  %runtimeCheck(expression={arguments.get(index)}, type={entry.getValue()}, needParentheses={false});
+                arguments.set(index, check);
+            }
+        }
+        if (dto.name != null) {
+            stringTemplate = %functionCall(identifier={dto.name}, arguments={arguments});
+        } else {
+            STAttrMap map = new STAttrMap().put("operator", operator);
+            if(arguments.size() == 1){
+                map.put("expression", arguments.get(0));
+            }else if(arguments.size() == 2){
+                map.put("left", arguments.get(0))
+                   .put("right", arguments.get(1))
+                   .put("needParentheses", needParentheses);
+            }
+            stringTemplate = templateLib.getInstanceOf(operatorFunction, map);
+        }
+        if (dto.returnRuntimeCheck != null) {
+            stringTemplate = %runtimeCheck(expression={stringTemplate}, type={dto.returnRuntimeCheck}, needParentheses={false});
+        }
+    } else {
+        String functionName = "\\trigger_error";
+        arguments = new ArrayList<>(2);
+        String errMessage = errorMessageCaller.getErrMessage(currentBindings, functionCall, identifier);
+        arguments.add(errMessage);
+        arguments.add("\\E_USER_ERROR");
+        stringTemplate = %functionCall(identifier={functionName}, arguments={arguments});
+    }
+
+    return stringTemplate;
 }
 
 }
@@ -686,39 +751,51 @@ staticAccess
 operator
     :   ^(unaryPreOperator expr=expression)
         {
-            String migrationFunction = controller.getMigrationFunction(currentBindings, $unaryPreOperator.start);
-            if(migrationFunction == null){
-                retval.st = %unaryPreOperator(operator={$unaryPreOperator.st}, expression={$expr.st});
-            }else{
-                retval.st = %functionCall(identifier={migrationFunction}, parameters={$expr.st});
-            }
+            FunctionApplicationDto dto = controller.getOperatorApplication(currentBindings, $unaryPreOperator.start);
+            List<Object> arguments = new ArrayList<>();
+            arguments.add($expr.st);
+            retval.st = getFunctionApplication(
+                dto, 
+                arguments,
+                $unaryPreOperator.start, 
+                $unaryPreOperator.start, 
+                operatorErrorMessageCaller,
+                "unaryPreOperator",
+                $unaryPreOperator.st,
+                false);
         }
 
     |   ^(unaryPostOperator expr=expression)
         {
-            String migrationFunction = controller.getMigrationFunction(currentBindings, $unaryPostOperator.start);
-            if(migrationFunction == null){
-                retval.st = %unaryPostOperator(operator={$unaryPostOperator.st}, expression={$expr.st});
-            }else{
-                retval.st = %functionCall(identifier={migrationFunction}, parameters={$expr.st});
-            }
+            FunctionApplicationDto dto = controller.getOperatorApplication(currentBindings, $unaryPostOperator.start);
+            List<Object> arguments = new ArrayList<>();
+            arguments.add($expr.st);
+            retval.st = getFunctionApplication(
+                dto, 
+                arguments,
+                $unaryPostOperator.start, 
+                $unaryPostOperator.start, 
+                operatorErrorMessageCaller,
+                "unaryPostOperator",
+                $unaryPostOperator.st,
+                false);
         }
     
     |   ^(binaryOperator left=expression right=expression)
         {
-            String migrationFunction = controller.getMigrationFunction(currentBindings, $binaryOperator.start);
-            if(migrationFunction == null){
-                retval.st = %binaryOperator(
-                    operator={$binaryOperator.st}, 
-                    left={$left.st}, 
-                    right={$right.st},
-                    needParentheses={$binaryOperator.needParentheses});
-            }else{
-                List<StringTemplate> parameters = new ArrayList<>();
-                parameters.add($left.st);
-                parameters.add($right.st);
-                retval.st = %functionCall(identifier={migrationFunction}, parameters={parameters});
-            }
+            FunctionApplicationDto dto = controller.getOperatorApplication(currentBindings, $binaryOperator.start);
+            List<Object> arguments = new ArrayList<>();
+            arguments.add($left.st);
+            arguments.add($right.st);
+            retval.st = getFunctionApplication(
+                dto, 
+                arguments,
+                $binaryOperator.start, 
+                $binaryOperator.start, 
+                operatorErrorMessageCaller,
+                "binaryOperator",
+                $binaryOperator.st,
+                $binaryOperator.needParentheses);
         }
 
     |   ^(QuestionMark cond=expression ifCase=expression elseCase=expression)
@@ -843,14 +920,19 @@ newOperator
 functionCall
     :   ^(FUNCTION_CALL identifier=TYPE_NAME actualParameters)
         {
-            String overloadName = controller.getOverloadName(currentBindings, $FUNCTION_CALL, $identifier);
+            FunctionApplicationDto dto = controller.getFunctionApplication(currentBindings, $FUNCTION_CALL, $identifier);
+            retval.st = getFunctionApplication(
+                dto, 
+                $actualParameters.parameters,
+                $FUNCTION_CALL, 
+                $identifier, 
+                functionErrorMessageCaller);
         }
-        -> functionCall(identifier={overloadName}, parameters={$actualParameters.parameters})
     ;
 
 actualParameters returns[List<Object> parameters]
     :   ^(ACTUAL_PARAMETERS params+=expression*) {$parameters=$params;}
-    ;   
+    ;
 
 //TODO rstoll TINS-271 - translator OOP - expressions 
 /*
