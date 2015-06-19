@@ -107,12 +107,12 @@ keyValue(key, value) ::= <<
 
 operator(o) ::= "<o>"
 
-unaryPreOperator(operator, expression) ::= <<
-<operator><expression>
+unaryPreOperator(operator, arguments) ::= <<
+<operator><firt(arguments)>
 >>
 
-unaryPostOperator(operator, expression) ::= <<
-<expression><operator>
+unaryPostOperator(operator, arguments) ::= <<
+<expression><firt(arguments)>
 >>
 
 binaryOperator(operator, left, right, needParentheses) ::= <<
@@ -137,6 +137,10 @@ functionCall(identifier, arguments) ::= <<
 
 runtimeCheck(expression, type, needParentheses) ::= <<
 <if(needParentheses)>(<endif>(<type>) (<expression>)<if(needParentheses)>)<endif>
+>>
+
+conversion(expression, targetType, ifTypes, needParentheses) ::= <<
+<if(needParentheses)>(<endif><expression> as <targetType><if(ifTypes)> if <ifTypes; separator=", "><endif><if(needParentheses)>)<endif>
 >>
 
 arrayAccess(expression, identifier) ::= <<

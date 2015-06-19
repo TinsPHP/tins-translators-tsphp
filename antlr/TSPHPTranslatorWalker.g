@@ -43,6 +43,7 @@ import ch.tsphp.tinsphp.common.translation.dtos.VariableDto;
 import ch.tsphp.tinsphp.translators.tsphp.antlrmod.IErrorMessageCaller;
 import ch.tsphp.tinsphp.translators.tsphp.antlrmod.FunctionErrorMessageCaller;
 import ch.tsphp.tinsphp.translators.tsphp.antlrmod.OperatorErrorMessageCaller;
+import ch.tsphp.tinsphp.common.utils.Pair;
 
 import java.util.Map;
 import java.util.Set;
@@ -97,60 +98,117 @@ private StringTemplate getType(VariableDto dto) {
 }
 
 private StringTemplate getFunctionApplication(
-        FunctionApplicationDto dto, 
-        List<Object> arguments, 
-        ITSPHPAst functionCall, 
-        ITSPHPAst identifier, 
-        IErrorMessageCaller errorMessageCaller) {
+        FunctionApplicationDto dto,
+        List<Object> arguments,
+        ITSPHPAst functionCall,
+        ITSPHPAst identifier,
+        IErrorMessageCaller errorMessageCaller){
+
+    StringTemplate stringTemplate;
         
-        return getFunctionApplication(
-                    dto, arguments, functionCall, identifier, errorMessageCaller, null, null, false);
+    if (dto != null) {
+    
+        Map<Integer, Pair<String, List<String>>> conversions = dto.conversions;
+        if(conversions == null) {
+            conversions = new HashMap<>(0);
+        }
+
+        Map<Integer, String> runtimeChecks = dto.runtimeChecks;
+        if(runtimeChecks == null){
+            runtimeChecks = new HashMap<>(0);
+        }    
+    
+        int numberOfArguments = arguments.size();
+        for(int i = 0; i < numberOfArguments; ++i){
+            Object argument = arguments.get(i);
+            if(conversions.containsKey(i)){
+                Pair<String, List<String>> conversion = conversions.get(i);
+                argument = %conversion(expression={argument}, targetType={conversion.first}, ifTypes={conversion.second}, needParentheses={false});
+            } else if(runtimeChecks.containsKey(i)) {
+                argument = %runtimeCheck(expression={argument}, type={runtimeChecks.get(i)}, needParentheses={false});
+            }
+            arguments.set(i, argument);
+        }
+        stringTemplate = %functionCall(identifier={dto.name}, arguments={arguments});
+    } else {
+        stringTemplate = getErrorMessage(functionCall, identifier, errorMessageCaller);
+    }
+    return stringTemplate;
 }
 
-private StringTemplate getFunctionApplication(
-        FunctionApplicationDto dto, 
-        List<Object> arguments, 
-        ITSPHPAst functionCall, 
-        ITSPHPAst identifier, 
-        IErrorMessageCaller errorMessageCaller, 
+private StringTemplate getOperatorOrFunctionApplication(
+        FunctionApplicationDto dto,
+        List<Pair<String, Object>> arguments,
+        ITSPHPAst operatorAst,
         String operatorFunction,
         StringTemplate operator,
-        boolean needParentheses) {   
-             
+        boolean needParentheses) {
+
     StringTemplate stringTemplate;
     if (dto != null) {
-        if (dto.runtimeChecks != null) {
-            for(Map.Entry<Integer, String> entry : dto.runtimeChecks.entrySet()){
-                int index = entry.getKey();
-                StringTemplate check =  %runtimeCheck(expression={arguments.get(index)}, type={entry.getValue()}, needParentheses={false});
-                arguments.set(index, check);
-            }
-        }
+        int numberOfArguments = arguments.size();
         if (dto.name != null) {
-            stringTemplate = %functionCall(identifier={dto.name}, arguments={arguments});
-        } else {
-            STAttrMap map = new STAttrMap().put("operator", operator);
-            if(arguments.size() == 1){
-                map.put("expression", arguments.get(0));
-            }else if(arguments.size() == 2){
-                map.put("left", arguments.get(0))
-                   .put("right", arguments.get(1))
-                   .put("needParentheses", needParentheses);
+            List<Object> functionArguments = new ArrayList<>(numberOfArguments);
+            for(int i = 0; i < numberOfArguments; ++i){
+                functionArguments.add(arguments.get(i).second);
             }
-            stringTemplate = templateLib.getInstanceOf(operatorFunction, map);
+            stringTemplate = getFunctionApplication(dto, functionArguments, operatorAst, operatorAst, operatorErrorMessageCaller);
+        } else {
+            stringTemplate = getOperatorApplication(dto, arguments, operatorFunction, operator, needParentheses);
         }
         if (dto.returnRuntimeCheck != null) {
             stringTemplate = %runtimeCheck(expression={stringTemplate}, type={dto.returnRuntimeCheck}, needParentheses={false});
         }
     } else {
-        String functionName = "\\trigger_error";
-        arguments = new ArrayList<>(2);
-        String errMessage = errorMessageCaller.getErrMessage(currentBindings, functionCall, identifier);
-        arguments.add(errMessage);
-        arguments.add("\\E_USER_ERROR");
-        stringTemplate = %functionCall(identifier={functionName}, arguments={arguments});
+        stringTemplate = getErrorMessage(operatorAst, operatorAst, operatorErrorMessageCaller);
     }
 
+    return stringTemplate;
+}
+
+private StringTemplate getOperatorApplication(
+        FunctionApplicationDto dto,
+        List<Pair<String, Object>> arguments,
+        String operatorFunction,
+        StringTemplate operator,
+        boolean needParentheses) {
+            
+    Map<Integer, Pair<String, List<String>>> conversions = dto.conversions;
+    if(conversions == null) {
+        conversions = new HashMap<>(0);
+    }
+    
+    Map<Integer, String> runtimeChecks = dto.runtimeChecks;
+    if(runtimeChecks == null){
+        runtimeChecks = new HashMap<>(0);
+    }
+
+    int numberOfArguments = arguments.size();
+    STAttrMap map = new STAttrMap().put("operator", operator).put("needParentheses", needParentheses);
+    for(int i = 0; i < numberOfArguments; ++i){
+        Pair<String, Object> pair = arguments.get(i);
+        Object argument = pair.second;
+        if(conversions.containsKey(i)){
+            Pair<String, List<String>> conversion = conversions.get(i);
+            argument = %conversion(expression={argument}, targetType={conversion.first}, ifTypes={conversion.second}, needParentheses={false});
+        } else if(runtimeChecks.containsKey(i)) {
+            argument = %runtimeCheck(expression={argument}, type={runtimeChecks.get(i)}, needParentheses={false});
+        }
+        map.put(pair.first, argument);
+    }
+    return templateLib.getInstanceOf(operatorFunction, map);
+}
+
+private StringTemplate getErrorMessage(
+        ITSPHPAst functionCall, ITSPHPAst identifier, IErrorMessageCaller errorMessageCaller) {
+        
+    StringTemplate stringTemplate;
+    String functionName = "\\trigger_error";
+    List<String> functionArguments = new ArrayList<>(2);
+    String errMessage = errorMessageCaller.getErrMessage(currentBindings, functionCall, identifier);
+    functionArguments.add(errMessage);
+    functionArguments.add("\\E_USER_ERROR");
+    stringTemplate = %functionCall(identifier={functionName}, arguments={functionArguments});
     return stringTemplate;
 }
 
@@ -601,18 +659,44 @@ instruction
     |   ^('return' expression)          -> return(expression = {$expression.st})
     |   'return'                        -> return(expression = {"null"})
     |   ^('throw' expression)           -> throw(expression = {$expression.st})
-    |   ^('echo' exprs+=expression+)    -> echo(expressions = {$exprs})
+    |   ^(Echo exprs+=expression+)
+        {
+            FunctionApplicationDto dto = controller.getOperatorApplication(currentBindings, $Echo);
+            List<Pair<String, Object>> arguments = new ArrayList<>(2);
+            arguments.add(new Pair<String, Object>("expressions", $exprs));
+            $st = getOperatorOrFunctionApplication(
+                dto, 
+                arguments,
+                $Echo,
+                "echo",
+                null,
+                false);        
+        }         
+    
     |   ^('break' index=Int?)           -> break(index={$index.text})
     |   ^('continue' index=Int?)        -> continue(index={$index.text})
     ;
 
 ifCondition
-    :   ^('if'
+    :   ^(If
             expression 
             ifBlock=blockConditional
             elseBlock=blockConditional?
         )
-        -> if(condition={$expression.st}, ifBlock={$ifBlock.instructions}, elseBlock={$elseBlock.instructions})
+        {
+            FunctionApplicationDto dto = controller.getOperatorApplication(currentBindings, $If);
+            List<Pair<String, Object>> arguments = new ArrayList<>(2);
+            arguments.add(new Pair<String, Object>("condition", $expression.st));
+            arguments.add(new Pair<String, Object>("ifBlock", $ifBlock.instructions));
+            arguments.add(new Pair<String, Object>("elseBlock", $elseBlock.instructions));
+            $st = getOperatorOrFunctionApplication(
+                dto, 
+                arguments,
+                $If,
+                "if",
+                null,
+                false);
+        }
     ;
 
 blockConditional returns[List<Object> instructions]
@@ -620,8 +704,20 @@ blockConditional returns[List<Object> instructions]
     ;
     
 switchCondition
-    :   ^('switch' expression content+=switchContent*) 
-        -> switch(condition={$expression.st}, content={$content})
+    :   ^(Switch expression content+=switchContent*) 
+        {
+            FunctionApplicationDto dto = controller.getOperatorApplication(currentBindings, $Switch);
+            List<Pair<String, Object>> arguments = new ArrayList<>(2);
+            arguments.add(new Pair<String, Object>("condition", $expression.st));
+            arguments.add(new Pair<String, Object>("content", $content));
+            $st = getOperatorOrFunctionApplication(
+                dto, 
+                arguments,
+                $Switch,
+                "switch",
+                null,
+                false);
+        }
     ;
 
 switchContent
@@ -709,7 +805,20 @@ expression
     //|   methodCallStatic           -> {$methodCallStatic.st}
     //|   classStaticAccess          -> {$classStaticAccess.st}
     |   postFixExpression          -> {$postFixExpression.st}
-    |   ^('exit' ex=expression?)   -> exit(expression={$ex.st})
+    |   ^(Exit expr=expression?)
+        {
+            FunctionApplicationDto dto = controller.getOperatorApplication(currentBindings, $Exit);
+            List<Pair<String, Object>> arguments = new ArrayList<>(2);
+            arguments.add(new Pair<String, Object>("expression", $expr.st));
+            $st = getOperatorOrFunctionApplication(
+                dto, 
+                arguments,
+                $Exit,
+                "exit",
+                null,
+                false);
+        }     
+    
     ;
   
 atom
@@ -755,14 +864,12 @@ operator
     :   ^(unaryPreOperator expr=expression)
         {
             FunctionApplicationDto dto = controller.getOperatorApplication(currentBindings, $unaryPreOperator.start);
-            List<Object> arguments = new ArrayList<>();
-            arguments.add($expr.st);
-            retval.st = getFunctionApplication(
+            List<Pair<String, Object>> arguments = new ArrayList<>(1);
+            arguments.add(new Pair<String, Object>("expression",$expr.st));
+            $st = getOperatorOrFunctionApplication(
                 dto, 
                 arguments,
                 $unaryPreOperator.start, 
-                $unaryPreOperator.start, 
-                operatorErrorMessageCaller,
                 "unaryPreOperator",
                 $unaryPreOperator.st,
                 false);
@@ -771,14 +878,12 @@ operator
     |   ^(unaryPostOperator expr=expression)
         {
             FunctionApplicationDto dto = controller.getOperatorApplication(currentBindings, $unaryPostOperator.start);
-            List<Object> arguments = new ArrayList<>();
-            arguments.add($expr.st);
-            retval.st = getFunctionApplication(
+            List<Pair<String, Object>> arguments = new ArrayList<>(1);
+            arguments.add(new Pair<String, Object>("expression",$expr.st));
+            $st = getOperatorOrFunctionApplication(
                 dto, 
                 arguments,
                 $unaryPostOperator.start, 
-                $unaryPostOperator.start, 
-                operatorErrorMessageCaller,
                 "unaryPostOperator",
                 $unaryPostOperator.st,
                 false);
@@ -787,28 +892,33 @@ operator
     |   ^(binaryOperator left=expression right=expression)
         {
             FunctionApplicationDto dto = controller.getOperatorApplication(currentBindings, $binaryOperator.start);
-            List<Object> arguments = new ArrayList<>();
-            arguments.add($left.st);
-            arguments.add($right.st);
-            retval.st = getFunctionApplication(
+            List<Pair<String, Object>> arguments = new ArrayList<>(2);
+            arguments.add(new Pair<String, Object>("left", $left.st));
+            arguments.add(new Pair<String, Object>("right", $right.st));
+            $st = getOperatorOrFunctionApplication(
                 dto, 
                 arguments,
                 $binaryOperator.start, 
-                $binaryOperator.start, 
-                operatorErrorMessageCaller,
                 "binaryOperator",
                 $binaryOperator.st,
                 $binaryOperator.needParentheses);
         }
 
     |   ^(QuestionMark cond=expression ifCase=expression elseCase=expression)
-        //ternary does not have a migration function
-        -> ternaryOperator(
-            cond={$cond.st},
-            ifCase={$ifCase.st},
-            elseCase={$elseCase.st},
-            needParentheses={controller.needParentheses($QuestionMark)}
-        )
+        {
+            FunctionApplicationDto dto = controller.getOperatorApplication(currentBindings, $QuestionMark);
+            List<Pair<String, Object>> arguments = new ArrayList<>(2);
+            arguments.add(new Pair<String, Object>("cond", $cond.st));
+            arguments.add(new Pair<String, Object>("ifCase", $ifCase.st));
+            arguments.add(new Pair<String, Object>("elseCase", $elseCase.st));
+            $st = getOperatorOrFunctionApplication(
+                dto, 
+                arguments,
+                $QuestionMark, 
+                "ternaryOperator",
+                null,
+                controller.needParentheses($QuestionMark));        
+        }
         
     //TODO rstoll TINS-276 conversions and casts
     /* 
@@ -816,13 +926,20 @@ operator
         -> {$castOperator.st}
     */
     |   ^(Instanceof expr=expression (type=TYPE_NAME|type=VariableId))
-        //instanceof does not have a migration function
-        -> instanceof(
-            expression={$expr.st},
-            type={$type.text},
-            needParentheses={controller.needParentheses($Instanceof)}
-        )
-
+        {
+            FunctionApplicationDto dto = controller.getOperatorApplication(currentBindings, $Instanceof);
+            List<Pair<String, Object>> arguments = new ArrayList<>(2);
+            arguments.add(new Pair<String, Object>("expression", $expr.st));
+            arguments.add(new Pair<String, Object>("type", $type.text));
+            $st = getOperatorOrFunctionApplication(
+                dto, 
+                arguments,
+                $Instanceof,
+                "instanceof",
+                null,
+                controller.needParentheses($Instanceof));        
+        }    
+           
     //TODO rstoll TINS-271 - translator OOP - expressions
     /* 
     |   newOperator
@@ -924,9 +1041,9 @@ functionCall
     :   ^(FUNCTION_CALL identifier=TYPE_NAME actualParameters)
         {
             FunctionApplicationDto dto = controller.getFunctionApplication(
-                currentBindings, $FUNCTION_CALL, $identifier, $actualParameters.start);
+                currentBindings, $FUNCTION_CALL, $identifier);
                 
-            retval.st = getFunctionApplication(
+            $st = getFunctionApplication(
                 dto, 
                 $actualParameters.parameters,
                 $FUNCTION_CALL, 

@@ -11,7 +11,10 @@ import ch.tsphp.common.symbols.ITypeSymbol;
 import ch.tsphp.tinsphp.common.gen.TokenTypes;
 import ch.tsphp.tinsphp.common.inference.constraints.IFunctionType;
 import ch.tsphp.tinsphp.common.inference.constraints.IOverloadBindings;
+import ch.tsphp.tinsphp.common.inference.constraints.IVariable;
 import ch.tsphp.tinsphp.common.inference.constraints.OverloadApplicationDto;
+import ch.tsphp.tinsphp.common.symbols.IConvertibleTypeSymbol;
+import ch.tsphp.tinsphp.common.symbols.IIntersectionTypeSymbol;
 import ch.tsphp.tinsphp.common.symbols.IUnionTypeSymbol;
 import ch.tsphp.tinsphp.common.symbols.PrimitiveTypeNames;
 import ch.tsphp.tinsphp.common.translation.dtos.FunctionApplicationDto;
@@ -21,7 +24,10 @@ import ch.tsphp.tinsphp.common.utils.Pair;
 import ch.tsphp.tinsphp.common.utils.TypeHelperDto;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import static ch.tsphp.tinsphp.common.utils.Pair.pair;
 
@@ -41,60 +47,123 @@ public class TSPHPOperatorHelper implements IOperatorHelper
 
     private void init() {
 
-        Map<String, Pair<String, ITypeSymbol>> map = new HashMap<>();
-        Pair<String, ITypeSymbol> pair =
-                pair("oldSchoolAddition", primitiveTypes.get(PrimitiveTypeNames.NUM));
-        map.put("{as (float | int)} x float -> float", pair);
-        map.put("float x {as (float | int)} -> float", pair);
-        map.put("{as T} x {as T} -> T \\ T <: (float | int)", pair);
-        migrationFunctions.put(TokenTypes.Plus, map);
-        dynamicFunctions.put(TokenTypes.Plus, pair);
 
-        map = new HashMap<>();
-        pair = pair("oldSchoolSubtraction", primitiveTypes.get(PrimitiveTypeNames.NUM));
-        map.put("{as (float | int)} x float -> float", pair);
-        map.put("float x {as (float | int)} -> float", pair);
-        map.put("{as T} x {as T} -> T \\ T <: (float | int)", pair);
-        migrationFunctions.put(TokenTypes.Minus, map);
-        dynamicFunctions.put(TokenTypes.Minus, pair);
+        int[] tokens = new int[]{TokenTypes.Plus, TokenTypes.Minus, TokenTypes.Multiply};
+        String[] migrationFunctionNames = new String[]{
+                "oldSchoolAddition", "oldSchoolSubtraction", "oldSchoolMultiplication"
+        };
 
-        map = new HashMap<>();
-        pair = pair("oldSchoolMultiplication", primitiveTypes.get(PrimitiveTypeNames.NUM));
-        map.put("{as (float | int)} x float -> float", pair);
-        map.put("float x {as (float | int)} -> float", pair);
-        map.put("{as T} x {as T} -> T \\ T <: (float | int)", pair);
-        migrationFunctions.put(TokenTypes.Multiply, map);
-        dynamicFunctions.put(TokenTypes.Multiply, pair);
+        for (int i = 0; i < tokens.length; ++i) {
+            int token = tokens[i];
+            Map<String, Pair<String, ITypeSymbol>> map = new HashMap<>();
+            Pair<String, ITypeSymbol> pair =
+                    pair(migrationFunctionNames[i], primitiveTypes.get(PrimitiveTypeNames.NUM));
+            map.put("{as (float | int)} x float -> float", pair);
+            map.put("float x {as (float | int)} -> float", pair);
+            map.put("{as T} x {as T} -> T \\ T <: (float | int)", pair);
+            migrationFunctions.put(token, map);
+            dynamicFunctions.put(token, pair);
+        }
+
+        tokens = new int[]{
+                TokenTypes.BitwiseOr, TokenTypes.BitwiseXor, TokenTypes.BitwiseAnd,
+                TokenTypes.ShiftLeft, TokenTypes.ShiftRight, TokenTypes.Modulo
+        };
+        migrationFunctionNames = new String[]{
+                "oldSchoolBitwiseOr", "oldSchoolBitwiseXor", "oldSchoolBitwiseAnd",
+                "oldSchoolShiftLeft", "oldSchoolShiftRight", "oldSchoolModulo"
+        };
+
+        for (int i = 0; i < tokens.length; ++i) {
+            int token = tokens[i];
+            Map<String, Pair<String, ITypeSymbol>> map = new HashMap<>();
+            Pair<String, ITypeSymbol> pair =
+                    pair(migrationFunctionNames[i], primitiveTypes.get(PrimitiveTypeNames.INT));
+            map.put("{as (float | int)} x {as (float | int)} -> int", pair);
+            migrationFunctions.put(token, map);
+            dynamicFunctions.put(token, pair);
+        }
     }
 
     @Override
     public void turnIntoMigrationFunctionIfRequired(
-            FunctionApplicationDto functionApplicationDto,
-            OverloadApplicationDto dto,
+            FunctionApplicationDto dto,
+            OverloadApplicationDto overloadApplicationDto,
             IOverloadBindings currentBindings,
             ITSPHPAst leftHandSide,
             ITSPHPAst arguments) {
 
         int operatorType = leftHandSide.getType();
 
-        IFunctionType overload = dto.overload;
+        IFunctionType overload = overloadApplicationDto.overload;
         if (overload != null) {
             if (migrationFunctions.containsKey(operatorType)) {
                 Map<String, Pair<String, ITypeSymbol>> overloads = migrationFunctions.get(operatorType);
                 String signature = overload.getSignature();
                 Pair<String, ITypeSymbol> pair = overloads.get(signature);
-                switchToMigrationFunction(functionApplicationDto, currentBindings, leftHandSide, pair);
+                switchToMigrationFunction(dto, currentBindings, leftHandSide, pair);
             }
 
-            if (functionApplicationDto.name != null
-                    && (functionApplicationDto.name.equals("oldSchoolAddition")
-                    || functionApplicationDto.name.equals("oldSchoolSubtraction")
-                    || functionApplicationDto.name.equals("oldSchoolMultiplication"))) {
-                handleOldSchoolFloatArithmetic(functionApplicationDto, dto, currentBindings, arguments);
+            if (dto.name != null) {
+                if (dto.name.equals("oldSchoolAddition")
+                        || dto.name.equals("oldSchoolSubtraction")
+                        || dto.name.equals("oldSchoolMultiplication")) {
+                    handleOldSchoolFloatArithmetic(dto, overloadApplicationDto, currentBindings, arguments);
+                }
+            } else if (overload.hasConvertibleParameterTypes()) {
+                handleConvertibleTypes(dto, overloadApplicationDto, currentBindings, arguments);
             }
         } else {
             Pair<String, ITypeSymbol> pair = dynamicFunctions.get(operatorType);
-            switchToMigrationFunction(functionApplicationDto, currentBindings, leftHandSide, pair);
+            switchToMigrationFunction(dto, currentBindings, leftHandSide, pair);
+        }
+    }
+
+    private void handleConvertibleTypes(
+            FunctionApplicationDto dto,
+            OverloadApplicationDto overloadApplicationDto,
+            IOverloadBindings currentBindings,
+            ITSPHPAst arguments) {
+
+        IOverloadBindings rightBindings = overloadApplicationDto.overload.getOverloadBindings();
+        dto.conversions = new HashMap<>();
+        List<IVariable> parameters = overloadApplicationDto.overload.getParameters();
+        int numberOfParameters = parameters.size();
+
+        Map<Integer, Pair<ITypeSymbol, List<ITypeSymbol>>> runtimeChecks = overloadApplicationDto.runtimeChecks;
+        if (runtimeChecks == null) {
+            runtimeChecks = new HashMap<>(0);
+        }
+
+        for (int i = 0; i < numberOfParameters; ++i) {
+            IVariable variable = parameters.get(i);
+            String typeVariable = rightBindings.getTypeVariable(variable.getAbsoluteName());
+            if (rightBindings.hasUpperTypeBounds(typeVariable)) {
+                IIntersectionTypeSymbol upperTypeBounds = rightBindings.getUpperTypeBounds(typeVariable);
+                ITypeSymbol next = upperTypeBounds.getTypeSymbols().values().iterator().next();
+                if (next instanceof IConvertibleTypeSymbol) {
+                    IConvertibleTypeSymbol convertibleTypeSymbol = (IConvertibleTypeSymbol) next;
+                    IIntersectionTypeSymbol targetType = convertibleTypeSymbol.getUpperTypeBounds();
+                    ITypeSymbol argumentType = getTypeSymbol(currentBindings, arguments.getChild(i));
+                    TypeHelperDto result = typeHelper.isFirstSameOrSubTypeOfSecond(argumentType, targetType);
+                    if (result.relation != ERelation.HAS_RELATION) {
+                        SortedSet<String> ifTypes = new TreeSet<>();
+                        if (runtimeChecks.containsKey(i)) {
+                            Pair<ITypeSymbol, List<ITypeSymbol>> pair = runtimeChecks.get(i);
+                            if (pair.second != null) {
+                                //runtime checks are covered in the as operator via if types
+                                dto.runtimeChecks.remove(i);
+                                for (ITypeSymbol typeSymbol : pair.second) {
+                                    ifTypes.add(typeSymbol.getAbsoluteName());
+                                }
+                            }
+                        }
+                        dto.conversions.put(i, pair(targetType.toString(), ifTypes));
+                    } else {
+                        //no conversion required since it is already a subtype
+                    }
+                }
+            }
         }
     }
 
@@ -120,20 +189,20 @@ public class TSPHPOperatorHelper implements IOperatorHelper
     }
 
     private void handleOldSchoolFloatArithmetic(
-            FunctionApplicationDto functionApplicationDto,
-            OverloadApplicationDto dto,
+            FunctionApplicationDto dto,
+            OverloadApplicationDto overloadApplicationDto,
             IOverloadBindings currentBindings,
             ITSPHPAst arguments) {
 
-        ITypeSymbol lhsTypeSymbol = getTypeSymbol(dto, 0, currentBindings, arguments.getChild(0));
-        ITypeSymbol rhsTypeSymbol = getTypeSymbol(dto, 1, currentBindings, arguments.getChild(1));
+        ITypeSymbol lhsTypeSymbol = getTypeSymbol(overloadApplicationDto, 0, currentBindings, arguments.getChild(0));
+        ITypeSymbol rhsTypeSymbol = getTypeSymbol(overloadApplicationDto, 1, currentBindings, arguments.getChild(1));
         String lhsAbsoluteName = lhsTypeSymbol.getAbsoluteName();
         String rhsAbsoluteName = rhsTypeSymbol.getAbsoluteName();
 
         //we can use the regular operator for float x int or int x float
         if (isFloatAndIntOrIntAndFloat(lhsAbsoluteName, rhsAbsoluteName)) {
-            functionApplicationDto.name = null;
-            functionApplicationDto.returnRuntimeCheck = null;
+            dto.name = null;
+            dto.returnRuntimeCheck = null;
         }
     }
 
@@ -150,12 +219,18 @@ public class TSPHPOperatorHelper implements IOperatorHelper
             typeSymbol = dto.runtimeChecks.get(index).first;
         }
         if (typeSymbol == null) {
-            String argumentId = ast.getSymbol().getAbsoluteName();
-            String typeVariable = currentBindings.getTypeVariable(argumentId);
-            typeSymbol = currentBindings.getLowerTypeBounds(typeVariable);
-            if (typeSymbol == null) {
-                typeSymbol = currentBindings.getUpperTypeBounds(typeVariable);
-            }
+            typeSymbol = getTypeSymbol(currentBindings, ast);
+        }
+        return typeSymbol;
+    }
+
+    private ITypeSymbol getTypeSymbol(IOverloadBindings currentBindings, ITSPHPAst ast) {
+        ITypeSymbol typeSymbol;
+        String argumentId = ast.getSymbol().getAbsoluteName();
+        String typeVariable = currentBindings.getTypeVariable(argumentId);
+        typeSymbol = currentBindings.getLowerTypeBounds(typeVariable);
+        if (typeSymbol == null) {
+            typeSymbol = currentBindings.getUpperTypeBounds(typeVariable);
         }
         return typeSymbol;
     }

@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 @RunWith(Parameterized.class)
@@ -69,11 +70,103 @@ public class MigrationFunctionTest extends ATranslatorInferenceTest
     public static Collection<Object[]> testStrings() {
         Collection<Object[]> collection = new ArrayDeque<>();
 
+        collection.addAll(getLogicOperator("or", true));
+        collection.addAll(getLogicOperator("xor", true));
+        collection.addAll(getLogicOperator("and", true));
+        collection.addAll(getLogicOperator("||", false));
+        collection.addAll(getLogicOperator("&&", false));
+
         collection.addAll(getArithmeticVariations("+", "oldSchoolAddition"));
         collection.addAll(getArithmeticVariations("-", "oldSchoolSubtraction"));
         collection.addAll(getArithmeticVariations("*", "oldSchoolMultiplication"));
 
+        collection.addAll(getIntVariations("|", "oldSchoolBitwiseOr"));
+        collection.addAll(getIntVariations("^", "oldSchoolBitwiseXor"));
+        collection.addAll(getIntVariations("&", "oldSchoolBitwiseAnd"));
+        collection.addAll(getIntVariations("<<", "oldSchoolShiftLeft"));
+        collection.addAll(getIntVariations(">>", "oldSchoolShiftRight"));
+
+        collection.addAll(Arrays.asList(new String[][]{
+                {"<?php echo 1;", "namespace{\n    echo 1 as string;\n}"},
+                {
+                        "<?php function foo6(Exception $x){ $x = 1; $x = 1.5; echo $x; return 1;}",
+                        "namespace{\n"
+                                + "\n"
+                                + "    function int foo6(Exception $x_0) {\n"
+                                + "        (Exception | float | int) $x = $x_0;\n"
+                                + "        $x = 1;\n"
+                                + "        $x = 1.5;\n"
+                                + "        echo $x as string if float, int;\n"
+                                + "        return 1;\n"
+                                + "    }\n"
+                                + "\n"
+                                + "}"
+                }
+        }));
+
         return collection;
+    }
+
+    private static Collection<? extends Object[]> getIntVariations(String op, String oldSchool) {
+        return Arrays.asList(new String[][]{
+                {"<?php $a = 1 " + op + " 1.2;", "namespace{\n    int $a;\n    $a = " + oldSchool + "(1, 1.2);\n}"},
+                {"<?php $a = 1.5 " + op + " 1;", "namespace{\n    int $a;\n    $a = " + oldSchool + "(1.5, 1);\n}"},
+                {
+                        "<?php $a = true " + op + " false;",
+                        "namespace{\n    int $a;\n    $a = " + oldSchool + "(true, false);\n}"
+                },
+                {
+                        "<?php $a = false " + op + " 1.6;",
+                        "namespace{\n    int $a;\n    $a = " + oldSchool + "(false, 1.6);\n}"
+                },
+        });
+    }
+
+    private static List<String[]> getLogicOperator(String op, boolean requiresParentheses) {
+        return Arrays.asList(new String[][]{
+                {
+                        "<?php $x = true; $x = false; $a = (1 " + op + " $x);",
+                        "namespace{"
+                                + "\n    (falseType | trueType) $a;"
+                                + "\n    (falseType | trueType) $x;"
+                                + "\n    $x = true;"
+                                + "\n    $x = false;"
+                                + "\n    $a = " + (requiresParentheses ? "(" : "")
+                                + "1 as (falseType | trueType) " + op + " $x" + (requiresParentheses ? ")" : "") + ";"
+                                + "\n}"
+                },
+                {
+                        "<?php $x = true; $x = false; $a = ($x " + op + " 1.2);",
+                        "namespace{"
+                                + "\n    (falseType | trueType) $a;"
+                                + "\n    (falseType | trueType) $x;"
+                                + "\n    $x = true;"
+                                + "\n    $x = false;"
+                                + "\n    $a = " + (requiresParentheses ? "(" : "")
+                                + "$x " + op + " 1.2 as (falseType | trueType)" + (requiresParentheses ? ")" : "") + ";"
+                                + "\n}"
+                },
+                {
+                        "<?php $a = (1 " + op + " 'a');",
+                        "namespace{"
+                                + "\n    (falseType | trueType) $a;"
+                                + "\n    $a = " + (requiresParentheses ? "(" : "")
+                                + "1 as (falseType | trueType) "
+                                + op + " 'a' as (falseType | trueType)" + (requiresParentheses ? ")" : "") + ";"
+                                + "\n}"
+                },
+                {
+                        "<?php $x = true; $x = false; $a = ($x " + op + " $x);",
+                        "namespace{"
+                                + "\n    (falseType | trueType) $a;"
+                                + "\n    (falseType | trueType) $x;"
+                                + "\n    $x = true;"
+                                + "\n    $x = false;"
+                                + "\n    $a = " + (requiresParentheses ? "(" : "")
+                                + "$x " + op + " $x" + (requiresParentheses ? ")" : "") + ";"
+                                + "\n}"
+                },
+        });
     }
 
     private static Collection<? extends Object[]> getArithmeticVariations(
