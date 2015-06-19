@@ -14,6 +14,7 @@ import ch.tsphp.common.TSPHPAstAdaptor;
 import ch.tsphp.tinsphp.common.IInferenceEngine;
 import ch.tsphp.tinsphp.common.IParser;
 import ch.tsphp.tinsphp.common.ITranslator;
+import ch.tsphp.tinsphp.common.config.ICoreInitialiser;
 import ch.tsphp.tinsphp.common.config.IInferenceEngineInitialiser;
 import ch.tsphp.tinsphp.common.config.IParserInitialiser;
 import ch.tsphp.tinsphp.common.config.ISymbolsInitialiser;
@@ -46,6 +47,7 @@ public class HardCodedTSPHPTranslatorInitialiserTest
 
         IAstHelper astHelper = new AstHelper(astAdaptor);
         ISymbolsInitialiser symbolsInitialiser = createSymbolsInitialiser();
+        ICoreInitialiser coreInitialiser = createCoreInitialiser(astHelper, symbolsInitialiser);
 
         IInferenceEngineInitialiser inferenceInitialiser = createInferenceInitialiser(
                 astAdaptor, astHelper, symbolsInitialiser);
@@ -57,7 +59,7 @@ public class HardCodedTSPHPTranslatorInitialiserTest
 
         //act
         ITranslatorInitialiser translatorInitialiser = createTranslatorInitialiser(
-                astAdaptor, inferenceInitialiser);
+                astAdaptor, symbolsInitialiser, coreInitialiser, inferenceInitialiser);
         ITranslator translator = translatorInitialiser.build();
         String output = translator.translate(commonTreeNodeStream);
 
@@ -66,11 +68,15 @@ public class HardCodedTSPHPTranslatorInitialiserTest
         assertThat(translator.hasFound(EnumSet.allOf(EIssueSeverity.class)), is(false));
     }
 
-    private ISymbolsInitialiser createSymbolsInitialiser() {
+    protected ICoreInitialiser createCoreInitialiser(IAstHelper astHelper, ISymbolsInitialiser symbolsInitialiser) {
+        return new HardCodedCoreInitialiser(astHelper, symbolsInitialiser);
+    }
+
+    protected ISymbolsInitialiser createSymbolsInitialiser() {
         return new HardCodedSymbolsInitialiser();
     }
 
-    private IInferenceEngineInitialiser createInferenceInitialiser(
+    protected IInferenceEngineInitialiser createInferenceInitialiser(
             ITSPHPAstAdaptor astAdaptor, IAstHelper astHelper, ISymbolsInitialiser symbolsInitialiser) {
         HardCodedCoreInitialiser coreInitialiser = new HardCodedCoreInitialiser(astHelper, symbolsInitialiser);
 
@@ -78,7 +84,11 @@ public class HardCodedTSPHPTranslatorInitialiserTest
     }
 
     protected ITranslatorInitialiser createTranslatorInitialiser(
-            ITSPHPAstAdaptor astAdaptor, IInferenceEngineInitialiser inferenceInitialiser) {
-        return new HardCodedTSPHPTranslatorInitialiser(astAdaptor, inferenceInitialiser);
+            ITSPHPAstAdaptor astAdaptor,
+            ISymbolsInitialiser symbolsInitialiser,
+            ICoreInitialiser coreInitialiser,
+            IInferenceEngineInitialiser inferenceInitialiser) {
+        return new HardCodedTSPHPTranslatorInitialiser(
+                astAdaptor, symbolsInitialiser, coreInitialiser, inferenceInitialiser);
     }
 }

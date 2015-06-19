@@ -923,7 +923,9 @@ newOperator
 functionCall
     :   ^(FUNCTION_CALL identifier=TYPE_NAME actualParameters)
         {
-            FunctionApplicationDto dto = controller.getFunctionApplication(currentBindings, $FUNCTION_CALL, $identifier);
+            FunctionApplicationDto dto = controller.getFunctionApplication(
+                currentBindings, $FUNCTION_CALL, $identifier, $actualParameters.start);
+                
             retval.st = getFunctionApplication(
                 dto, 
                 $actualParameters.parameters,

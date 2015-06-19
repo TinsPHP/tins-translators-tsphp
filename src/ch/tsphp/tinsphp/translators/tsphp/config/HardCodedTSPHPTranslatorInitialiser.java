@@ -15,16 +15,18 @@ package ch.tsphp.tinsphp.translators.tsphp.config;
 import ch.tsphp.common.ITSPHPAstAdaptor;
 import ch.tsphp.common.exceptions.TSPHPException;
 import ch.tsphp.tinsphp.common.ITranslator;
+import ch.tsphp.tinsphp.common.config.ICoreInitialiser;
 import ch.tsphp.tinsphp.common.config.IInferenceEngineInitialiser;
+import ch.tsphp.tinsphp.common.config.ISymbolsInitialiser;
 import ch.tsphp.tinsphp.common.config.ITranslatorInitialiser;
 import ch.tsphp.tinsphp.common.translation.IDtoCreator;
 import ch.tsphp.tinsphp.common.translation.ITranslatorController;
 import ch.tsphp.tinsphp.translators.tsphp.IOperatorHelper;
 import ch.tsphp.tinsphp.translators.tsphp.IPrecedenceHelper;
 import ch.tsphp.tinsphp.translators.tsphp.ITempVariableHelper;
-import ch.tsphp.tinsphp.translators.tsphp.OperatorHelper;
 import ch.tsphp.tinsphp.translators.tsphp.PrecedenceHelper;
 import ch.tsphp.tinsphp.translators.tsphp.TSPHPDtoCreator;
+import ch.tsphp.tinsphp.translators.tsphp.TSPHPOperatorHelper;
 import ch.tsphp.tinsphp.translators.tsphp.TSPHPTranslator;
 import ch.tsphp.tinsphp.translators.tsphp.TempVariableHelper;
 import ch.tsphp.tinsphp.translators.tsphp.TranslatorController;
@@ -49,12 +51,16 @@ public class HardCodedTSPHPTranslatorInitialiser implements ITranslatorInitialis
     private Exception loadingTemplateException;
 
     public HardCodedTSPHPTranslatorInitialiser(
-            ITSPHPAstAdaptor anAstAdaptor, IInferenceEngineInitialiser theInferenceEngineInitialiser) {
+            ITSPHPAstAdaptor anAstAdaptor,
+            ISymbolsInitialiser theSymbolsInitialiser,
+            ICoreInitialiser theCoreInitialiser,
+            IInferenceEngineInitialiser theInferenceEngineInitialiser) {
         inferenceEngineInitialiser = theInferenceEngineInitialiser;
 
         IPrecedenceHelper precedenceHelper = new PrecedenceHelper();
         ITempVariableHelper tempVariableHelper = new TempVariableHelper(anAstAdaptor);
-        IOperatorHelper operatorHelper = new OperatorHelper();
+        IOperatorHelper operatorHelper = new TSPHPOperatorHelper(
+                theSymbolsInitialiser.getTypeHelper(), theCoreInitialiser.getCore().getPrimitiveTypes());
         IDtoCreator dtoCreator = new TSPHPDtoCreator(tempVariableHelper);
         controller = new TranslatorController(
                 precedenceHelper,

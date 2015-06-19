@@ -106,8 +106,7 @@ public class TranslatorController implements ITranslatorController
             }
 
             Map<Integer, String> runtimeChecks = getRuntimeChecks(appliedOverload);
-            String returnRuntimeCheck = getReturnRuntimeCheck(runtimeChecks);
-            dto = new FunctionApplicationDto(name, runtimeChecks, returnRuntimeCheck);
+            dto = new FunctionApplicationDto(name, runtimeChecks, null);
         }
 
         return dto;
@@ -132,22 +131,12 @@ public class TranslatorController implements ITranslatorController
         String absoluteName = operator.getSymbol().getAbsoluteName();
         OverloadApplicationDto appliedOverload = bindings.getAppliedOverload(absoluteName);
         if (appliedOverload != null) {
-
-            String name = operatorHelper.getMigrationFunction(operator.getType(), appliedOverload.overload);
-            Map<Integer, String> runtimeChecks = getRuntimeChecks(appliedOverload);
-            String returnRuntimeCheck = getReturnRuntimeCheck(runtimeChecks);
-            dto = new FunctionApplicationDto(name, runtimeChecks, returnRuntimeCheck);
+            dto = new FunctionApplicationDto();
+            dto.runtimeChecks = getRuntimeChecks(appliedOverload);
+            operatorHelper.turnIntoMigrationFunctionIfRequired(dto, appliedOverload, bindings, operator, operator);
         }
 
         return dto;
-    }
-
-    private String getReturnRuntimeCheck(Map<Integer, String> runtimeChecks) {
-        String returnRuntimeCheck = null;
-        if (runtimeChecks != null) {
-            returnRuntimeCheck = runtimeChecks.remove(-1);
-        }
-        return returnRuntimeCheck;
     }
 
     @Override

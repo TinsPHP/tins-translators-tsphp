@@ -11,12 +11,13 @@ import ch.tsphp.tinsphp.common.inference.constraints.IOverloadBindings;
 import ch.tsphp.tinsphp.common.inference.constraints.OverloadApplicationDto;
 import ch.tsphp.tinsphp.common.translation.dtos.FunctionApplicationDto;
 
-public interface IOperatorHelper
+public class MetaOperatorHelper implements IOperatorHelper
 {
-    void turnIntoMigrationFunctionIfRequired(
-            FunctionApplicationDto functionApplicationDto,
-            OverloadApplicationDto dto,
-            IOverloadBindings currentBindings,
-            ITSPHPAst leftHandSide,
-            ITSPHPAst arguments);
+
+    @Override
+    public void turnIntoMigrationFunctionIfRequired(FunctionApplicationDto functionApplicationDto,
+            OverloadApplicationDto dto, IOverloadBindings currentBindings, ITSPHPAst leftHandSide,
+            ITSPHPAst arguments) {
+        //does not do anything
+    }
 }

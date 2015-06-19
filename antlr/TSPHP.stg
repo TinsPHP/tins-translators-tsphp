@@ -136,7 +136,7 @@ functionCall(identifier, arguments) ::= <<
 >>
 
 runtimeCheck(expression, type, needParentheses) ::= <<
-<if(needParentheses)>(<endif>(<type>) <expression><if(needParentheses)>)<endif>
+<if(needParentheses)>(<endif>(<type>) (<expression>)<if(needParentheses)>)<endif>
 >>
 
 arrayAccess(expression, identifier) ::= <<

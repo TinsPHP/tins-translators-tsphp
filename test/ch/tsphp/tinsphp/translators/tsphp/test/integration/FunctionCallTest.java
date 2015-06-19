@@ -288,7 +288,7 @@ public class FunctionCallTest extends ATranslatorInferenceTest
                                 + "    function (float | int) barA(array $x_0) {\n"
                                 + "        (array | {as (float | int)}) $x = $x_0;\n"
                                 + "        $x = 1;\n"
-                                + "        return ((float | int)) fooA(({as (float | int)}) $x);\n"
+                                + "        return fooA(({as (float | int)}) ($x));\n"
                                 + "    }\n"
                                 + "\n"
                                 + "    $i = fooA1(1);\n"
