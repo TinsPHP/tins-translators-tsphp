@@ -29,8 +29,6 @@ options {
 package ch.tsphp.tinsphp.translators.tsphp.antlr;
 
 import ch.tsphp.common.ITSPHPAst;
-import ch.tsphp.common.symbols.ISymbol;
-import ch.tsphp.common.symbols.ITypeSymbol;
 import ch.tsphp.tinsphp.common.inference.constraints.IOverloadBindings;
 import ch.tsphp.tinsphp.common.scopes.IGlobalNamespaceScope;
 import ch.tsphp.tinsphp.common.symbols.IArrayTypeSymbol;
@@ -46,9 +44,8 @@ import ch.tsphp.tinsphp.translators.tsphp.antlrmod.OperatorErrorMessageCaller;
 import ch.tsphp.tinsphp.common.utils.Pair;
 
 import java.util.Map;
-import java.util.Set;
-import java.util.HashSet;
 import java.util.Collection;
+import java.util.SortedSet;
 
 }
 
@@ -108,7 +105,7 @@ private StringTemplate getFunctionApplication(
         
     if (dto != null) {
     
-        Map<Integer, Pair<String, List<String>>> conversions = dto.conversions;
+        Map<Integer, Pair<String, SortedSet<String>>> conversions = dto.conversions;
         if(conversions == null) {
             conversions = new HashMap<>(0);
         }
@@ -122,7 +119,7 @@ private StringTemplate getFunctionApplication(
         for(int i = 0; i < numberOfArguments; ++i){
             Object argument = arguments.get(i);
             if(conversions.containsKey(i)){
-                Pair<String, List<String>> conversion = conversions.get(i);
+                Pair<String, SortedSet<String>> conversion = conversions.get(i);
                 argument = %conversion(expression={argument}, targetType={conversion.first}, ifTypes={conversion.second}, needParentheses={false});
             } else if(runtimeChecks.containsKey(i)) {
                 argument = %runtimeCheck(expression={argument}, type={runtimeChecks.get(i)}, needParentheses={false});
@@ -173,7 +170,7 @@ private StringTemplate getOperatorApplication(
         StringTemplate operator,
         boolean needParentheses) {
             
-    Map<Integer, Pair<String, List<String>>> conversions = dto.conversions;
+    Map<Integer, Pair<String, SortedSet<String>>> conversions = dto.conversions;
     if(conversions == null) {
         conversions = new HashMap<>(0);
     }
@@ -189,7 +186,7 @@ private StringTemplate getOperatorApplication(
         Pair<String, Object> pair = arguments.get(i);
         Object argument = pair.second;
         if(conversions.containsKey(i)){
-            Pair<String, List<String>> conversion = conversions.get(i);
+            Pair<String, SortedSet<String>> conversion = conversions.get(i);
             argument = %conversion(expression={argument}, targetType={conversion.first}, ifTypes={conversion.second}, needParentheses={false});
         } else if(runtimeChecks.containsKey(i)) {
             argument = %runtimeCheck(expression={argument}, type={runtimeChecks.get(i)}, needParentheses={false});
@@ -683,20 +680,7 @@ ifCondition
             ifBlock=blockConditional
             elseBlock=blockConditional?
         )
-        {
-            FunctionApplicationDto dto = controller.getOperatorApplication(currentBindings, $If);
-            List<Pair<String, Object>> arguments = new ArrayList<>(2);
-            arguments.add(new Pair<String, Object>("condition", $expression.st));
-            arguments.add(new Pair<String, Object>("ifBlock", $ifBlock.instructions));
-            arguments.add(new Pair<String, Object>("elseBlock", $elseBlock.instructions));
-            $st = getOperatorOrFunctionApplication(
-                dto, 
-                arguments,
-                $If,
-                "if",
-                null,
-                false);
-        }
+        -> if(condition={$expression.st}, ifBlock={$ifBlock.instructions}, elseBlock={$elseBlock.instructions})
     ;
 
 blockConditional returns[List<Object> instructions]
@@ -705,19 +689,7 @@ blockConditional returns[List<Object> instructions]
     
 switchCondition
     :   ^(Switch expression content+=switchContent*) 
-        {
-            FunctionApplicationDto dto = controller.getOperatorApplication(currentBindings, $Switch);
-            List<Pair<String, Object>> arguments = new ArrayList<>(2);
-            arguments.add(new Pair<String, Object>("condition", $expression.st));
-            arguments.add(new Pair<String, Object>("content", $content));
-            $st = getOperatorOrFunctionApplication(
-                dto, 
-                arguments,
-                $Switch,
-                "switch",
-                null,
-                false);
-        }
+        -> switch(condition={$expression.st}, content={$content})
     ;
 
 switchContent
@@ -805,20 +777,7 @@ expression
     //|   methodCallStatic           -> {$methodCallStatic.st}
     //|   classStaticAccess          -> {$classStaticAccess.st}
     |   postFixExpression          -> {$postFixExpression.st}
-    |   ^(Exit expr=expression?)
-        {
-            FunctionApplicationDto dto = controller.getOperatorApplication(currentBindings, $Exit);
-            List<Pair<String, Object>> arguments = new ArrayList<>(2);
-            arguments.add(new Pair<String, Object>("expression", $expr.st));
-            $st = getOperatorOrFunctionApplication(
-                dto, 
-                arguments,
-                $Exit,
-                "exit",
-                null,
-                false);
-        }     
-    
+    |   ^('exit' ex=expression?)   -> exit(expression={$ex.st})
     ;
   
 atom

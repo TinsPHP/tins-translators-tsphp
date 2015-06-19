@@ -107,12 +107,12 @@ keyValue(key, value) ::= <<
 
 operator(o) ::= "<o>"
 
-unaryPreOperator(operator, arguments) ::= <<
-<operator><firt(arguments)>
+unaryPreOperator(operator, expression) ::= <<
+<operator><expression>
 >>
 
 unaryPostOperator(operator, arguments) ::= <<
-<expression><firt(arguments)>
+<expression><operator>
 >>
 
 binaryOperator(operator, left, right, needParentheses) ::= <<

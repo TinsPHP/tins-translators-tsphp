@@ -88,6 +88,7 @@ public class MigrationFunctionTest extends ATranslatorInferenceTest
 
         collection.addAll(Arrays.asList(new String[][]{
                 {"<?php echo 1;", "namespace{\n    echo 1 as string;\n}"},
+                {"<?php echo true;", "namespace{\n    echo true as string;\n}"},
                 {
                         "<?php function foo6(Exception $x){ $x = 1; $x = 1.5; echo $x; return 1;}",
                         "namespace{\n"
