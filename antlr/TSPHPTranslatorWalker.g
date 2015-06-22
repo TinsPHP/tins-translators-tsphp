@@ -104,27 +104,28 @@ private StringTemplate getFunctionApplication(
     StringTemplate stringTemplate;
         
     if (dto != null) {
-    
-        Map<Integer, Pair<String, SortedSet<String>>> conversions = dto.conversions;
-        if(conversions == null) {
-            conversions = new HashMap<>(0);
-        }
-
-        Map<Integer, String> runtimeChecks = dto.runtimeChecks;
-        if(runtimeChecks == null){
-            runtimeChecks = new HashMap<>(0);
-        }    
-    
-        int numberOfArguments = arguments.size();
-        for(int i = 0; i < numberOfArguments; ++i){
-            Object argument = arguments.get(i);
-            if(conversions.containsKey(i)){
-                Pair<String, SortedSet<String>> conversion = conversions.get(i);
-                argument = %conversion(expression={argument}, targetType={conversion.first}, ifTypes={conversion.second}, needParentheses={false});
-            } else if(runtimeChecks.containsKey(i)) {
-                argument = %runtimeCheck(expression={argument}, type={runtimeChecks.get(i)}, needParentheses={false});
+        if(arguments != null){
+            Map<Integer, Pair<String, SortedSet<String>>> conversions = dto.conversions;
+            if(conversions == null) {
+                conversions = new HashMap<>(0);
             }
-            arguments.set(i, argument);
+
+            Map<Integer, String> runtimeChecks = dto.runtimeChecks;
+            if(runtimeChecks == null){
+                runtimeChecks = new HashMap<>(0);
+            }
+
+            int numberOfArguments = arguments.size();
+            for(int i = 0; i < numberOfArguments; ++i){
+                Object argument = arguments.get(i);
+                if(conversions.containsKey(i)){
+                    Pair<String, SortedSet<String>> conversion = conversions.get(i);
+                    argument = %conversion(expression={argument}, targetType={conversion.first}, ifTypes={conversion.second}, needParentheses={false});
+                } else if(runtimeChecks.containsKey(i)) {
+                    argument = %runtimeCheck(expression={argument}, type={runtimeChecks.get(i)}, needParentheses={false});
+                }
+                arguments.set(i, argument);
+            }
         }
         stringTemplate = %functionCall(identifier={dto.name}, arguments={arguments});
     } else {
@@ -143,6 +144,7 @@ private StringTemplate getOperatorOrFunctionApplication(
 
     StringTemplate stringTemplate;
     if (dto != null) {
+        //there is no operator without arguments, therefore the check is not necessary
         int numberOfArguments = arguments.size();
         if (dto.name != null) {
             List<Object> functionArguments = new ArrayList<>(numberOfArguments);
