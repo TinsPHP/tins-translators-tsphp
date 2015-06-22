@@ -264,6 +264,28 @@ public class MigrationFunctionTest extends ATranslatorInferenceTest
                                 + "\n"
                                 + "}"
                 },
+                {
+                        "<?php function foo6($x, $y){ return $x + $y;}",
+                        "namespace{\n"
+                                + "\n"
+                                + "    function array foo60(array $x, array $y) {\n"
+                                + "        return $x + $y;\n"
+                                + "    }\n"
+                                + "\n"
+                                + "    function float foo61(float $x, float $y) {\n"
+                                + "        return $x + $y;\n"
+                                + "    }\n"
+                                + "\n"
+                                + "    function int foo62(int $x, int $y) {\n"
+                                + "        return $x + $y;\n"
+                                + "    }\n"
+                                + "\n"
+                                + "    function T foo63<T>({as T} $x, {as T} $y) where [T < (float | int)] {\n"
+                                + "        return (T) (oldSchoolAddition($x, $y));\n"
+                                + "    }\n"
+                                + "\n"
+                                + "}"
+                },
         });
     }
 }
