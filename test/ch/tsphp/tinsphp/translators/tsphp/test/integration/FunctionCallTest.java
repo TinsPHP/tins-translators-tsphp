@@ -244,6 +244,18 @@ public class FunctionCallTest extends ATranslatorInferenceTest
                                 + "    $i = fooA0(1);\n"
                                 + "    $j = barA([1, 2]);\n"
                                 + "}"
+                },
+                {"<?php function foo(){return 1;} $a = foo();",
+                        "namespace{"
+                                + "\n    int $a;"
+                                + "\n"
+                                + "\n    function int foo(){"
+                                + "\n      return 1;"
+                                + "\n    }"
+                                + "\n"
+                                + "\n    $a = foo();"
+                                + "\n}"
+
                 }
         }));
 
