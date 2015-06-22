@@ -256,14 +256,10 @@ public class MigrationFunctionTest extends ATranslatorInferenceTest
                         "<?php function foo5(array $x){ $x = 1.2; return $x " + op + " '1';}",
                         "namespace{\n"
                                 + "\n"
-                                //TODO TINS-537 most specific overload in soft typing
-                                //+ "    function float foo5(array $x_0) {\n"
-                                + "    function (float | int) foo5(array $x_0) {\n"
+                                + "    function float foo5(array $x_0) {\n"
                                 + "        (array | float) $x = $x_0;\n"
                                 + "        $x = 1.2;\n"
-                                //TODO TINS-537 most specific overload in soft typing
-                                //+ "        return (float) (oldSchoolAddition((float) ($x), '1'));\n"
-                                + "        return " + oldSchool + "((float) ($x), '1');\n"
+                                + "        return (float) (" + oldSchool + "((float) ($x), '1'));\n"
                                 + "    }\n"
                                 + "\n"
                                 + "}"

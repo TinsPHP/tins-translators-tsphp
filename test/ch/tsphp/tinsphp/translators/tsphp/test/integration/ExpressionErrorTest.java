@@ -55,8 +55,6 @@ public class ExpressionErrorTest extends ATranslatorInferenceTest
                                 + "Existing overloads:\\n"
                                 + "int x int -> int\\n"
                                 + "float x float -> float\\n"
-                                + "float x {as (float | int)} -> float\\n"
-                                + "{as (float | int)} x float -> float\\n"
                                 + "{as T} x {as T} -> T \\ T <: (float | int)\\n"
                                 + "array x array -> array', \\E_USER_ERROR);\n"
                                 + "    }\n"
