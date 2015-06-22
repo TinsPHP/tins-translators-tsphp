@@ -58,8 +58,6 @@ public class TSPHPOperatorHelper implements IOperatorHelper
             Map<String, Pair<String, ITypeSymbol>> map = new HashMap<>();
             Pair<String, ITypeSymbol> pair =
                     pair(migrationFunctionNames[i], primitiveTypes.get(PrimitiveTypeNames.NUM));
-            map.put("{as (float | int)} x float -> float", pair);
-            map.put("float x {as (float | int)} -> float", pair);
             map.put("{as T} x {as T} -> T \\ T <: (float | int)", pair);
             migrationFunctions.put(token, map);
             dynamicFunctions.put(token, pair);
@@ -104,15 +102,10 @@ public class TSPHPOperatorHelper implements IOperatorHelper
                 switchToMigrationFunction(dto, currentBindings, leftHandSide, pair);
             }
 
-            if (dto.name != null) {
-                if (dto.name.equals("oldSchoolAddition")
-                        || dto.name.equals("oldSchoolSubtraction")
-                        || dto.name.equals("oldSchoolMultiplication")) {
-                    handleOldSchoolFloatArithmetic(dto, overloadApplicationDto, currentBindings, arguments);
-                }
-            } else if (overload.hasConvertibleParameterTypes()) {
+            if (dto.name == null && overload.hasConvertibleParameterTypes()) {
                 handleConvertibleTypes(dto, overloadApplicationDto, currentBindings, arguments);
             }
+
         } else {
             Pair<String, ITypeSymbol> pair = dynamicFunctions.get(operatorType);
             switchToMigrationFunction(dto, currentBindings, leftHandSide, pair);
@@ -186,29 +179,6 @@ public class TSPHPOperatorHelper implements IOperatorHelper
                 functionApplicationDto.returnRuntimeCheck = lowerTypeBounds.getAbsoluteName();
             }
         }
-    }
-
-    private void handleOldSchoolFloatArithmetic(
-            FunctionApplicationDto dto,
-            OverloadApplicationDto overloadApplicationDto,
-            IOverloadBindings currentBindings,
-            ITSPHPAst arguments) {
-
-        ITypeSymbol lhsTypeSymbol = getTypeSymbol(overloadApplicationDto, 0, currentBindings, arguments.getChild(0));
-        ITypeSymbol rhsTypeSymbol = getTypeSymbol(overloadApplicationDto, 1, currentBindings, arguments.getChild(1));
-        String lhsAbsoluteName = lhsTypeSymbol.getAbsoluteName();
-        String rhsAbsoluteName = rhsTypeSymbol.getAbsoluteName();
-
-        //we can use the regular operator for float x int or int x float
-        if (isFloatAndIntOrIntAndFloat(lhsAbsoluteName, rhsAbsoluteName)) {
-            dto.name = null;
-            dto.returnRuntimeCheck = null;
-        }
-    }
-
-    private boolean isFloatAndIntOrIntAndFloat(String lhsAbsoluteName, String rhsAbsoluteName) {
-        return (lhsAbsoluteName.equals(PrimitiveTypeNames.INT) || lhsAbsoluteName.equals(PrimitiveTypeNames.FLOAT))
-                && (rhsAbsoluteName.equals(PrimitiveTypeNames.INT) || rhsAbsoluteName.equals(PrimitiveTypeNames.FLOAT));
     }
 
     private ITypeSymbol getTypeSymbol(
