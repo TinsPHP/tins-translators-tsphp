@@ -76,7 +76,7 @@ type(prefixModifiers, type, suffixModifiers) ::=<<
 >>
 
 typeParameter(lowerBounds, lowerMoreThanOne, typeVariable, upperBounds, upperMoreThanOne) ::=<<
-<if(lowerBounds)><if(lowerMoreThanOne)>(<endif><lowerBounds; separator=" | "><if(lowerMoreThanOne)>)<endif> \< <endif><typeVariable><if(upperBounds)> \< <if(upperMoreThanOne)>(<endif><upperBounds; separator=" & "><if(upperMoreThanOne)>)<endif><endif>
+<if(lowerBounds)><if(lowerMoreThanOne)>(<endif><lowerBounds; separator=" | "><if(lowerMoreThanOne)>)<endif> \<: <endif><typeVariable><if(upperBounds)> \<: <if(upperMoreThanOne)>(<endif><upperBounds; separator=" & "><if(upperMoreThanOne)>)<endif><endif>
 >>
 
 bound(bounds, moreThanOne, sep) ::=<<

@@ -280,7 +280,7 @@ public class MigrationFunctionTest extends ATranslatorInferenceTest
                                 + "        return $x + $y;\n"
                                 + "    }\n"
                                 + "\n"
-                                + "    function T foo63<T>({as T} $x, {as T} $y) where [T < (float | int)] {\n"
+                                + "    function T foo63<T>({as T} $x, {as T} $y) where [T <: (float | int)] {\n"
                                 + "        return (T) (oldSchoolAddition($x, $y));\n"
                                 + "    }\n"
                                 + "\n"
