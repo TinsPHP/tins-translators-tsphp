@@ -77,7 +77,7 @@ public class FunctionCallTest extends ATranslatorInferenceTest
                 {
                         "<?php function fac($n){ return $n > 0 ? $n * fac($n-1): 1;} $a = fac(6); $b = fac(5.4);",
                         "namespace{\n"
-                                + "    int $b;\n"
+                                + "    (float | int) $b;\n"
                                 + "    int $a;\n"
                                 + "\n"
                                 + "    function int fac0(int $n) {\n"
@@ -236,9 +236,9 @@ public class FunctionCallTest extends ATranslatorInferenceTest
                                 + "    }\n"
                                 + "\n"
                                 + "    function int barA(array $x_0) {\n"
-                                + "        (array | {as (float | int)}) $x = $x_0;\n"
+                                + "        (array | int) $x = $x_0;\n"
                                 + "        $x = 1;\n"
-                                + "        return fooA(({as (float | int)}) ($x));\n"
+                                + "        return fooA((int) ($x));\n"
                                 + "    }\n"
                                 + "\n"
                                 + "    $i = fooA0(1);\n"

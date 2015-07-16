@@ -205,27 +205,21 @@ public class FunctionDefinitionTest extends ATranslatorInferenceTest
                         "<?php function foo($x, $y){ return $x /= $y;}",
                         "namespace{\n"
                                 + "\n"
-                                + "    function (falseType | float | int) foo0("
-                                + "(falseType | float | int) $x, (float | int) $y) {\n"
+                                + "    function (falseType | float) foo0((falseType | float) $x, float $y) {\n"
                                 + "        return $x /= $y;\n"
                                 + "    }\n"
                                 + "\n"
-                                + "    function (falseType | float) foo1((falseType | float) $x, float $y) {\n"
+                                + "    function T foo1<T>(T $x, float $y) where [(falseType | float) < T < {as (float" +
+                                " | int)}] {\n"
                                 + "        return $x /= $y;\n"
                                 + "    }\n"
                                 + "\n"
-                                + "    function T foo2<T>(T $x, float $y) "
-                                + "where [(falseType | float) < T < {as (float | int)}] {\n"
+                                + "    function T foo2<T>(T $x, {as (float | int)} $y) where [(falseType | float | " +
+                                "int) < T < {as (float | int)}] {\n"
                                 + "        return $x /= $y;\n"
                                 + "    }\n"
                                 + "\n"
-                                + "    function T foo3<T>(T $x, {as (float | int)} $y) "
-                                + "where [(falseType | float | int) < T < {as (float | int)}] {\n"
-                                + "        return $x /= $y;\n"
-                                + "    }\n"
-                                + "\n"
-                                + "}" +
-                                ""
+                                + "}"
                 },
                 //TINS-479 local vars with multiple lower ref to params
                 {

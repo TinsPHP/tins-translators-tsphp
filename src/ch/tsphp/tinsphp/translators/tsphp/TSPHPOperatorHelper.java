@@ -78,7 +78,7 @@ public class TSPHPOperatorHelper implements IOperatorHelper
             Map<String, Pair<String, ITypeSymbol>> map = new HashMap<>();
             Pair<String, ITypeSymbol> pair =
                     pair(migrationFunctionNames[i], primitiveTypes.get(PrimitiveTypeNames.INT));
-            map.put("{as (float | int)} x {as (float | int)} -> int", pair);
+            map.put("(array | {as int}) x (array | {as int}) -> int", pair);
             migrationFunctions.put(token, map);
             dynamicFunctions.put(token, pair);
         }
@@ -100,7 +100,7 @@ public class TSPHPOperatorHelper implements IOperatorHelper
                 Map<String, Pair<String, ITypeSymbol>> overloads = migrationFunctions.get(operatorType);
                 String signature = overload.getSignature();
                 Pair<String, ITypeSymbol> pair = overloads.get(signature);
-                switchToMigrationFunction(dto, currentBindings, leftHandSide, pair);
+                switchToMigrationFunction(dto, currentBindings, leftHandSide, arguments, pair);
             }
 
             if (dto.name == null && overload.hasConvertibleParameterTypes()) {
@@ -109,7 +109,7 @@ public class TSPHPOperatorHelper implements IOperatorHelper
 
         } else {
             Pair<String, ITypeSymbol> pair = dynamicFunctions.get(operatorType);
-            switchToMigrationFunction(dto, currentBindings, leftHandSide, pair);
+            switchToMigrationFunction(dto, currentBindings, leftHandSide, arguments, pair);
         }
     }
 
@@ -165,25 +165,43 @@ public class TSPHPOperatorHelper implements IOperatorHelper
             FunctionApplicationDto functionApplicationDto,
             IOverloadBindings currentBindings,
             ITSPHPAst leftHandSide,
-            Pair<String, ITypeSymbol> pair) {
+            ITSPHPAst arguments, Pair<String, ITypeSymbol> pair) {
 
         if (pair != null) {
-            functionApplicationDto.name = pair.first;
+            boolean needMigrationFunction = true;
 
-            String leftHandSideId = leftHandSide.getSymbol().getAbsoluteName();
-            ITypeVariableReference reference = currentBindings.getTypeVariableReference(leftHandSideId);
-            String lhsTypeVariable = reference.getTypeVariable();
-            ITypeSymbol returnType = pair.second;
-            if (reference.hasFixedType()) {
-                IUnionTypeSymbol lowerTypeBounds = currentBindings.getLowerTypeBounds(lhsTypeVariable);
-                TypeHelperDto result = typeHelper.isFirstSameOrSubTypeOfSecond(returnType, lowerTypeBounds);
-                //if the left hand side is more specific than the return type then we need to cast
-                if (result.relation == ERelation.HAS_NO_RELATION) {
-                    functionApplicationDto.returnRuntimeCheck = lowerTypeBounds.getAbsoluteName();
+
+            int operatorType = leftHandSide.getType();
+            if (operatorType == TokenTypes.Plus
+                    || operatorType == TokenTypes.Minus
+                    || operatorType == TokenTypes.Multiply) {
+                ITypeSymbol lhs = getTypeSymbol(currentBindings, arguments.getChild(0));
+                ITypeSymbol rhs = getTypeSymbol(currentBindings, arguments.getChild(1));
+                ITypeSymbol intTypeSymbol = primitiveTypes.get(PrimitiveTypeNames.INT);
+                ITypeSymbol floatTypeSymbol = primitiveTypes.get(PrimitiveTypeNames.FLOAT);
+                if ((typeHelper.areSame(lhs, intTypeSymbol) || typeHelper.areSame(lhs, floatTypeSymbol))
+                        && (typeHelper.areSame(rhs, intTypeSymbol) || typeHelper.areSame(rhs, floatTypeSymbol))) {
+                    needMigrationFunction = false;
                 }
-            } else {
-                //if overload is parametric polymorhpic then we need to cast to the parametric type
-                functionApplicationDto.returnRuntimeCheck = lhsTypeVariable;
+            }
+
+            if (needMigrationFunction) {
+                functionApplicationDto.name = pair.first;
+                String leftHandSideId = leftHandSide.getSymbol().getAbsoluteName();
+                ITypeVariableReference reference = currentBindings.getTypeVariableReference(leftHandSideId);
+                String lhsTypeVariable = reference.getTypeVariable();
+                ITypeSymbol returnType = pair.second;
+                if (reference.hasFixedType()) {
+                    IUnionTypeSymbol lowerTypeBounds = currentBindings.getLowerTypeBounds(lhsTypeVariable);
+                    TypeHelperDto result = typeHelper.isFirstSameOrSubTypeOfSecond(returnType, lowerTypeBounds);
+                    //if the left hand side is more specific than the return type then we need to cast
+                    if (result.relation == ERelation.HAS_NO_RELATION) {
+                        functionApplicationDto.returnRuntimeCheck = lowerTypeBounds.getAbsoluteName();
+                    }
+                } else {
+                    //if overload is parametric polymorhpic then we need to cast to the parametric type
+                    functionApplicationDto.returnRuntimeCheck = lhsTypeVariable;
+                }
             }
         }
     }
