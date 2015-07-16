@@ -7,9 +7,9 @@
 package ch.tsphp.tinsphp.translators.tsphp.antlrmod;
 
 import ch.tsphp.common.ITSPHPAst;
-import ch.tsphp.tinsphp.common.inference.constraints.IOverloadBindings;
+import ch.tsphp.tinsphp.common.inference.constraints.IBindingCollection;
 
 public interface IErrorMessageCaller
 {
-    String getErrMessage(IOverloadBindings currentBindings, ITSPHPAst rootNode, ITSPHPAst identifier);
+    String getErrMessage(IBindingCollection currentBindings, ITSPHPAst rootNode, ITSPHPAst identifier);
 }

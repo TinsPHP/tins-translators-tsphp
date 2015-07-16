@@ -15,7 +15,7 @@ package ch.tsphp.tinsphp.translators.tsphp.test.unit.testutils;
 import ch.tsphp.common.ITSPHPAst;
 import ch.tsphp.common.TSPHPAst;
 import ch.tsphp.common.TSPHPAstAdaptor;
-import ch.tsphp.tinsphp.common.inference.constraints.IOverloadBindings;
+import ch.tsphp.tinsphp.common.inference.constraints.IBindingCollection;
 import ch.tsphp.tinsphp.common.scopes.IGlobalNamespaceScope;
 import ch.tsphp.tinsphp.common.translation.ITranslatorController;
 import ch.tsphp.tinsphp.translators.tsphp.antlrmod.ErrorReportingTSPHPTranslatorWalker;
@@ -39,7 +39,7 @@ public abstract class AWalkerTest
         treeNodeStream = createTreeNodeStream(ast);
         controller = mock(ITranslatorController.class);
         IGlobalNamespaceScope globalDefaultNamespace = mock(IGlobalNamespaceScope.class);
-        when(globalDefaultNamespace.getBindings()).thenReturn(Arrays.asList(mock(IOverloadBindings.class)));
+        when(globalDefaultNamespace.getBindings()).thenReturn(Arrays.asList(mock(IBindingCollection.class)));
         return new ErrorReportingTSPHPTranslatorWalker(treeNodeStream, controller, globalDefaultNamespace);
     }
 

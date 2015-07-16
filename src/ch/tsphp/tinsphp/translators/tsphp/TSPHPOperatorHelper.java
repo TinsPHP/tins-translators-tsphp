@@ -9,8 +9,8 @@ package ch.tsphp.tinsphp.translators.tsphp;
 import ch.tsphp.common.ITSPHPAst;
 import ch.tsphp.common.symbols.ITypeSymbol;
 import ch.tsphp.tinsphp.common.gen.TokenTypes;
+import ch.tsphp.tinsphp.common.inference.constraints.IBindingCollection;
 import ch.tsphp.tinsphp.common.inference.constraints.IFunctionType;
-import ch.tsphp.tinsphp.common.inference.constraints.IOverloadBindings;
 import ch.tsphp.tinsphp.common.inference.constraints.ITypeVariableReference;
 import ch.tsphp.tinsphp.common.inference.constraints.IVariable;
 import ch.tsphp.tinsphp.common.inference.constraints.OverloadApplicationDto;
@@ -88,7 +88,7 @@ public class TSPHPOperatorHelper implements IOperatorHelper
     public void turnIntoMigrationFunctionIfRequired(
             FunctionApplicationDto dto,
             OverloadApplicationDto overloadApplicationDto,
-            IOverloadBindings currentBindings,
+            IBindingCollection currentBindings,
             ITSPHPAst leftHandSide,
             ITSPHPAst arguments) {
 
@@ -116,10 +116,10 @@ public class TSPHPOperatorHelper implements IOperatorHelper
     private void handleConvertibleTypes(
             FunctionApplicationDto dto,
             OverloadApplicationDto overloadApplicationDto,
-            IOverloadBindings currentBindings,
+            IBindingCollection currentBindings,
             ITSPHPAst arguments) {
 
-        IOverloadBindings rightBindings = overloadApplicationDto.overload.getOverloadBindings();
+        IBindingCollection rightBindings = overloadApplicationDto.overload.getBindingCollection();
         dto.conversions = new HashMap<>();
         List<IVariable> parameters = overloadApplicationDto.overload.getParameters();
         int numberOfParameters = parameters.size();
@@ -163,7 +163,7 @@ public class TSPHPOperatorHelper implements IOperatorHelper
 
     private void switchToMigrationFunction(
             FunctionApplicationDto functionApplicationDto,
-            IOverloadBindings currentBindings,
+            IBindingCollection currentBindings,
             ITSPHPAst leftHandSide,
             ITSPHPAst arguments, Pair<String, ITypeSymbol> pair) {
 
@@ -206,7 +206,7 @@ public class TSPHPOperatorHelper implements IOperatorHelper
         }
     }
 
-    private ITypeSymbol getTypeSymbol(IOverloadBindings currentBindings, ITSPHPAst ast) {
+    private ITypeSymbol getTypeSymbol(IBindingCollection currentBindings, ITSPHPAst ast) {
         ITypeSymbol typeSymbol;
         String argumentId = ast.getSymbol().getAbsoluteName();
         String typeVariable = currentBindings.getTypeVariable(argumentId);

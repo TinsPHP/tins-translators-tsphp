@@ -29,7 +29,7 @@ options {
 package ch.tsphp.tinsphp.translators.tsphp.antlr;
 
 import ch.tsphp.common.ITSPHPAst;
-import ch.tsphp.tinsphp.common.inference.constraints.IOverloadBindings;
+import ch.tsphp.tinsphp.common.inference.constraints.IBindingCollection;
 import ch.tsphp.tinsphp.common.scopes.IGlobalNamespaceScope;
 import ch.tsphp.tinsphp.common.symbols.IArrayTypeSymbol;
 import ch.tsphp.tinsphp.common.translation.ITranslatorController;
@@ -51,7 +51,7 @@ import java.util.SortedSet;
 
 @members{
 private ITranslatorController controller;
-private IOverloadBindings currentBindings;
+private IBindingCollection currentBindings;
 private boolean isFunctionBefore;
 private IErrorMessageCaller functionErrorMessageCaller;
 private IErrorMessageCaller operatorErrorMessageCaller;
@@ -62,9 +62,9 @@ public TSPHPTranslatorWalker(
         IGlobalNamespaceScope globalDefaultNamespaceScope) {
     this(input);
     controller = theController;
-    List<IOverloadBindings> bindingsList = globalDefaultNamespaceScope.getBindings();
-    if (bindingsList != null && !bindingsList.isEmpty()){
-        currentBindings = bindingsList.get(0);
+    List<IBindingCollection> bindingCollections = globalDefaultNamespaceScope.getBindings();
+    if (bindingCollections != null && !bindingCollections.isEmpty()){
+        currentBindings = bindingCollections.get(0);
     }
     functionErrorMessageCaller = new FunctionErrorMessageCaller(controller);
     operatorErrorMessageCaller = new OperatorErrorMessageCaller(controller);
@@ -544,7 +544,7 @@ interfaceMethodDeclaration
 functionDefinition
 @init{
     List<StringTemplate> methods = new ArrayList<>();
-    IOverloadBindings tmp = currentBindings;
+    IBindingCollection tmp = currentBindings;
 }
     :   ^(Function
             FUNCTION_MODIFIER

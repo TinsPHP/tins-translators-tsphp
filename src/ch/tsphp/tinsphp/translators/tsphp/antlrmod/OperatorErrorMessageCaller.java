@@ -7,7 +7,7 @@
 package ch.tsphp.tinsphp.translators.tsphp.antlrmod;
 
 import ch.tsphp.common.ITSPHPAst;
-import ch.tsphp.tinsphp.common.inference.constraints.IOverloadBindings;
+import ch.tsphp.tinsphp.common.inference.constraints.IBindingCollection;
 import ch.tsphp.tinsphp.common.translation.ITranslatorController;
 
 public class OperatorErrorMessageCaller implements IErrorMessageCaller
@@ -19,7 +19,7 @@ public class OperatorErrorMessageCaller implements IErrorMessageCaller
     }
 
     @Override
-    public String getErrMessage(IOverloadBindings currentBindings, ITSPHPAst rootNode, ITSPHPAst identifier) {
+    public String getErrMessage(IBindingCollection currentBindings, ITSPHPAst rootNode, ITSPHPAst identifier) {
         return controller.getErrMessageOperatorApplication(currentBindings, identifier);
     }
 }

@@ -7,7 +7,7 @@
 package ch.tsphp.tinsphp.translators.tsphp;
 
 import ch.tsphp.common.ITSPHPAst;
-import ch.tsphp.tinsphp.common.inference.constraints.IOverloadBindings;
+import ch.tsphp.tinsphp.common.inference.constraints.IBindingCollection;
 import ch.tsphp.tinsphp.common.inference.constraints.OverloadApplicationDto;
 import ch.tsphp.tinsphp.common.translation.dtos.FunctionApplicationDto;
 
@@ -16,7 +16,7 @@ public class MetaOperatorHelper implements IOperatorHelper
 
     @Override
     public void turnIntoMigrationFunctionIfRequired(FunctionApplicationDto functionApplicationDto,
-            OverloadApplicationDto dto, IOverloadBindings currentBindings, ITSPHPAst leftHandSide,
+            OverloadApplicationDto dto, IBindingCollection currentBindings, ITSPHPAst leftHandSide,
             ITSPHPAst arguments) {
         //does not do anything
     }

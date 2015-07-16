@@ -9,8 +9,8 @@ package ch.tsphp.tinsphp.translators.tsphp;
 import ch.tsphp.common.symbols.ISymbol;
 import ch.tsphp.common.symbols.ITypeSymbol;
 import ch.tsphp.tinsphp.common.TinsPHPConstants;
+import ch.tsphp.tinsphp.common.inference.constraints.IBindingCollection;
 import ch.tsphp.tinsphp.common.inference.constraints.IFunctionType;
-import ch.tsphp.tinsphp.common.inference.constraints.IOverloadBindings;
 import ch.tsphp.tinsphp.common.inference.constraints.ITypeVariableReference;
 import ch.tsphp.tinsphp.common.inference.constraints.IVariable;
 import ch.tsphp.tinsphp.common.symbols.IMethodSymbol;
@@ -73,7 +73,7 @@ public class TSPHPDtoCreator implements IDtoCreator
     private Pair<OverloadDto, Integer> createOverloadDto(
             String name, int count, IFunctionType overload, IMethodSymbol methodSymbol, int numberOfOverloads) {
         Map<String, List<ISymbol>> symbols = methodSymbol.getDefinitionScope().getSymbols();
-        IOverloadBindings bindings = overload.getOverloadBindings();
+        IBindingCollection bindings = overload.getBindingCollection();
         List<IVariable> parameters = overload.getParameters();
         int numberOfParameters = parameters.size();
 
@@ -116,7 +116,7 @@ public class TSPHPDtoCreator implements IDtoCreator
         return pair(methodDto, numbering);
     }
 
-    private ParameterDto createParameterDto(IMethodSymbol methodSymbol, IOverloadBindings bindings, Set<String>
+    private ParameterDto createParameterDto(IMethodSymbol methodSymbol, IBindingCollection bindings, Set<String>
             typeVariablesAdded, List<TypeParameterDto> typeParameters, IVariable parameter) {
         ParameterDto parameterDto;
         String parameterName = parameter.getName();
@@ -144,7 +144,7 @@ public class TSPHPDtoCreator implements IDtoCreator
         return parameterDto;
     }
 
-    private VariableDto createReturnVariable(IOverloadBindings bindings, Set<String> typeVariablesAdded, List
+    private VariableDto createReturnVariable(IBindingCollection bindings, Set<String> typeVariablesAdded, List
             <TypeParameterDto> typeParameters, Set<String> nonFixedTypeParameters) {
         ITypeVariableReference reference = bindings.getTypeVariableReference(TinsPHPConstants.RETURN_VARIABLE_NAME);
         String returnTypeVariable = reference.getTypeVariable();
@@ -164,7 +164,7 @@ public class TSPHPDtoCreator implements IDtoCreator
 
     private TypeDto createTypeDto(
             String variableId,
-            IOverloadBindings bindings,
+            IBindingCollection bindings,
             List<TypeParameterDto> typeParameters,
             Set<String> typeVariablesAdded) {
 
@@ -181,7 +181,7 @@ public class TSPHPDtoCreator implements IDtoCreator
         return typeDto;
     }
 
-    private TypeParameterDto createTypeParameterDto(IOverloadBindings bindings, String typeVariable) {
+    private TypeParameterDto createTypeParameterDto(IBindingCollection bindings, String typeVariable) {
         List<String> lowerBounds = null;
         if (bindings.hasLowerBounds(typeVariable)) {
             lowerBounds = new ArrayList<>();
@@ -203,7 +203,7 @@ public class TSPHPDtoCreator implements IDtoCreator
         return new TypeParameterDto(lowerBounds, typeVariable, upperBounds);
     }
 
-    private TypeDto createParameterTypeDto(ITypeVariableReference reference, IOverloadBindings bindings) {
+    private TypeDto createParameterTypeDto(ITypeVariableReference reference, IBindingCollection bindings) {
         String typeVariable = reference.getTypeVariable();
         String type;
         if (reference.hasFixedType()) {
@@ -222,14 +222,14 @@ public class TSPHPDtoCreator implements IDtoCreator
     }
 
     @Override
-    public VariableDto createVariableDtoForConstant(IOverloadBindings bindings, IVariable constant) {
+    public VariableDto createVariableDtoForConstant(IBindingCollection bindings, IVariable constant) {
         String name = constant.getName();
         name = name.substring(0, name.length() - 1);
 
         return createVariableDto(bindings, constant.getAbsoluteName(), name);
     }
 
-    private VariableDto createVariableDto(IOverloadBindings bindings, String absoluteName, String name) {
+    private VariableDto createVariableDto(IBindingCollection bindings, String absoluteName, String name) {
         ITypeVariableReference reference = bindings.getTypeVariableReference(absoluteName);
         String typeVariable = reference.getTypeVariable();
         TypeParameterDto typeParameterDto = null;
@@ -251,7 +251,7 @@ public class TSPHPDtoCreator implements IDtoCreator
     }
 
     @Override
-    public VariableDto createVariableDto(IOverloadBindings bindings, IVariable variable) {
+    public VariableDto createVariableDto(IBindingCollection bindings, IVariable variable) {
         return createVariableDto(bindings, variable.getAbsoluteName(), variable.getName());
     }
 }

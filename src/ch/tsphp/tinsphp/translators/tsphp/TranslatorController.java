@@ -8,8 +8,8 @@ package ch.tsphp.tinsphp.translators.tsphp;
 
 import ch.tsphp.common.ITSPHPAst;
 import ch.tsphp.common.symbols.ITypeSymbol;
+import ch.tsphp.tinsphp.common.inference.constraints.IBindingCollection;
 import ch.tsphp.tinsphp.common.inference.constraints.IFunctionType;
-import ch.tsphp.tinsphp.common.inference.constraints.IOverloadBindings;
 import ch.tsphp.tinsphp.common.inference.constraints.IVariable;
 import ch.tsphp.tinsphp.common.inference.constraints.OverloadApplicationDto;
 import ch.tsphp.tinsphp.common.symbols.IExpressionVariableSymbol;
@@ -77,18 +77,18 @@ public class TranslatorController implements ITranslatorController
     }
 
     @Override
-    public VariableDto createVariableDtoForConstant(IOverloadBindings bindings, ITSPHPAst constant) {
+    public VariableDto createVariableDtoForConstant(IBindingCollection bindings, ITSPHPAst constant) {
         return dtoCreator.createVariableDtoForConstant(bindings, (IVariable) constant.getSymbol());
     }
 
     @Override
-    public VariableDto createVariableDto(IOverloadBindings bindings, ITSPHPAst variableId) {
+    public VariableDto createVariableDto(IBindingCollection bindings, ITSPHPAst variableId) {
         return dtoCreator.createVariableDto(bindings, (IVariable) variableId.getSymbol());
     }
 
     @Override
     public FunctionApplicationDto getFunctionApplication(
-            IOverloadBindings bindings, ITSPHPAst functionCall, ITSPHPAst identifier) {
+            IBindingCollection bindings, ITSPHPAst functionCall, ITSPHPAst identifier) {
 
         FunctionApplicationDto dto = null;
 
@@ -125,7 +125,7 @@ public class TranslatorController implements ITranslatorController
     }
 
     @Override
-    public FunctionApplicationDto getOperatorApplication(IOverloadBindings bindings, ITSPHPAst operator) {
+    public FunctionApplicationDto getOperatorApplication(IBindingCollection bindings, ITSPHPAst operator) {
         FunctionApplicationDto dto = null;
 
         String absoluteName = operator.getSymbol().getAbsoluteName();
@@ -141,7 +141,7 @@ public class TranslatorController implements ITranslatorController
 
     @Override
     public String getErrMessageFunctionApplication(
-            IOverloadBindings bindings, ITSPHPAst functionCall, ITSPHPAst identifier) {
+            IBindingCollection bindings, ITSPHPAst functionCall, ITSPHPAst identifier) {
         StringBuilder stringBuilder = new StringBuilder("'No applicable overload found for the function ");
         stringBuilder.append(identifier.getText()).append(".\\n");
         ITSPHPAst arguments = functionCall.getChild(1);
@@ -152,7 +152,7 @@ public class TranslatorController implements ITranslatorController
     }
 
     private void appendArgumentTypes(
-            StringBuilder stringBuilder, IOverloadBindings bindings, ITSPHPAst arguments) {
+            StringBuilder stringBuilder, IBindingCollection bindings, ITSPHPAst arguments) {
         stringBuilder.append("Given argument types: ");
         int numberOfArguments = arguments.getChildCount();
         if (numberOfArguments == 0) {
@@ -176,7 +176,7 @@ public class TranslatorController implements ITranslatorController
     }
 
     @Override
-    public String getErrMessageOperatorApplication(IOverloadBindings bindings, ITSPHPAst operator) {
+    public String getErrMessageOperatorApplication(IBindingCollection bindings, ITSPHPAst operator) {
         StringBuilder stringBuilder = new StringBuilder("'No applicable overload found for the ")
                 .append(operator.getText()).append(" operator.\\n");
         appendArgumentTypes(stringBuilder, bindings, operator);
