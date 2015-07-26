@@ -65,7 +65,6 @@ public class FunctionDefinitionTest extends ATranslatorInferenceTest
                                 + "\n"
                                 + "}"
                 },
-                //TODO TINS-531 inferred overload is not general enough
                 {
                         "<?php function fooA($x, $y){return $x + $y + 1;} ?>",
                         "namespace{\n"
@@ -78,7 +77,7 @@ public class FunctionDefinitionTest extends ATranslatorInferenceTest
                                 + "        return $x + $y + 1;\n"
                                 + "    }\n"
                                 + "\n"
-                                + "    function int fooA2({as int} $x, {as int} $y) {\n"
+                                + "    function (int | T) fooA2<T>({as T} $x, {as T} $y) where [T <: (float | int)] {\n"
                                 + "        return $x + $y + 1;\n"
                                 + "    }\n"
                                 + "\n"

@@ -106,7 +106,6 @@ public class TSPHPOperatorHelper implements IOperatorHelper
             if (dto.name == null && overload.hasConvertibleParameterTypes()) {
                 handleConvertibleTypes(dto, overloadApplicationDto, currentBindings, arguments);
             }
-
         } else {
             Pair<String, ITypeSymbol> pair = dynamicFunctions.get(operatorType);
             switchToMigrationFunction(dto, currentBindings, leftHandSide, arguments, pair);

@@ -98,9 +98,10 @@ public class FunctionCallTest extends ATranslatorInferenceTest
                                 + "\nfunction bar($x){ if($x > 0){return foo($x-1);} return $x;}",
                         "namespace{\n"
                                 + "\n"
-                                + "    function (int | T) foo0<T>(T $x) where [T <: {as int}] {\n"
+                                + "    function (int | T1 | T2) foo0<T1, T2>(T1 $x) where [T1 <: {as T2}, " +
+                                "int <: T2 <: (float | int)] {\n"
                                 + "        if ($x > 0) {\n"
-                                + "            return bar1($x - 1);\n"
+                                + "            return bar0($x - 1);\n"
                                 + "        }\n"
                                 + "        return $x;\n"
                                 + "    }\n"
@@ -112,9 +113,10 @@ public class FunctionCallTest extends ATranslatorInferenceTest
                                 + "        return $x;\n"
                                 + "    }\n"
                                 + "\n"
-                                + "    function (int | T) bar0<T>(T $x) where [T <: {as int}] {\n"
+                                + "    function (int | T1 | T2) bar0<T1, T2>(T1 $x) where [T1 <: {as T2}, " +
+                                "int <: T2 <: (float | int)] {\n"
                                 + "        if ($x > 0) {\n"
-                                + "            return foo1($x - 1);\n"
+                                + "            return foo0($x - 1);\n"
                                 + "        }\n"
                                 + "        return $x;\n"
                                 + "    }\n"
@@ -135,8 +137,9 @@ public class FunctionCallTest extends ATranslatorInferenceTest
                                 + "\nfunction bar($x, $y){ return $x > 10 ? foo($x + $y, $y) : $y;}",
                         "namespace{\n"
                                 + "\n"
-                                + "    function (int | T) foo0<T>(T $x, int $y) where [T <: {as int}] {\n"
-                                + "        return ($x > 0) ? bar2($x + $y, $y) : $x;\n"
+                                + "    function (T1 | T2) foo0<T1, T2>(T1 $x, T2 $y) where [T1 <: {as (float | int)}," +
+                                " T2 <: {as (float | int)}] {\n"
+                                + "        return ($x > 0) ? bar3($x + $y, $y) : $x;\n"
                                 + "    }\n"
                                 + "\n"
                                 + "    function array foo1(array $x, array $y) {\n"
@@ -163,8 +166,9 @@ public class FunctionCallTest extends ATranslatorInferenceTest
                                 + "        return ($x > 10) ? foo3($x + $y, $y) : $y;\n"
                                 + "    }\n"
                                 + "\n"
-                                + "    function int bar3({as int} $x, int $y) {\n"
-                                + "        return ($x > 10) ? foo3($x + $y, $y) : $y;\n"
+                                + "    function (T1 | T2) bar3<T1, T2>({as T2} $x, " +
+                                "T1 $y) where [T1 <: {as (float | int)}, T2 <: (float | int)] {\n"
+                                + "        return ($x > 10) ? foo0($x + $y, $y) : $y;\n"
                                 + "    }\n"
                                 + "\n"
                                 + "}"
@@ -180,8 +184,9 @@ public class FunctionCallTest extends ATranslatorInferenceTest
                                 + "    array $j;\n"
                                 + "    int $i;\n"
                                 + "\n"
-                                + "    function (int | T) rec10<T>(T $x, int $y) where [T <: {as int}] {\n"
-                                + "        return ($x > 0) ? rec22($x + $y, $y) : $x;\n"
+                                + "    function (T1 | T2) rec10<T1, T2>(T1 $x, T2 $y) where [T1 <: {as (float | int)" +
+                                "}, T2 <: {as (float | int)}] {\n"
+                                + "        return ($x > 0) ? rec23($x + $y, $y) : $x;\n"
                                 + "    }\n"
                                 + "\n"
                                 + "    function array rec11(array $x, array $y) {\n"
@@ -208,8 +213,9 @@ public class FunctionCallTest extends ATranslatorInferenceTest
                                 + "        return ($x > 10) ? rec13($x + $y, $y) : $y;\n"
                                 + "    }\n"
                                 + "\n"
-                                + "    function int rec23({as int} $x, int $y) {\n"
-                                + "        return ($x > 10) ? rec13($x + $y, $y) : $y;\n"
+                                + "    function (T1 | T2) rec23<T1, T2>({as T2} $x, " +
+                                "T1 $y) where [T1 <: {as (float | int)}, T2 <: (float | int)] {\n"
+                                + "        return ($x > 10) ? rec10($x + $y, $y) : $y;\n"
                                 + "    }\n"
                                 + "\n"
                                 + "    $i = rec13(5, 8);\n"
