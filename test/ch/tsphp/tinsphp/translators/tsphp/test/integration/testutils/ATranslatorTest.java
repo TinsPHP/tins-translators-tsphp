@@ -22,10 +22,10 @@ import org.junit.Ignore;
 import java.util.EnumSet;
 
 @Ignore
-public abstract class ATranslatorInferenceTest extends ATest
+public abstract class ATranslatorTest extends ATest
 {
 
-    public ATranslatorInferenceTest(String theTestString, String theExpectedResult) {
+    public ATranslatorTest(String theTestString, String theExpectedResult) {
         super(theTestString, theExpectedResult);
     }
 

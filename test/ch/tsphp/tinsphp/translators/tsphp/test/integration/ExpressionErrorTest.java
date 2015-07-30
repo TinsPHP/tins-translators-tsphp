@@ -16,7 +16,7 @@ package ch.tsphp.tinsphp.translators.tsphp.test.integration;
 import ch.tsphp.common.exceptions.TSPHPException;
 import ch.tsphp.tinsphp.common.IInferenceEngine;
 import ch.tsphp.tinsphp.common.issues.EIssueSeverity;
-import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorInferenceTest;
+import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorTest;
 import org.antlr.runtime.RecognitionException;
 import org.junit.Assert;
 import org.junit.Test;
@@ -29,7 +29,7 @@ import java.util.Collection;
 import java.util.EnumSet;
 
 @RunWith(Parameterized.class)
-public class ExpressionErrorTest extends ATranslatorInferenceTest
+public class ExpressionErrorTest extends ATranslatorTest
 {
 
     public ExpressionErrorTest(String testString, String expectedResult) {

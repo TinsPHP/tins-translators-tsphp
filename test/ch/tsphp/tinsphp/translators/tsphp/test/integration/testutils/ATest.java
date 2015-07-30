@@ -26,15 +26,18 @@ import ch.tsphp.tinsphp.common.config.IParserInitialiser;
 import ch.tsphp.tinsphp.common.config.ISymbolsInitialiser;
 import ch.tsphp.tinsphp.common.issues.EIssueSeverity;
 import ch.tsphp.tinsphp.common.issues.IIssueLogger;
+import ch.tsphp.tinsphp.common.translation.IDtoCreator;
 import ch.tsphp.tinsphp.common.translation.ITranslatorController;
 import ch.tsphp.tinsphp.core.config.HardCodedCoreInitialiser;
 import ch.tsphp.tinsphp.inference_engine.config.HardCodedInferenceEngineInitialiser;
 import ch.tsphp.tinsphp.parser.config.HardCodedParserInitialiser;
 import ch.tsphp.tinsphp.symbols.config.HardCodedSymbolsInitialiser;
+import ch.tsphp.tinsphp.translators.tsphp.DtoCreator;
+import ch.tsphp.tinsphp.translators.tsphp.INameTransformer;
 import ch.tsphp.tinsphp.translators.tsphp.IOperatorHelper;
+import ch.tsphp.tinsphp.translators.tsphp.MetaNameTransformer;
 import ch.tsphp.tinsphp.translators.tsphp.MetaOperatorHelper;
 import ch.tsphp.tinsphp.translators.tsphp.PrecedenceHelper;
-import ch.tsphp.tinsphp.translators.tsphp.TSPHPDtoCreator;
 import ch.tsphp.tinsphp.translators.tsphp.TempVariableHelper;
 import ch.tsphp.tinsphp.translators.tsphp.TranslatorController;
 import ch.tsphp.tinsphp.translators.tsphp.antlrmod.ErrorReportingTSPHPTranslatorWalker;
@@ -67,6 +70,7 @@ public abstract class ATest implements IIssueLogger
     protected ITranslatorController controller;
     protected IInferenceEngineInitialiser inferenceEngineInitialiser;
     protected ISymbolsInitialiser symbolsInitialiser;
+    protected ICoreInitialiser coreInitialiser;
 
     public ATest(String theTestString, String theExpectedResult) {
         testString = theTestString;
@@ -101,7 +105,10 @@ public abstract class ATest implements IIssueLogger
 
         IAstHelper astHelper = new AstHelper(astAdaptor);
         symbolsInitialiser = createSymbolsInitialiser();
-        inferenceEngineInitialiser = createInferenceInitialiser(astAdaptor, astHelper, symbolsInitialiser);
+        coreInitialiser = createCoreInitialiser(astHelper, symbolsInitialiser);
+        inferenceEngineInitialiser = createInferenceInitialiser(
+                astAdaptor, astHelper, symbolsInitialiser, coreInitialiser);
+
         inferTypes();
 
         // LOAD TEMPLATES (via classpath)
@@ -113,14 +120,17 @@ public abstract class ATest implements IIssueLogger
         commonTreeNodeStream.reset();
 
         TempVariableHelper tempVariableHelper = new TempVariableHelper(astAdaptor);
-        IOperatorHelper operatorHelper = createOperatorHelper();
+        INameTransformer nameTransformer = createNameTransformer();
+        IOperatorHelper operatorHelper = createOperatorHelper(nameTransformer);
+
+        IDtoCreator dtoCreator = new DtoCreator(tempVariableHelper, nameTransformer);
+
         controller = new TranslatorController(
                 new PrecedenceHelper(),
                 tempVariableHelper,
                 operatorHelper,
-                new TSPHPDtoCreator(tempVariableHelper));
+                dtoCreator);
         controller.setMethodSymbols(inferenceEngineInitialiser.getMethodSymbols());
-
         translator = new ErrorReportingTSPHPTranslatorWalker(
                 commonTreeNodeStream, controller, inferenceEngineInitialiser.getGlobalDefaultNamespace());
         translator.registerIssueLogger(this);
@@ -131,7 +141,15 @@ public abstract class ATest implements IIssueLogger
         check();
     }
 
-    protected IOperatorHelper createOperatorHelper() {
+    protected INameTransformer createNameTransformer() {
+        return new MetaNameTransformer();
+    }
+
+    protected ICoreInitialiser createCoreInitialiser(IAstHelper astHelper, ISymbolsInitialiser symbolsInitialiser) {
+        return new HardCodedCoreInitialiser(astHelper, symbolsInitialiser);
+    }
+
+    protected IOperatorHelper createOperatorHelper(INameTransformer nameTransformer) {
         return new MetaOperatorHelper();
     }
 
@@ -148,10 +166,13 @@ public abstract class ATest implements IIssueLogger
     }
 
     protected IInferenceEngineInitialiser createInferenceInitialiser(
-            ITSPHPAstAdaptor astAdaptor, IAstHelper astHelper, ISymbolsInitialiser symbolsInitialiser) {
+            ITSPHPAstAdaptor astAdaptor,
+            IAstHelper astHelper,
+            ISymbolsInitialiser theSymbolsInitialiser,
+            ICoreInitialiser theCoreInitialiser) {
 
-        ICoreInitialiser coreInitialiser = new HardCodedCoreInitialiser(astHelper, symbolsInitialiser);
-        return new HardCodedInferenceEngineInitialiser(astAdaptor, astHelper, symbolsInitialiser, coreInitialiser);
+        return new HardCodedInferenceEngineInitialiser(
+                astAdaptor, astHelper, theSymbolsInitialiser, theCoreInitialiser);
     }
 
     protected ISymbolsInitialiser createSymbolsInitialiser() {

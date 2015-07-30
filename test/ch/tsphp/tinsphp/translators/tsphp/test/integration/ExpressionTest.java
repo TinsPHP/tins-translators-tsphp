@@ -13,7 +13,7 @@
 package ch.tsphp.tinsphp.translators.tsphp.test.integration;
 
 
-import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorInferenceStatementTest;
+import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorStatementTest;
 import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ExpressionHelper;
 import org.antlr.runtime.RecognitionException;
 import org.junit.Test;
@@ -27,7 +27,7 @@ import java.util.Collection;
 import java.util.List;
 
 @RunWith(Parameterized.class)
-public class ExpressionTest extends ATranslatorInferenceStatementTest
+public class ExpressionTest extends ATranslatorStatementTest
 {
 
     public ExpressionTest(String testString, String expectedResult) {

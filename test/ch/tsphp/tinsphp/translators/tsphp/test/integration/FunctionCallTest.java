@@ -13,7 +13,7 @@
 package ch.tsphp.tinsphp.translators.tsphp.test.integration;
 
 
-import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorInferenceTest;
+import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorTest;
 import org.antlr.runtime.RecognitionException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,7 +26,7 @@ import java.util.Collection;
 import java.util.List;
 
 @RunWith(Parameterized.class)
-public class FunctionCallTest extends ATranslatorInferenceTest
+public class FunctionCallTest extends ATranslatorTest
 {
 
     public FunctionCallTest(String testString, String expectedResult) {

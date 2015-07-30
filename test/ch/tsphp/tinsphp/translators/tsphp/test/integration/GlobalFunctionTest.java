@@ -6,7 +6,7 @@
 
 package ch.tsphp.tinsphp.translators.tsphp.test.integration;
 
-import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorInferenceStatementTest;
+import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorStatementTest;
 import org.antlr.runtime.RecognitionException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,7 +17,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 @RunWith(Parameterized.class)
-public class GlobalFunctionTest extends ATranslatorInferenceStatementTest
+public class GlobalFunctionTest extends ATranslatorStatementTest
 {
 
     public GlobalFunctionTest(String testString, String expectedResult) {

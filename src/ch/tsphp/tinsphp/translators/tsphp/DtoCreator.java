@@ -30,18 +30,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
-import java.util.SortedSet;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 import static ch.tsphp.tinsphp.common.utils.Pair.pair;
 
-public class TSPHPDtoCreator implements IDtoCreator
+public class DtoCreator implements IDtoCreator
 {
     private final ITempVariableHelper tempVariableHelper;
+    private final INameTransformer nameTransformer;
 
-    public TSPHPDtoCreator(ITempVariableHelper theTempVariableHelper) {
+    public DtoCreator(ITempVariableHelper theTempVariableHelper, INameTransformer theNameTransformer) {
         tempVariableHelper = theTempVariableHelper;
+        nameTransformer = theNameTransformer;
     }
 
     @Override
@@ -144,10 +144,15 @@ public class TSPHPDtoCreator implements IDtoCreator
         return parameterDto;
     }
 
-    private VariableDto createReturnVariable(IBindingCollection bindings, Set<String> typeVariablesAdded, List
-            <TypeParameterDto> typeParameters, Set<String> nonFixedTypeParameters) {
+    private VariableDto createReturnVariable(
+            IBindingCollection bindings,
+            Set<String> typeVariablesAdded,
+            List<TypeParameterDto> typeParameters,
+            Set<String> nonFixedTypeParameters) {
         ITypeVariableReference reference = bindings.getTypeVariableReference(TinsPHPConstants.RETURN_VARIABLE_NAME);
         String returnTypeVariable = reference.getTypeVariable();
+
+
         VariableDto returnVariable;
         TypeParameterDto typeParamDto = createTypeParameterDto(bindings, returnTypeVariable);
         if (nonFixedTypeParameters.contains(returnTypeVariable)) {
@@ -186,19 +191,16 @@ public class TSPHPDtoCreator implements IDtoCreator
         if (bindings.hasLowerBounds(typeVariable)) {
             lowerBounds = new ArrayList<>();
             if (bindings.hasLowerTypeBounds(typeVariable)) {
-                SortedSet<String> sortedSet = new TreeSet<>(
-                        bindings.getLowerTypeBounds(typeVariable).getTypeSymbols().keySet());
-                lowerBounds.addAll(sortedSet);
+                lowerBounds.addAll(nameTransformer.getTypeBounds(bindings.getLowerTypeBounds(typeVariable)));
             }
             if (bindings.hasLowerRefBounds(typeVariable)) {
-                SortedSet<String> sortedSet = new TreeSet<>(bindings.getLowerRefBounds(typeVariable));
-                lowerBounds.addAll(sortedSet);
+                lowerBounds.addAll(nameTransformer.getLowerRefBounds(bindings, typeVariable));
             }
         }
         List<String> upperBounds = null;
         if (bindings.hasUpperTypeBounds(typeVariable)) {
             upperBounds = new ArrayList<>();
-            upperBounds.addAll(bindings.getUpperTypeBounds(typeVariable).getTypeSymbols().keySet());
+            upperBounds.addAll(nameTransformer.getTypeBounds(bindings.getUpperTypeBounds(typeVariable)));
         }
         return new TypeParameterDto(lowerBounds, typeVariable, upperBounds);
     }
@@ -207,14 +209,7 @@ public class TSPHPDtoCreator implements IDtoCreator
         String typeVariable = reference.getTypeVariable();
         String type;
         if (reference.hasFixedType()) {
-            ITypeSymbol typeSymbol;
-            if (bindings.hasUpperTypeBounds(typeVariable)) {
-                typeSymbol = bindings.getUpperTypeBounds(typeVariable);
-            } else {
-                typeSymbol = bindings.getLowerTypeBounds(typeVariable);
-            }
-            //TODO rstoll TINS-379 find least upper bound
-            type = typeSymbol.toString();
+            type = nameTransformer.getTypeName(bindings, typeVariable);
         } else {
             type = typeVariable;
         }
@@ -237,13 +232,8 @@ public class TSPHPDtoCreator implements IDtoCreator
         if (typeVariable.startsWith("T")) {
             typeDto = new TypeDto(null, typeVariable, null);
         } else if (reference.hasFixedType()) {
-            ITypeSymbol typeSymbol;
-            if (bindings.hasLowerTypeBounds(typeVariable)) {
-                typeSymbol = bindings.getLowerTypeBounds(typeVariable);
-            } else {
-                typeSymbol = bindings.getUpperTypeBounds(typeVariable);
-            }
-            typeDto = new TypeDto(null, typeSymbol.toString(), null);
+            String type = nameTransformer.getTypeName(bindings, typeVariable);
+            typeDto = new TypeDto(null, type, null);
         } else {
             typeParameterDto = createTypeParameterDto(bindings, typeVariable);
         }

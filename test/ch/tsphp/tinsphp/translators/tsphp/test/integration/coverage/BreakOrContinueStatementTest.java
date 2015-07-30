@@ -13,7 +13,7 @@
 package ch.tsphp.tinsphp.translators.tsphp.test.integration.coverage;
 
 
-import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorInferenceTest;
+import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorTest;
 import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.StatementHelper;
 import org.antlr.runtime.RecognitionException;
 import org.junit.Test;
@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 @RunWith(Parameterized.class)
-public class BreakOrContinueStatementTest extends ATranslatorInferenceTest
+public class BreakOrContinueStatementTest extends ATranslatorTest
 {
 
     public BreakOrContinueStatementTest(String testString, String expectedResult) {

@@ -14,18 +14,23 @@ package ch.tsphp.tinsphp.translators.tsphp.config;
 
 import ch.tsphp.common.ITSPHPAstAdaptor;
 import ch.tsphp.common.exceptions.TSPHPException;
+import ch.tsphp.common.symbols.ITypeSymbol;
 import ch.tsphp.tinsphp.common.ITranslator;
 import ch.tsphp.tinsphp.common.config.ICoreInitialiser;
 import ch.tsphp.tinsphp.common.config.IInferenceEngineInitialiser;
 import ch.tsphp.tinsphp.common.config.ISymbolsInitialiser;
 import ch.tsphp.tinsphp.common.config.ITranslatorInitialiser;
+import ch.tsphp.tinsphp.common.symbols.ISymbolFactory;
 import ch.tsphp.tinsphp.common.translation.IDtoCreator;
 import ch.tsphp.tinsphp.common.translation.ITranslatorController;
+import ch.tsphp.tinsphp.common.utils.ITypeHelper;
+import ch.tsphp.tinsphp.translators.tsphp.DtoCreator;
+import ch.tsphp.tinsphp.translators.tsphp.INameTransformer;
 import ch.tsphp.tinsphp.translators.tsphp.IOperatorHelper;
 import ch.tsphp.tinsphp.translators.tsphp.IPrecedenceHelper;
 import ch.tsphp.tinsphp.translators.tsphp.ITempVariableHelper;
 import ch.tsphp.tinsphp.translators.tsphp.PrecedenceHelper;
-import ch.tsphp.tinsphp.translators.tsphp.TSPHPDtoCreator;
+import ch.tsphp.tinsphp.translators.tsphp.TSPHPNameTransformer;
 import ch.tsphp.tinsphp.translators.tsphp.TSPHPOperatorHelper;
 import ch.tsphp.tinsphp.translators.tsphp.TSPHPTranslator;
 import ch.tsphp.tinsphp.translators.tsphp.TempVariableHelper;
@@ -35,6 +40,7 @@ import org.antlr.stringtemplate.StringTemplateGroup;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Map;
 
 /**
  * The factory which builds the PHP54Translator.
@@ -59,9 +65,13 @@ public class HardCodedTSPHPTranslatorInitialiser implements ITranslatorInitialis
 
         IPrecedenceHelper precedenceHelper = new PrecedenceHelper();
         ITempVariableHelper tempVariableHelper = new TempVariableHelper(anAstAdaptor);
-        IOperatorHelper operatorHelper = new TSPHPOperatorHelper(
-                theSymbolsInitialiser.getTypeHelper(), theCoreInitialiser.getCore().getPrimitiveTypes());
-        IDtoCreator dtoCreator = new TSPHPDtoCreator(tempVariableHelper);
+
+        Map<String, ITypeSymbol> primitiveTypes = theCoreInitialiser.getCore().getPrimitiveTypes();
+        ITypeHelper typeHelper = theSymbolsInitialiser.getTypeHelper();
+        ISymbolFactory symbolFactory = theSymbolsInitialiser.getSymbolFactory();
+        INameTransformer nameTransformer = new TSPHPNameTransformer(symbolFactory, typeHelper, primitiveTypes);
+        IOperatorHelper operatorHelper = new TSPHPOperatorHelper(typeHelper, primitiveTypes, nameTransformer);
+        IDtoCreator dtoCreator = new DtoCreator(tempVariableHelper, nameTransformer);
         controller = new TranslatorController(
                 precedenceHelper,
                 tempVariableHelper,

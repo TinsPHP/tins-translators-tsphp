@@ -35,19 +35,23 @@ import static ch.tsphp.tinsphp.common.utils.Pair.pair;
 public class TSPHPOperatorHelper implements IOperatorHelper
 {
     private final ITypeHelper typeHelper;
+    private final Map<String, ITypeSymbol> primitiveTypes;
+    private final INameTransformer nameTransformer;
 
     private final Map<Integer, Map<String, Pair<String, ITypeSymbol>>> migrationFunctions = new HashMap<>();
     private final Map<Integer, Pair<String, ITypeSymbol>> dynamicFunctions = new HashMap<>();
-    private final Map<String, ITypeSymbol> primitiveTypes;
 
-    public TSPHPOperatorHelper(ITypeHelper theTypeHelper, Map<String, ITypeSymbol> thePrimitiveTypes) {
+    public TSPHPOperatorHelper(
+            ITypeHelper theTypeHelper,
+            Map<String, ITypeSymbol> thePrimitiveTypes,
+            INameTransformer theNameTransformer) {
         typeHelper = theTypeHelper;
         primitiveTypes = thePrimitiveTypes;
+        nameTransformer = theNameTransformer;
         init();
     }
 
     private void init() {
-
 
         int[] tokens = new int[]{TokenTypes.Plus, TokenTypes.Minus, TokenTypes.Multiply};
         String[] migrationFunctionNames = new String[]{
@@ -147,11 +151,11 @@ public class TSPHPOperatorHelper implements IOperatorHelper
                                 //runtime checks are covered in the as operator via if types
                                 dto.runtimeChecks.remove(i);
                                 for (ITypeSymbol typeSymbol : pair.second) {
-                                    ifTypes.add(typeSymbol.getAbsoluteName());
+                                    ifTypes.add(nameTransformer.getTypeName(typeSymbol));
                                 }
                             }
                         }
-                        dto.conversions.put(i, pair(targetType.toString(), ifTypes));
+                        dto.conversions.put(i, pair(nameTransformer.getTypeName(targetType), ifTypes));
                     } else {
                         //no conversion required since it is already a subtype
                     }
@@ -195,10 +199,10 @@ public class TSPHPOperatorHelper implements IOperatorHelper
                     TypeHelperDto result = typeHelper.isFirstSameOrSubTypeOfSecond(returnType, lowerTypeBounds);
                     //if the left hand side is more specific than the return type then we need to cast
                     if (result.relation == ERelation.HAS_NO_RELATION) {
-                        functionApplicationDto.returnRuntimeCheck = lowerTypeBounds.getAbsoluteName();
+                        functionApplicationDto.returnRuntimeCheck = nameTransformer.getTypeName(lowerTypeBounds);
                     }
                 } else {
-                    //if overload is parametric polymorhpic then we need to cast to the parametric type
+                    //if overload is parametric polymorphic then we need to cast to the parametric type
                     functionApplicationDto.returnRuntimeCheck = lhsTypeVariable;
                 }
             }

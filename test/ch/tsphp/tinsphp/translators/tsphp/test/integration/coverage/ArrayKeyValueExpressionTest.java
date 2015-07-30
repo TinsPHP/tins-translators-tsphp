@@ -6,7 +6,7 @@
 
 package ch.tsphp.tinsphp.translators.tsphp.test.integration.coverage;
 
-import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorInferenceStatementTest;
+import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorStatementTest;
 import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ExpressionHelper;
 import org.antlr.runtime.RecognitionException;
 import org.junit.Test;
@@ -19,7 +19,7 @@ import java.util.Collection;
 import java.util.List;
 
 @RunWith(Parameterized.class)
-public class ArrayKeyValueExpressionTest extends ATranslatorInferenceStatementTest
+public class ArrayKeyValueExpressionTest extends ATranslatorStatementTest
 {
 
     public ArrayKeyValueExpressionTest(String testString, String expectedResult) {

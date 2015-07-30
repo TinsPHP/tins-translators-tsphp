@@ -10,23 +10,11 @@
  * For more information see http://tsphp.ch/wiki/display/TSPHP/License
  */
 
-package ch.tsphp.tinsphp.translators.tsphp.test.integration;
+package ch.tsphp.tinsphp.translators.tsphp.test.integration.with_reduction;
 
 
-import ch.tsphp.common.AstHelper;
-import ch.tsphp.common.TSPHPAstAdaptor;
-import ch.tsphp.common.symbols.ITypeSymbol;
-import ch.tsphp.tinsphp.common.config.ICoreInitialiser;
-import ch.tsphp.tinsphp.common.config.ISymbolsInitialiser;
-import ch.tsphp.tinsphp.common.utils.ITypeHelper;
-import ch.tsphp.tinsphp.core.config.HardCodedCoreInitialiser;
-import ch.tsphp.tinsphp.symbols.config.HardCodedSymbolsInitialiser;
-import ch.tsphp.tinsphp.translators.tsphp.INameTransformer;
-import ch.tsphp.tinsphp.translators.tsphp.IOperatorHelper;
-import ch.tsphp.tinsphp.translators.tsphp.TSPHPOperatorHelper;
-import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorTest;
+import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorWithReductionTest;
 import org.antlr.runtime.RecognitionException;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -36,35 +24,18 @@ import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 @RunWith(Parameterized.class)
-public class MigrationFunctionTest extends ATranslatorTest
+public class MigrationFunctionTest extends ATranslatorWithReductionTest
 {
-    private static ITypeHelper typeHelper;
-    private static Map<String, ITypeSymbol> primitiveTypes;
 
     public MigrationFunctionTest(String testString, String expectedResult) {
         super(testString, expectedResult);
     }
 
-    @BeforeClass
-    public static void init() {
-        ISymbolsInitialiser symbolsInitialiser = new HardCodedSymbolsInitialiser();
-        ICoreInitialiser coreInitialiser = new HardCodedCoreInitialiser(
-                new AstHelper(new TSPHPAstAdaptor()), symbolsInitialiser);
-        typeHelper = symbolsInitialiser.getTypeHelper();
-        primitiveTypes = coreInitialiser.getCore().getPrimitiveTypes();
-    }
-
     @Test
     public void test() throws RecognitionException, IOException {
         translate();
-    }
-
-    @Override
-    public IOperatorHelper createOperatorHelper(INameTransformer nameTransformer) {
-        return new TSPHPOperatorHelper(typeHelper, primitiveTypes, nameTransformer);
     }
 
     @Parameterized.Parameters
@@ -95,7 +66,7 @@ public class MigrationFunctionTest extends ATranslatorTest
                         "namespace{\n"
                                 + "\n"
                                 + "    function int foo6(Exception $x_0) {\n"
-                                + "        (Exception | float | int) $x = $x_0;\n"
+                                + "        mixed $x = $x_0;\n"
                                 + "        $x = 1;\n"
                                 + "        $x = 1.5;\n"
                                 + "        echo $x as string if float, int;\n"
@@ -129,39 +100,38 @@ public class MigrationFunctionTest extends ATranslatorTest
                 {
                         "<?php $x = true; $x = false; $a = (1 " + op + " $x);",
                         "namespace{"
-                                + "\n    (falseType | trueType) $a;"
-                                + "\n    (falseType | trueType) $x;"
+                                + "\n    bool $a;"
+                                + "\n    bool $x;"
                                 + "\n    $x = true;"
                                 + "\n    $x = false;"
                                 + "\n    $a = " + (requiresParentheses ? "(" : "")
-                                + "1 as (falseType | trueType) " + op + " $x" + (requiresParentheses ? ")" : "") + ";"
+                                + "1 as bool " + op + " $x" + (requiresParentheses ? ")" : "") + ";"
                                 + "\n}"
                 },
                 {
                         "<?php $x = true; $x = false; $a = ($x " + op + " 1.2);",
                         "namespace{"
-                                + "\n    (falseType | trueType) $a;"
-                                + "\n    (falseType | trueType) $x;"
+                                + "\n    bool $a;"
+                                + "\n    bool $x;"
                                 + "\n    $x = true;"
                                 + "\n    $x = false;"
                                 + "\n    $a = " + (requiresParentheses ? "(" : "")
-                                + "$x " + op + " 1.2 as (falseType | trueType)" + (requiresParentheses ? ")" : "") + ";"
+                                + "$x " + op + " 1.2 as bool" + (requiresParentheses ? ")" : "") + ";"
                                 + "\n}"
                 },
                 {
                         "<?php $a = (1 " + op + " 'a');",
                         "namespace{"
-                                + "\n    (falseType | trueType) $a;"
+                                + "\n    bool $a;"
                                 + "\n    $a = " + (requiresParentheses ? "(" : "")
-                                + "1 as (falseType | trueType) "
-                                + op + " 'a' as (falseType | trueType)" + (requiresParentheses ? ")" : "") + ";"
+                                + "1 as bool " + op + " 'a' as bool" + (requiresParentheses ? ")" : "") + ";"
                                 + "\n}"
                 },
                 {
                         "<?php $x = true; $x = false; $a = ($x " + op + " $x);",
                         "namespace{"
-                                + "\n    (falseType | trueType) $a;"
-                                + "\n    (falseType | trueType) $x;"
+                                + "\n    bool $a;"
+                                + "\n    bool $x;"
                                 + "\n    $x = true;"
                                 + "\n    $x = false;"
                                 + "\n    $a = " + (requiresParentheses ? "(" : "")
@@ -184,15 +154,15 @@ public class MigrationFunctionTest extends ATranslatorTest
                 },
                 {
                         "<?php $a = 'a' " + op + " 1;",
-                        "namespace{\n    (float | int) $a;\n    $a = " + oldSchool + "('a', 1);\n}"
+                        "namespace{\n    num $a;\n    $a = " + oldSchool + "('a', 1);\n}"
                 },
                 {
                         "<?php $a = 'a' " + op + " true;",
-                        "namespace{\n    (float | int) $a;\n    $a = " + oldSchool + "('a', true);\n}"
+                        "namespace{\n    num $a;\n    $a = " + oldSchool + "('a', true);\n}"
                 },
                 {
                         "<?php $a = '1' " + op + " '2';",
-                        "namespace{\n    (float | int) $a;\n    $a = " + oldSchool + "('1', '2');\n}"
+                        "namespace{\n    num $a;\n    $a = " + oldSchool + "('1', '2');\n}"
                 },
                 {
                         "<?php $a = true " + op + " false;",
@@ -210,7 +180,7 @@ public class MigrationFunctionTest extends ATranslatorTest
                         "namespace{\n"
                                 + "\n"
                                 + "    function int foo1(array $x_0) {\n"
-                                + "        (array | int) $x = $x_0;\n"
+                                + "        mixed $x = $x_0;\n"
                                 + "        $x = 1;\n"
                                 + "        return (int) (" + oldSchool + "((int) ($x), 1));\n"
                                 + "    }\n"
@@ -222,7 +192,7 @@ public class MigrationFunctionTest extends ATranslatorTest
                         "namespace{\n"
                                 + "\n"
                                 + "    function float foo2(array $x_0) {\n"
-                                + "        (array | float) $x = $x_0;\n"
+                                + "        mixed $x = $x_0;\n"
                                 + "        $x = 1.5;\n"
                                 + "        return (float) (" + oldSchool + "(1.2, (float) ($x)));\n"
                                 + "    }\n"
@@ -234,7 +204,7 @@ public class MigrationFunctionTest extends ATranslatorTest
                         "namespace{\n"
                                 + "\n"
                                 + "    function float foo3(array $x_0) {\n"
-                                + "        (array | float) $x = $x_0;\n"
+                                + "        mixed $x = $x_0;\n"
                                 + "        $x = 1.5;\n"
                                 + "        return (float) (" + oldSchool + "(1.2, (float) ($x))) " + op + " 1;\n"
                                 + "    }\n"
@@ -245,8 +215,8 @@ public class MigrationFunctionTest extends ATranslatorTest
                         "<?php function foo4(array $x){ $x = 1; return $x " + op + " '1';}",
                         "namespace{\n"
                                 + "\n"
-                                + "    function (float | int) foo4(array $x_0) {\n"
-                                + "        (array | int) $x = $x_0;\n"
+                                + "    function num foo4(array $x_0) {\n"
+                                + "        mixed $x = $x_0;\n"
                                 + "        $x = 1;\n"
                                 + "        return " + oldSchool + "((int) ($x), '1');\n"
                                 + "    }\n"
@@ -258,7 +228,7 @@ public class MigrationFunctionTest extends ATranslatorTest
                         "namespace{\n"
                                 + "\n"
                                 + "    function float foo5(array $x_0) {\n"
-                                + "        (array | float) $x = $x_0;\n"
+                                + "        mixed $x = $x_0;\n"
                                 + "        $x = 1.2;\n"
                                 + "        return (float) (" + oldSchool + "((float) ($x), '1'));\n"
                                 + "    }\n"
@@ -281,7 +251,7 @@ public class MigrationFunctionTest extends ATranslatorTest
                                 + "        return $x + $y;\n"
                                 + "    }\n"
                                 + "\n"
-                                + "    function T foo63<T>({as T} $x, {as T} $y) where [T <: (float | int)] {\n"
+                                + "    function T foo63<T>({as T} $x, {as T} $y) where [T <: num] {\n"
                                 + "        return (T) (oldSchoolAddition($x, $y));\n"
                                 + "    }\n"
                                 + "\n"

@@ -7,7 +7,7 @@
 package ch.tsphp.tinsphp.translators.tsphp.test.integration.coverage;
 
 
-import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorInferenceTest;
+import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorTest;
 import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.InstructionHelper;
 import org.antlr.runtime.RecognitionException;
 import org.junit.Test;
@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.util.Collection;
 
 @RunWith(Parameterized.class)
-public class BlockInstructionTest extends ATranslatorInferenceTest
+public class BlockInstructionTest extends ATranslatorTest
 {
 
     public BlockInstructionTest(String testString, String expectedResult) {

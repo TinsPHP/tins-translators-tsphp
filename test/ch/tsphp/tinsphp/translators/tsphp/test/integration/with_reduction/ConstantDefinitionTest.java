@@ -10,10 +10,10 @@
  * For more information see http://tsphp.ch/wiki/display/TSPHP/License
  */
 
-package ch.tsphp.tinsphp.translators.tsphp.test.integration;
+package ch.tsphp.tinsphp.translators.tsphp.test.integration.with_reduction;
 
 
-import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorStatementTest;
+import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorWithReductionTest;
 import org.antlr.runtime.RecognitionException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,11 +24,11 @@ import java.util.Arrays;
 import java.util.Collection;
 
 @RunWith(Parameterized.class)
-public class ConstantDefinitionTest extends ATranslatorStatementTest
+public class ConstantDefinitionTest extends ATranslatorWithReductionTest
 {
 
     public ConstantDefinitionTest(String theTestString, String theExpectedResult) {
-        super(theTestString, theExpectedResult);
+        super("<?php " + theTestString + " ?>", "namespace{\n    " + theExpectedResult + "\n}");
     }
 
     @Test
@@ -39,9 +39,9 @@ public class ConstantDefinitionTest extends ATranslatorStatementTest
     @Parameterized.Parameters
     public static Collection<Object[]> testStrings() {
         return Arrays.asList(new Object[][]{
-                {"const a = null;", "const nullType a = null;"},
-                {"const a = false;", "const falseType a = false;"},
-                {"const a = true;", "const trueType a = true;"},
+                {"const a = null;", "const mixed a = null;"},
+                {"const a = false;", "const bool a = false;"},
+                {"const a = true;", "const bool a = true;"},
                 {"const a = 1;", "const int a = 1;"},
                 {"const a = 1.2;", "const float a = 1.2;"},
                 {"const a = 'hi';", "const string a = 'hi';"},
@@ -51,9 +51,9 @@ public class ConstantDefinitionTest extends ATranslatorStatementTest
                 {"const a = 1, b = 2;", "const int a = 1;\n    const int b = 2;"},
                 {
                         "const a = null, b = false, c = true, d=1, e=2.1, f='hi', g=f, i=[1,2], j=['a'=>'b'];",
-                        "const nullType a = null;"
-                                + "\n    const falseType b = false;"
-                                + "\n    const trueType c = true;"
+                        "const mixed a = null;"
+                                + "\n    const bool b = false;"
+                                + "\n    const bool c = true;"
                                 + "\n    const int d = 1;"
                                 + "\n    const float e = 2.1;"
                                 + "\n    const string f = 'hi';"

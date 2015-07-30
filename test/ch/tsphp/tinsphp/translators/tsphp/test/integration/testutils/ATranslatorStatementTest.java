@@ -16,10 +16,10 @@ package ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils;
 import org.junit.Ignore;
 
 @Ignore
-public abstract class ATranslatorInferenceStatementTest extends ATranslatorInferenceTest
+public abstract class ATranslatorStatementTest extends ATranslatorTest
 {
 
-    public ATranslatorInferenceStatementTest(String theTestString, String theExpectedResult) {
+    public ATranslatorStatementTest(String theTestString, String theExpectedResult) {
         super("<?php " + theTestString + " ?>", "namespace{\n    " + theExpectedResult + "\n}");
     }
 }
