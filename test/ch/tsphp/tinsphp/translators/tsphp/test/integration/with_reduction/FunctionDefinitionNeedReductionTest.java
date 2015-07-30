@@ -72,6 +72,8 @@ public class FunctionDefinitionNeedReductionTest extends ATranslatorWithReductio
                         "namespace{\n"
                                 + "\n"
                                 + "    function mixed foo(mixed $x) {\n"
+                                + "        if(!is_float($x) && !is_int($x) && !is_string($x) && !($x instanceof " +
+                                "Exception)){}"
                                 + "        ~((float | int | string)) ($x);\n"
                                 + "        try {\n"
                                 + "        } catch (Exception $x1_49) {\n"
@@ -89,8 +91,7 @@ public class FunctionDefinitionNeedReductionTest extends ATranslatorWithReductio
                                 + "    function scalar foo(scalar $x) {\n"
                                 + "        mixed $v;\n"
                                 + "        ~((float | int | string)) ($x);\n"
-                                + "        foreach ([1] as (falseType | float | int | string | trueType) $x1_43 => " +
-                                "mixed $v1_49) {\n"
+                                + "        foreach ([1] as (int | string) $x1_43 => mixed $v1_49) {\n"
                                 + "            $x = $x1_43;\n"
                                 + "            $v = $v1_49;\n"
                                 + "        }\n"
