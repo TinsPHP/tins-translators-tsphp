@@ -129,7 +129,8 @@ public abstract class ATest implements IIssueLogger
                 new PrecedenceHelper(),
                 tempVariableHelper,
                 operatorHelper,
-                dtoCreator);
+                dtoCreator,
+                nameTransformer);
         controller.setMethodSymbols(inferenceEngineInitialiser.getMethodSymbols());
         translator = new ErrorReportingTSPHPTranslatorWalker(
                 commonTreeNodeStream, controller, inferenceEngineInitialiser.getGlobalDefaultNamespace());

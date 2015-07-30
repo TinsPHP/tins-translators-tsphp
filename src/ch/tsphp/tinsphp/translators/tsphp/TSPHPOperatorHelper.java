@@ -16,7 +16,6 @@ import ch.tsphp.tinsphp.common.inference.constraints.IVariable;
 import ch.tsphp.tinsphp.common.inference.constraints.OverloadApplicationDto;
 import ch.tsphp.tinsphp.common.symbols.IConvertibleTypeSymbol;
 import ch.tsphp.tinsphp.common.symbols.IIntersectionTypeSymbol;
-import ch.tsphp.tinsphp.common.symbols.IUnionTypeSymbol;
 import ch.tsphp.tinsphp.common.symbols.PrimitiveTypeNames;
 import ch.tsphp.tinsphp.common.translation.dtos.FunctionApplicationDto;
 import ch.tsphp.tinsphp.common.utils.ERelation;
@@ -151,7 +150,13 @@ public class TSPHPOperatorHelper implements IOperatorHelper
                                 //runtime checks are covered in the as operator via if types
                                 dto.runtimeChecks.remove(i);
                                 for (ITypeSymbol typeSymbol : pair.second) {
-                                    ifTypes.add(nameTransformer.getTypeName(typeSymbol));
+                                    String typeName;
+                                    if (typeSymbol instanceof IConvertibleTypeSymbol) {
+                                        typeName = nameTransformer.getTypeName((IConvertibleTypeSymbol) typeSymbol);
+                                    } else {
+                                        typeName = typeSymbol.getAbsoluteName();
+                                    }
+                                    ifTypes.add(typeName);
                                 }
                             }
                         }
@@ -172,7 +177,6 @@ public class TSPHPOperatorHelper implements IOperatorHelper
 
         if (pair != null) {
             boolean needMigrationFunction = true;
-
 
             int operatorType = leftHandSide.getType();
             if (operatorType == TokenTypes.Plus
@@ -195,11 +199,14 @@ public class TSPHPOperatorHelper implements IOperatorHelper
                 String lhsTypeVariable = reference.getTypeVariable();
                 ITypeSymbol returnType = pair.second;
                 if (reference.hasFixedType()) {
-                    IUnionTypeSymbol lowerTypeBounds = currentBindings.getLowerTypeBounds(lhsTypeVariable);
-                    TypeHelperDto result = typeHelper.isFirstSameOrSubTypeOfSecond(returnType, lowerTypeBounds);
+                    ITypeSymbol typeSymbol = currentBindings.getLowerTypeBounds(lhsTypeVariable);
+                    if (typeSymbol == null) {
+                        typeSymbol = currentBindings.getUpperTypeBounds(lhsTypeVariable);
+                    }
+                    TypeHelperDto result = typeHelper.isFirstSameOrSubTypeOfSecond(returnType, typeSymbol);
                     //if the left hand side is more specific than the return type then we need to cast
                     if (result.relation == ERelation.HAS_NO_RELATION) {
-                        functionApplicationDto.returnRuntimeCheck = nameTransformer.getTypeName(lowerTypeBounds);
+                        functionApplicationDto.returnRuntimeCheck = nameTransformer.getTypeName(typeSymbol);
                     }
                 } else {
                     //if overload is parametric polymorphic then we need to cast to the parametric type

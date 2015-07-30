@@ -10,10 +10,10 @@
  * For more information see http://tsphp.ch/wiki/display/TSPHP/License
  */
 
-package ch.tsphp.tinsphp.translators.tsphp.test.integration;
+package ch.tsphp.tinsphp.translators.tsphp.test.integration.with_reduction;
 
 
-import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorTest;
+import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorWithReductionTest;
 import org.antlr.runtime.RecognitionException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,7 +24,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 @RunWith(Parameterized.class)
-public class FunctionDefinitionTest extends ATranslatorTest
+public class FunctionDefinitionTest extends ATranslatorWithReductionTest
 {
 
     public FunctionDefinitionTest(String testString, String expectedResult) {
@@ -59,12 +59,13 @@ public class FunctionDefinitionTest extends ATranslatorTest
                                 + "        return $x + $y;\n"
                                 + "    }\n"
                                 + "\n"
-                                + "    function T foo3<T>({as T} $x, {as T} $y) where [T <: (float | int)] {\n"
-                                + "        return $x + $y;\n"
+                                + "    function T foo3<T>({as T} $x, {as T} $y) where [T <: num] {\n"
+                                + "        return (T) (oldSchoolAddition($x, $y));\n"
                                 + "    }\n"
                                 + "\n"
                                 + "}"
                 },
+                //TODO TINS-584 find least upper reference bound
                 {
                         "<?php function fooA($x, $y){return $x + $y + 1;} ?>",
                         "namespace{\n"
@@ -77,8 +78,8 @@ public class FunctionDefinitionTest extends ATranslatorTest
                                 + "        return $x + $y + 1;\n"
                                 + "    }\n"
                                 + "\n"
-                                + "    function (int | T) fooA2<T>({as T} $x, {as T} $y) where [T <: (float | int)] {\n"
-                                + "        return $x + $y + 1;\n"
+                                + "    function (int | T) fooA2<T>({as T} $x, {as T} $y) where [T <: num] {\n"
+                                + "        return (V4) (oldSchoolAddition((T) (oldSchoolAddition($x, $y)), 1));\n"
                                 + "    }\n"
                                 + "\n"
                                 + "}"
@@ -87,20 +88,20 @@ public class FunctionDefinitionTest extends ATranslatorTest
                 // see TINS-404 return without expression and implicit null
                 {
                         "<?php function foo(){ return;} ?>",
-                        "namespace{\n\n    function nullType foo() {\n        return null;\n    }\n\n}"
+                        "namespace{\n\n    function mixed foo() {\n        return null;\n    }\n\n}"
                 },
                 {
                         "<?php function foo($x){ if($x){ return; } return 1;} ?>",
                         "namespace{\n"
                                 + "\n"
-                                + "    function (int | nullType) foo0((falseType | trueType) $x) {\n"
+                                + "    function int? foo0(bool $x) {\n"
                                 + "        if ($x) {\n"
                                 + "            return null;\n"
                                 + "        }\n"
                                 + "        return 1;\n"
                                 + "    }\n"
                                 + "\n"
-                                + "    function (int | nullType) foo1({as (falseType | trueType)} $x) {\n"
+                                + "    function int? foo1({as bool} $x) {\n"
                                 + "        if ($x) {\n"
                                 + "            return null;\n"
                                 + "        }\n"
@@ -113,7 +114,7 @@ public class FunctionDefinitionTest extends ATranslatorTest
                         "<?php function foo($x){ if($x){ return; } else { return 1;}} ?>",
                         "namespace{\n"
                                 + "\n"
-                                + "    function (int | nullType) foo0((falseType | trueType) $x) {\n"
+                                + "    function int? foo0(bool $x) {\n"
                                 + "        if ($x) {\n"
                                 + "            return null;\n"
                                 + "        } else {\n"
@@ -121,7 +122,7 @@ public class FunctionDefinitionTest extends ATranslatorTest
                                 + "        }\n"
                                 + "    }\n"
                                 + "\n"
-                                + "    function (int | nullType) foo1({as (falseType | trueType)} $x) {\n"
+                                + "    function int? foo1({as bool} $x) {\n"
                                 + "        if ($x) {\n"
                                 + "            return null;\n"
                                 + "        } else {\n"
@@ -152,8 +153,8 @@ public class FunctionDefinitionTest extends ATranslatorTest
                                 + "    }\n"
                                 + "\n"
                                 + "    function T1 foo1<T1, T2>(T1 $x, {as T2} $y) "
-                                + "where [(int | T2) <: T1, int <: T2 <: (float | int)] {\n"
-                                + "        $x = 1 + $y;\n"
+                                + "where [(int | T2) <: T1, int <: T2 <: num] {\n"
+                                + "        $x = (T2) (oldSchoolAddition(1, $y));\n"
                                 + "        return $x;\n"
                                 + "    }\n"
                                 + "\n"
@@ -181,41 +182,40 @@ public class FunctionDefinitionTest extends ATranslatorTest
                                 + "        return $a;\n"
                                 + "    }\n"
                                 + "\n"
-                                + "    function T foo3<T>({as T} $x, {as T} $y) where [T <: (float | int)] {\n"
+                                + "    function T foo3<T>({as T} $x, {as T} $y) where [T <: num] {\n"
                                 + "        T $a;\n"
-                                + "        $a = $x + $y;\n"
+                                + "        $a = (T) (oldSchoolAddition($x, $y));\n"
                                 + "        return $a;\n"
                                 + "    }\n"
                                 + "\n"
                                 + "}"
                 },
+                //TODO TINS-579 as operator and compound assignments
                 {
                         "<?php function foo($x){ return $x /= false;}",
                         "namespace{\n"
                                 + "\n"
-                                + "    function T foo<T>(T $x) "
-                                + "where [(falseType | float | int) <: T <: {as (float | int)}] {\n"
-                                + "        return $x /= false;\n"
+                                + "    function T foo<T>(T $x) where [num! <: T <: {as num}] {\n"
+                                + "        return $x as num /= false as num;\n"
                                 + "    }\n"
                                 + "\n"
                                 + "}"
                 },
+                //TODO TINS-579 as operator and compound assignments
                 {
                         "<?php function foo($x, $y){ return $x /= $y;}",
                         "namespace{\n"
                                 + "\n"
-                                + "    function (falseType | float) foo0((falseType | float) $x, float $y) {\n"
+                                + "    function float! foo0(float! $x, float $y) {\n"
                                 + "        return $x /= $y;\n"
                                 + "    }\n"
                                 + "\n"
-                                + "    function T foo1<T>(T $x, float $y) "
-                                + "where [(falseType | float) <: T <: {as (float | int)}] {\n"
-                                + "        return $x /= $y;\n"
+                                + "    function T foo1<T>(T $x, float $y) where [float! <: T <: {as num}] {\n"
+                                + "        return $x as num /= $y;\n"
                                 + "    }\n"
                                 + "\n"
-                                + "    function T foo2<T>(T $x, {as (float | int)} $y) "
-                                + "where [(falseType | float | int) <: T <: {as (float | int)}] {\n"
-                                + "        return $x /= $y;\n"
+                                + "    function T foo2<T>(T $x, {as num} $y) where [num! <: T <: {as num}] {\n"
+                                + "        return $x as num /= $y as num;\n"
                                 + "    }\n"
                                 + "\n"
                                 + "}"
@@ -225,54 +225,54 @@ public class FunctionDefinitionTest extends ATranslatorTest
                         "<?php function foo($x, $y){ $a = $x / $y; return $a;}",
                         "namespace{\n"
                                 + "\n"
-                                + "    function (falseType | float) foo0(float $x, float $y) {\n"
-                                + "        (falseType | float) $a;\n"
+                                + "    function float! foo0(float $x, float $y) {\n"
+                                + "        float! $a;\n"
                                 + "        $a = $x / $y;\n"
                                 + "        return $a;\n"
                                 + "    }\n"
                                 + "\n"
-                                + "    function (falseType | float) foo1(float $x, {as (float | int)} $y) {\n"
-                                + "        (falseType | float) $a;\n"
+                                + "    function float! foo1(float $x, {as num} $y) {\n"
+                                + "        float! $a;\n"
+                                + "        $a = $x / $y as num;\n"
+                                + "        return $a;\n"
+                                + "    }\n"
+                                + "\n"
+                                + "    function num! foo2(int $x, int $y) {\n"
+                                + "        num! $a;\n"
                                 + "        $a = $x / $y;\n"
                                 + "        return $a;\n"
                                 + "    }\n"
                                 + "\n"
-                                + "    function (falseType | float | int) foo2(int $x, int $y) {\n"
-                                + "        (falseType | float | int) $a;\n"
-                                + "        $a = $x / $y;\n"
+                                + "    function float! foo3({as num} $x, float $y) {\n"
+                                + "        float! $a;\n"
+                                + "        $a = $x as num / $y;\n"
                                 + "        return $a;\n"
                                 + "    }\n"
                                 + "\n"
-                                + "    function (falseType | float) foo3({as (float | int)} $x, float $y) {\n"
-                                + "        (falseType | float) $a;\n"
-                                + "        $a = $x / $y;\n"
-                                + "        return $a;\n"
-                                + "    }\n"
-                                + "\n"
-                                + "    function (falseType | float | int) foo4("
-                                + "{as (float | int)} $x, {as (float | int)} $y) {\n"
-                                + "        (falseType | float | int) $a;\n"
-                                + "        $a = $x / $y;\n"
+                                + "    function num! foo4({as num} $x, {as num} $y) {\n"
+                                + "        num! $a;\n"
+                                + "        $a = $x as num / $y as num;\n"
                                 + "        return $a;\n"
                                 + "    }\n"
                                 + "\n"
                                 + "}" +
                                 ""
                 },
+                //TODO TINS-584 find least upper reference bound
                 //TINS-479 local vars with multiple lower ref to params
                 {
                         "<?php function fooK($x, $y){ $a = 1; $a = $x + $y; return $a;}",
                         "namespace{\n"
                                 + "\n"
-                                + "    function (array | int) fooK0(array $x, array $y) {\n"
-                                + "        (array | int) $a;\n"
+                                + "    function mixed fooK0(array $x, array $y) {\n"
+                                + "        mixed $a;\n"
                                 + "        $a = 1;\n"
                                 + "        $a = $x + $y;\n"
                                 + "        return $a;\n"
                                 + "    }\n"
                                 + "\n"
-                                + "    function (float | int) fooK1(float $x, float $y) {\n"
-                                + "        (float | int) $a;\n"
+                                + "    function num fooK1(float $x, float $y) {\n"
+                                + "        num $a;\n"
                                 + "        $a = 1;\n"
                                 + "        $a = $x + $y;\n"
                                 + "        return $a;\n"
@@ -285,87 +285,11 @@ public class FunctionDefinitionTest extends ATranslatorTest
                                 + "        return $a;\n"
                                 + "    }\n"
                                 + "\n"
-                                + "    function (int | T) fooK3<T>({as T} $x, {as T} $y) where [T <: (float | int)] {\n"
+                                + "    function (int | T) fooK3<T>({as T} $x, {as T} $y) where [T <: num] {\n"
                                 + "        (int | T) $a;\n"
                                 + "        $a = 1;\n"
-                                + "        $a = $x + $y;\n"
+                                + "        $a = (T) (oldSchoolAddition($x, $y));\n"
                                 + "        return $a;\n"
-                                + "    }\n"
-                                + "\n"
-                                + "}"
-                },
-
-                //see TINS-442 blank line around functions
-                {
-                        "<?php function foo(){return 1;} function bar(){return 2;}",
-                        "namespace{"
-                                + "\n"
-                                + "\n    function int foo() {"
-                                + "\n        return 1;"
-                                + "\n    }"
-                                + "\n"
-                                + "\n    function int bar() {"
-                                + "\n        return 2;"
-                                + "\n    }"
-                                + "\n"
-                                + "\n}"
-                },
-                //see TINS-442 blank line around functions
-                {
-                        "<?php function foo(){return 1;} $a = 'hello'; "
-                                + "function bar(){return 2;} function baz(){return 3;}",
-                        "namespace{"
-                                + "\n    string $a;"
-                                + "\n"
-                                + "\n    function int foo() {"
-                                + "\n        return 1;"
-                                + "\n    }"
-                                + "\n"
-                                + "\n    $a = 'hello';"
-                                + "\n"
-                                + "\n    function int bar() {"
-                                + "\n        return 2;"
-                                + "\n    }"
-                                + "\n"
-                                + "\n    function int baz() {"
-                                + "\n        return 3;"
-                                + "\n    }"
-                                + "\n"
-                                + "\n}"
-                },
-                //TINS-396 create local variable for parameters with type hints
-                {
-                        "<?php function typeHint(array \n$a){ return 1;}",
-                        "namespace{"
-                                + "\n"
-                                + "\n    function int typeHint(array $a_0) {"
-                                + "\n        mixed $a = $a_0;"
-                                + "\n        return 1;"
-                                + "\n    }"
-                                + "\n"
-                                + "\n}"
-                },
-                {
-                        "<?php function typeHint(array \n$a, array \n$b){return $a + $b;}",
-                        "namespace{"
-                                + "\n"
-                                + "\n    function array typeHint(array $a_0, array $b_0) {"
-                                + "\n        array $b = $b_0;"
-                                + "\n        array $a = $a_0;"
-                                + "\n        return $a + $b;"
-                                + "\n    }"
-                                + "\n"
-                                + "\n}"
-                },
-                {
-                        "<?php function foo($x){if(true){return ~$x;} return $x + [1];}",
-                        "namespace{\n"
-                                + "\n"
-                                + "    function (array | int | string) foo((array | {as (float | int)}) $x) {\n"
-                                + "        if (true) {\n"
-                                + "            return ~((float | int | string)) ($x);\n"
-                                + "        }\n"
-                                + "        return (array) ($x) + [1];\n"
                                 + "    }\n"
                                 + "\n"
                                 + "}"

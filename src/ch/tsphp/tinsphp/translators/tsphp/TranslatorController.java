@@ -12,6 +12,8 @@ import ch.tsphp.tinsphp.common.inference.constraints.IBindingCollection;
 import ch.tsphp.tinsphp.common.inference.constraints.IFunctionType;
 import ch.tsphp.tinsphp.common.inference.constraints.IVariable;
 import ch.tsphp.tinsphp.common.inference.constraints.OverloadApplicationDto;
+import ch.tsphp.tinsphp.common.symbols.IContainerTypeSymbol;
+import ch.tsphp.tinsphp.common.symbols.IConvertibleTypeSymbol;
 import ch.tsphp.tinsphp.common.symbols.IExpressionVariableSymbol;
 import ch.tsphp.tinsphp.common.symbols.IMethodSymbol;
 import ch.tsphp.tinsphp.common.symbols.IMinimalMethodSymbol;
@@ -33,17 +35,20 @@ public class TranslatorController implements ITranslatorController
     private final ITempVariableHelper tempVariableHelper;
     private final IOperatorHelper operatorHelper;
     private final IDtoCreator dtoCreator;
+    private final INameTransformer nameTransformer;
     private Map<String, Collection<OverloadDto>> methodDtosMap;
 
     public TranslatorController(
             IPrecedenceHelper thePrecedenceHelper,
             ITempVariableHelper theTempVariableHelper,
             IOperatorHelper theOperatorHelper,
-            IDtoCreator theDtoCreator) {
+            IDtoCreator theDtoCreator,
+            INameTransformer theNameTransformer) {
         precedenceHelper = thePrecedenceHelper;
         tempVariableHelper = theTempVariableHelper;
         operatorHelper = theOperatorHelper;
         dtoCreator = theDtoCreator;
+        nameTransformer = theNameTransformer;
     }
 
 
@@ -118,10 +123,29 @@ public class TranslatorController implements ITranslatorController
             runtimeChecks = new HashMap<>();
             for (Map.Entry<Integer, Pair<ITypeSymbol, List<ITypeSymbol>>> entry
                     : appliedOverload.runtimeChecks.entrySet()) {
-                runtimeChecks.put(entry.getKey(), entry.getValue().first.getAbsoluteName());
+                addToRuntimeChecks(runtimeChecks, entry.getKey(), entry.getValue().first);
             }
         }
         return runtimeChecks;
+    }
+
+    private void addToRuntimeChecks(Map<Integer, String> runtimeChecks, int argumentNumber, ITypeSymbol typeSymbol) {
+        if (typeSymbol instanceof IContainerTypeSymbol) {
+            //TODO TINS-604 runtime check with union type
+//            IContainerTypeSymbol containerTypeSymbol = (IContainerTypeSymbol) typeSymbol;
+//            for (ITypeSymbol innerTypeSymbol : containerTypeSymbol.getTypeSymbols().values()) {
+//                addToRuntimeChecks(runtimeChecks, argumentNumber, innerTypeSymbol);
+//            }
+            runtimeChecks.put(argumentNumber, typeSymbol.getAbsoluteName());
+        } else {
+            String typeName;
+            if (typeSymbol instanceof IConvertibleTypeSymbol) {
+                typeName = nameTransformer.getTypeName((IConvertibleTypeSymbol) typeSymbol);
+            } else {
+                typeName = typeSymbol.getAbsoluteName();
+            }
+            runtimeChecks.put(argumentNumber, typeName);
+        }
     }
 
     @Override

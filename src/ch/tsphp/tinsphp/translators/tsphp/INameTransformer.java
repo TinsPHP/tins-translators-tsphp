@@ -9,6 +9,7 @@ package ch.tsphp.tinsphp.translators.tsphp;
 import ch.tsphp.common.symbols.ITypeSymbol;
 import ch.tsphp.tinsphp.common.inference.constraints.IBindingCollection;
 import ch.tsphp.tinsphp.common.symbols.IContainerTypeSymbol;
+import ch.tsphp.tinsphp.common.symbols.IConvertibleTypeSymbol;
 
 import java.util.Collection;
 
@@ -21,7 +22,9 @@ public interface INameTransformer
 
     String getTypeName(ITypeSymbol typeSymbol);
 
-    String getTypeName(IContainerTypeSymbol typeSymbol);
+    String getTypeName(IContainerTypeSymbol containerTypeSymbol);
+
+    String getTypeName(IConvertibleTypeSymbol convertibleTypeSymbol);
 
     Collection<String> getTypeBounds(IContainerTypeSymbol typeBounds);
 

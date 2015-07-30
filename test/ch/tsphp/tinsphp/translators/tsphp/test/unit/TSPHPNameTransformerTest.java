@@ -6,6 +6,7 @@
 
 package ch.tsphp.tinsphp.translators.tsphp.test.unit;
 
+import ch.tsphp.tinsphp.common.symbols.IConvertibleTypeSymbol;
 import ch.tsphp.tinsphp.common.symbols.IIntersectionTypeSymbol;
 import ch.tsphp.tinsphp.common.symbols.IUnionTypeSymbol;
 import ch.tsphp.tinsphp.translators.tsphp.INameTransformer;
@@ -16,7 +17,7 @@ import org.junit.Test;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-public class TSPHPTypeReducerTest extends ATypeTest
+public class TSPHPNameTransformerTest extends ATypeTest
 {
 
     @Test
@@ -272,6 +273,62 @@ public class TSPHPTypeReducerTest extends ATypeTest
         String result = nameTransformer.getTypeName(unionTypeSymbol);
 
         assertThat(result, is("num"));
+    }
+
+    @Test
+    public void getTypeName_AsInt_ReturnsAsInt() {
+        IConvertibleTypeSymbol convertibleTypeSymbol = createConvertibleTypeSymbol(intType);
+
+        INameTransformer nameTransformer = createNameTransformer();
+        String result = nameTransformer.getTypeName(convertibleTypeSymbol);
+
+        assertThat(result, is("{as int}"));
+    }
+
+    @Test
+    public void getTypeName_AsFalseTypeOrTrueType_ReturnsAsBool() {
+        IUnionTypeSymbol unionTypeSymbol = createUnionTypeSymbol(falseType, trueType);
+        IConvertibleTypeSymbol convertibleTypeSymbol = createConvertibleTypeSymbol(unionTypeSymbol);
+
+        INameTransformer nameTransformer = createNameTransformer();
+        String result = nameTransformer.getTypeName(convertibleTypeSymbol);
+
+        assertThat(result, is("{as bool}"));
+    }
+
+    @Test
+    public void getTypeName_AsFalseTypeOrTrueTypeInUnion_ReturnsAsBool() {
+        IUnionTypeSymbol unionTypeSymbol1 = createUnionTypeSymbol(falseType, trueType);
+        IConvertibleTypeSymbol convertibleTypeSymbol = createConvertibleTypeSymbol(unionTypeSymbol1);
+        IUnionTypeSymbol unionTypeSymbol2 = createUnionTypeSymbol(convertibleTypeSymbol);
+
+        INameTransformer nameTransformer = createNameTransformer();
+        String result = nameTransformer.getTypeName(unionTypeSymbol2);
+
+        assertThat(result, is("{as bool}"));
+    }
+
+    @Test
+    public void getTypeName_AsIntOrFloat_ReturnsAsNum() {
+        IUnionTypeSymbol unionTypeSymbol = createUnionTypeSymbol(intType, floatType);
+        IConvertibleTypeSymbol convertibleTypeSymbol = createConvertibleTypeSymbol(unionTypeSymbol);
+
+        INameTransformer nameTransformer = createNameTransformer();
+        String result = nameTransformer.getTypeName(convertibleTypeSymbol);
+
+        assertThat(result, is("{as num}"));
+    }
+
+    @Test
+    public void getTypeName_AsIntOrFloatInIntersection_ReturnsAsNum() {
+        IUnionTypeSymbol unionTypeSymbol = createUnionTypeSymbol(intType, floatType);
+        IConvertibleTypeSymbol convertibleTypeSymbol = createConvertibleTypeSymbol(unionTypeSymbol);
+        IIntersectionTypeSymbol intersectionTypeSymbol = createIntersectionTypeSymbol(convertibleTypeSymbol);
+
+        INameTransformer nameTransformer = createNameTransformer();
+        String result = nameTransformer.getTypeName(intersectionTypeSymbol);
+
+        assertThat(result, is("{as num}"));
     }
 
     protected INameTransformer createNameTransformer() {

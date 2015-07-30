@@ -244,8 +244,8 @@ public abstract class ATypeTest
         return convertibleTypeSymbol;
     }
 
-    protected ConvertibleTypeSymbol createConvertibleType() {
-        return createConvertibleType(symbolFactory, typeHelper);
+    protected IConvertibleTypeSymbol createConvertibleTypeSymbol(ITypeSymbol typeSymbol) {
+        return createConvertibleType(typeSymbol, symbolFactory, typeHelper);
     }
 
     protected ConvertibleTypeSymbol createConvertibleType(ISymbolFactory theSymbolFactory, ITypeHelper theTypeHelper) {

@@ -49,8 +49,10 @@ public class VariableDeclarationTest extends ATranslatorTest
                 {"<?php $a=1.2;", "namespace{\n    float $a;\n    $a = 1.2;\n}"},
                 {"<?php $a='hi';", "namespace{\n    string $a;\n    $a = 'hi';\n}"},
                 {"<?php $a=[];", "namespace{\n    array $a;\n    $a = [];\n}"},
-                {"<?php $a=false; $a=true;", "namespace{\n    (falseType | trueType) $a;\n    $a = false;\n    $a = " +
-                        "true;\n}"},
+                {
+                        "<?php $a=false; $a=true;",
+                        "namespace{\n    (falseType | trueType) $a;\n    $a = false;\n    $a = true;\n}"
+                },
                 {"<?php $a=1; $a=2.3;", "namespace{\n    (float | int) $a;\n    $a = 1;\n    $a = 2.3;\n}"},
                 {
                         "<?php $a=false; $a=true; $a=1; $a=1.5; $a='hi';",

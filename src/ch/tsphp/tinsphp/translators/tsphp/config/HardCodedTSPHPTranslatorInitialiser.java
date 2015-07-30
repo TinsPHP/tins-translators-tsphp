@@ -76,7 +76,8 @@ public class HardCodedTSPHPTranslatorInitialiser implements ITranslatorInitialis
                 precedenceHelper,
                 tempVariableHelper,
                 operatorHelper,
-                dtoCreator);
+                dtoCreator,
+                nameTransformer);
 
         loadStringTemplate();
     }

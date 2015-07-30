@@ -9,6 +9,7 @@ package ch.tsphp.tinsphp.translators.tsphp;
 import ch.tsphp.common.symbols.ITypeSymbol;
 import ch.tsphp.tinsphp.common.inference.constraints.IBindingCollection;
 import ch.tsphp.tinsphp.common.symbols.IContainerTypeSymbol;
+import ch.tsphp.tinsphp.common.symbols.IConvertibleTypeSymbol;
 import ch.tsphp.tinsphp.common.symbols.IIntersectionTypeSymbol;
 import ch.tsphp.tinsphp.common.symbols.ISymbolFactory;
 import ch.tsphp.tinsphp.common.symbols.IUnionTypeSymbol;
@@ -86,7 +87,9 @@ public class TSPHPNameTransformer implements INameTransformer
 
     private String getTypeFromNonContainer(ITypeSymbol typeSymbol) {
         String typeName;
-        if (typeHelper.areSame(typeSymbol, primitiveTypes.get(PrimitiveTypeNames.FALSE_TYPE))) {
+        if (typeSymbol instanceof IConvertibleTypeSymbol) {
+            typeName = getTypeName((IConvertibleTypeSymbol) typeSymbol);
+        } else if (typeHelper.areSame(typeSymbol, primitiveTypes.get(PrimitiveTypeNames.FALSE_TYPE))) {
             typeName = "bool";
         } else if (typeHelper.areSame(typeSymbol, primitiveTypes.get(PrimitiveTypeNames.TRUE_TYPE))) {
             typeName = "bool";
@@ -131,6 +134,16 @@ public class TSPHPNameTransformer implements INameTransformer
             typeName = getTypeFromNonContainer(containerTypeSymbol.getTypeSymbols().values().iterator().next());
         }
         return typeName;
+    }
+
+    @Override
+    public String getTypeName(IConvertibleTypeSymbol convertibleTypeSymbol) {
+        if (convertibleTypeSymbol.isFixed()) {
+            String innerTypeName = getTypeName(
+                    convertibleTypeSymbol.getBindingCollection(), convertibleTypeSymbol.getTypeVariable());
+            return "{as " + innerTypeName + "}";
+        }
+        return convertibleTypeSymbol.getAbsoluteName();
     }
 
     /**
@@ -178,7 +191,7 @@ public class TSPHPNameTransformer implements INameTransformer
             suffix += "?";
 //            }
         }
-        return leastUpperTypeBound.getAbsoluteName() + suffix;
+        return getTypeFromNonContainer(leastUpperTypeBound) + suffix;
     }
 
     private ITypeSymbol calculateLeastUpperTypeBound(IUnionTypeSymbol containerTypeSymbol) {
@@ -244,13 +257,18 @@ public class TSPHPNameTransformer implements INameTransformer
         List<ITypeSymbol> parentTypeSymbols = new ArrayList<>();
         typeSymbols:
         for (ITypeSymbol typeSymbol : typeSymbols) {
-            for (ITypeSymbol parentTypeSymbol : typeSymbol.getParentTypeSymbols()) {
-                if (typeHelper.areSame(parentTypeSymbol, mixedTypeSymbol) || areAllSubtypes(typeSymbols,
-                        parentTypeSymbol)) {
-                    leastUpperBound = parentTypeSymbol;
-                    break typeSymbols;
+            if (!(typeSymbol instanceof IConvertibleTypeSymbol)) {
+                for (ITypeSymbol parentTypeSymbol : typeSymbol.getParentTypeSymbols()) {
+                    if (typeHelper.areSame(parentTypeSymbol, mixedTypeSymbol) || areAllSubtypes(typeSymbols,
+                            parentTypeSymbol)) {
+                        leastUpperBound = parentTypeSymbol;
+                        break typeSymbols;
+                    }
+                    parentTypeSymbols.add(parentTypeSymbol);
                 }
-                parentTypeSymbols.add(parentTypeSymbol);
+            } else {
+                //a convertible type has only mixed as parent type
+                leastUpperBound = mixedTypeSymbol;
             }
         }
         if (leastUpperBound == null) {

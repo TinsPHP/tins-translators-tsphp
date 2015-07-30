@@ -9,6 +9,7 @@ package ch.tsphp.tinsphp.translators.tsphp;
 import ch.tsphp.common.symbols.ITypeSymbol;
 import ch.tsphp.tinsphp.common.inference.constraints.IBindingCollection;
 import ch.tsphp.tinsphp.common.symbols.IContainerTypeSymbol;
+import ch.tsphp.tinsphp.common.symbols.IConvertibleTypeSymbol;
 
 import java.util.Collection;
 import java.util.TreeSet;
@@ -28,13 +29,18 @@ public class MetaNameTransformer implements INameTransformer
     }
 
     @Override
+    public String getTypeName(ITypeSymbol typeSymbol) {
+        return typeSymbol.getAbsoluteName();
+    }
+
+    @Override
     public String getTypeName(IContainerTypeSymbol typeSymbol) {
         return typeSymbol.getAbsoluteName();
     }
 
     @Override
-    public String getTypeName(ITypeSymbol typeSymbol) {
-        return typeSymbol.getAbsoluteName();
+    public String getTypeName(IConvertibleTypeSymbol convertibleTypeSymbol) {
+        return convertibleTypeSymbol.getAbsoluteName();
     }
 
     @Override
@@ -44,7 +50,6 @@ public class MetaNameTransformer implements INameTransformer
 
     @Override
     public Collection<String> getLowerRefBounds(IBindingCollection bindingCollection, String typeVariable) {
-        //TODO TINS-584 find least upper reference bound
         return new TreeSet<>(bindingCollection.getLowerRefBounds(typeVariable));
     }
 }
