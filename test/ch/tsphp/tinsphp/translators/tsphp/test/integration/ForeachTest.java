@@ -128,15 +128,15 @@ public class ForeachTest extends ATranslatorTest
                                 + "\n    }"
                                 + "\n}"
                 },
+                //TODO TINS-602 runtime check for convertible types
                 //see TINS-247 translator procedural - foreach header
                 {
                         "<?php $v = null;"
                                 + "\n foreach([1,2] as \n$k => \n$v){"
                                 + "\n }"
-                        //TODO rstoll TINS-306 inference - runtime check insertion
-//                                + "\n if($v != null){"
-//                                + "\n   echo $v;"
-//                                + "\n }"
+                                + "\n if($v != null){"
+                                + "\n   echo $v;"
+                                + "\n }"
                         ,
                         "namespace{"
                                 + "\n    (int | string) $k;"
@@ -146,10 +146,9 @@ public class ForeachTest extends ATranslatorTest
                                 + "\n        $k = $k3_0;"
                                 + "\n        $v = $v4_0;"
                                 + "\n    }"
-                                //TODO rstoll TINS-306 inference - runtime check insertion
-//                                + "\n    if ($v != null) {"
-//                                + "\n        echo $v;"
-//                                + "\n    }"
+                                + "\n    if ($v != null) {"
+                                + "\n        echo ({as string}) ($v);"
+                                + "\n    }"
                                 + "\n}"
                 }
         });

@@ -58,6 +58,11 @@ public class FunctionDefinitionNeedReductionTest extends ATranslatorWithReductio
                         "namespace{\n"
                                 + "\n"
                                 + "    function mixed foo(mixed $x) {\n"
+                                //TODO TINS-603 enhance collecting types in soft typing
+//                                + "        if (!is_array($x) && !is_float($x) && !is_int($x) && !is_string($x)) {\n"
+//                                + "            \\trigger_error('Argument 1 passed to foo() must be a value of type "
+//                                + "array, float, int or string', \\E_USER_ERROR);\n"
+//                                + "        }\n"
                                 + "        if (true) {\n"
                                 + "            return ~((float | int | string)) ($x);\n"
                                 + "        }\n"
@@ -72,8 +77,11 @@ public class FunctionDefinitionNeedReductionTest extends ATranslatorWithReductio
                         "namespace{\n"
                                 + "\n"
                                 + "    function mixed foo(mixed $x) {\n"
-                                + "        if(!is_float($x) && !is_int($x) && !is_string($x) && !($x instanceof " +
-                                "Exception)){}"
+                                + "        if (!($x instanceof Exception) && !is_float($x) && !is_int($x) "
+                                + "&& !is_string($x)) {\n"
+                                + "            \\trigger_error('Argument 1 passed to foo() (parameter $x) must be a "
+                                + "value of type Exception, float, int or string', \\E_USER_ERROR);\n"
+                                + "        }\n"
                                 + "        ~((float | int | string)) ($x);\n"
                                 + "        try {\n"
                                 + "        } catch (Exception $x1_49) {\n"
@@ -89,6 +97,10 @@ public class FunctionDefinitionNeedReductionTest extends ATranslatorWithReductio
                         "namespace{\n"
                                 + "\n"
                                 + "    function scalar foo(scalar $x) {\n"
+                                + "        if (!is_float($x) && !is_int($x) && !is_string($x)) {\n"
+                                + "            \\trigger_error('Argument 1 passed to foo() (parameter $x) must be a "
+                                + "value of type float, int or string', \\E_USER_ERROR);\n"
+                                + "        }\n"
                                 + "        mixed $v;\n"
                                 + "        ~((float | int | string)) ($x);\n"
                                 + "        foreach ([1] as (int | string) $x1_43 => mixed $v1_49) {\n"
@@ -99,7 +111,7 @@ public class FunctionDefinitionNeedReductionTest extends ATranslatorWithReductio
                                 + "    }\n"
                                 + "\n"
                                 + "}"
-                }
+                },
         });
     }
 }

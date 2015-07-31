@@ -152,7 +152,9 @@ public class TSPHPOperatorHelper implements IOperatorHelper
                                 for (ITypeSymbol typeSymbol : pair.second) {
                                     String typeName;
                                     if (typeSymbol instanceof IConvertibleTypeSymbol) {
-                                        typeName = nameTransformer.getTypeName((IConvertibleTypeSymbol) typeSymbol);
+                                        Pair<String, Boolean> nameTransformerPair = nameTransformer.getTypeName(
+                                                (IConvertibleTypeSymbol) typeSymbol);
+                                        typeName = nameTransformerPair.first;
                                     } else {
                                         typeName = typeSymbol.getAbsoluteName();
                                     }
@@ -160,7 +162,8 @@ public class TSPHPOperatorHelper implements IOperatorHelper
                                 }
                             }
                         }
-                        dto.conversions.put(i, pair(nameTransformer.getTypeName(targetType), ifTypes));
+                        Pair<String, Boolean> nameTransformerPair = nameTransformer.getTypeName(targetType);
+                        dto.conversions.put(i, pair(nameTransformerPair.first, ifTypes));
                     } else {
                         //no conversion required since it is already a subtype
                     }
@@ -206,7 +209,8 @@ public class TSPHPOperatorHelper implements IOperatorHelper
                     TypeHelperDto result = typeHelper.isFirstSameOrSubTypeOfSecond(returnType, typeSymbol);
                     //if the left hand side is more specific than the return type then we need to cast
                     if (result.relation == ERelation.HAS_NO_RELATION) {
-                        functionApplicationDto.returnRuntimeCheck = nameTransformer.getTypeName(typeSymbol);
+                        Pair<String, Boolean> nameTransformerPair = nameTransformer.getTypeName(typeSymbol);
+                        functionApplicationDto.returnRuntimeCheck = nameTransformerPair.first;
                     }
                 } else {
                     //if overload is parametric polymorphic then we need to cast to the parametric type

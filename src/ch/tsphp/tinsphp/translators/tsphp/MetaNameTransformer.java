@@ -10,37 +10,40 @@ import ch.tsphp.common.symbols.ITypeSymbol;
 import ch.tsphp.tinsphp.common.inference.constraints.IBindingCollection;
 import ch.tsphp.tinsphp.common.symbols.IContainerTypeSymbol;
 import ch.tsphp.tinsphp.common.symbols.IConvertibleTypeSymbol;
+import ch.tsphp.tinsphp.common.utils.Pair;
 
 import java.util.Collection;
 import java.util.TreeSet;
+
+import static ch.tsphp.tinsphp.common.utils.Pair.pair;
 
 public class MetaNameTransformer implements INameTransformer
 {
 
     @Override
-    public String getTypeName(IBindingCollection bindingCollection, String typeVariable) {
+    public Pair<String, Boolean> getTypeName(IBindingCollection bindingCollection, String typeVariable) {
         IContainerTypeSymbol containerTypeSymbol;
         if (bindingCollection.hasUpperTypeBounds(typeVariable)) {
             containerTypeSymbol = bindingCollection.getUpperTypeBounds(typeVariable);
         } else {
             containerTypeSymbol = bindingCollection.getLowerTypeBounds(typeVariable);
         }
-        return containerTypeSymbol.getAbsoluteName();
+        return pair(containerTypeSymbol.getAbsoluteName(), false);
     }
 
     @Override
-    public String getTypeName(ITypeSymbol typeSymbol) {
-        return typeSymbol.getAbsoluteName();
+    public Pair<String, Boolean> getTypeName(ITypeSymbol typeSymbol) {
+        return pair(typeSymbol.getAbsoluteName(), false);
     }
 
     @Override
-    public String getTypeName(IContainerTypeSymbol typeSymbol) {
-        return typeSymbol.getAbsoluteName();
+    public Pair<String, Boolean> getTypeName(IContainerTypeSymbol typeSymbol) {
+        return pair(typeSymbol.getAbsoluteName(), false);
     }
 
     @Override
-    public String getTypeName(IConvertibleTypeSymbol convertibleTypeSymbol) {
-        return convertibleTypeSymbol.getAbsoluteName();
+    public Pair<String, Boolean> getTypeName(IConvertibleTypeSymbol convertibleTypeSymbol) {
+        return pair(convertibleTypeSymbol.getAbsoluteName(), false);
     }
 
     @Override

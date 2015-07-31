@@ -23,7 +23,9 @@ import ch.tsphp.tinsphp.common.translation.dtos.FunctionApplicationDto;
 import ch.tsphp.tinsphp.common.translation.dtos.OverloadDto;
 import ch.tsphp.tinsphp.common.translation.dtos.VariableDto;
 import ch.tsphp.tinsphp.common.utils.Pair;
+import ch.tsphp.tinsphp.translators.tsphp.issues.IOutputIssueMessageProvider;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -36,6 +38,7 @@ public class TranslatorController implements ITranslatorController
     private final IOperatorHelper operatorHelper;
     private final IDtoCreator dtoCreator;
     private final INameTransformer nameTransformer;
+    private final IOutputIssueMessageProvider messageProvider;
     private Map<String, Collection<OverloadDto>> methodDtosMap;
 
     public TranslatorController(
@@ -43,12 +46,14 @@ public class TranslatorController implements ITranslatorController
             ITempVariableHelper theTempVariableHelper,
             IOperatorHelper theOperatorHelper,
             IDtoCreator theDtoCreator,
-            INameTransformer theNameTransformer) {
+            INameTransformer theNameTransformer,
+            IOutputIssueMessageProvider theMessageProvider) {
         precedenceHelper = thePrecedenceHelper;
         tempVariableHelper = theTempVariableHelper;
         operatorHelper = theOperatorHelper;
         dtoCreator = theDtoCreator;
         nameTransformer = theNameTransformer;
+        messageProvider = theMessageProvider;
     }
 
 
@@ -140,7 +145,8 @@ public class TranslatorController implements ITranslatorController
         } else {
             String typeName;
             if (typeSymbol instanceof IConvertibleTypeSymbol) {
-                typeName = nameTransformer.getTypeName((IConvertibleTypeSymbol) typeSymbol);
+                Pair<String, Boolean> pair = nameTransformer.getTypeName((IConvertibleTypeSymbol) typeSymbol);
+                typeName = pair.first;
             } else {
                 typeName = typeSymbol.getAbsoluteName();
             }
@@ -166,46 +172,41 @@ public class TranslatorController implements ITranslatorController
     @Override
     public String getErrMessageFunctionApplication(
             IBindingCollection bindings, ITSPHPAst functionCall, ITSPHPAst identifier) {
-        StringBuilder stringBuilder = new StringBuilder("'No applicable overload found for the function ");
-        stringBuilder.append(identifier.getText()).append(".\\n");
-        ITSPHPAst arguments = functionCall.getChild(1);
-        appendArgumentTypes(stringBuilder, bindings, arguments);
-        appendOverloads(stringBuilder, functionCall);
-        stringBuilder.append("'");
-        return stringBuilder.toString();
+        List<String> arguments = getArguments(bindings, functionCall.getChild(1));
+        List<String> overloads = getOverloads(functionCall);
+        return messageProvider.getWrongApplication("wrongFunctionUsage", identifier.getText(), arguments, overloads);
     }
 
-    private void appendArgumentTypes(
-            StringBuilder stringBuilder, IBindingCollection bindings, ITSPHPAst arguments) {
-        stringBuilder.append("Given argument types: ");
-        int numberOfArguments = arguments.getChildCount();
-        if (numberOfArguments == 0) {
-            stringBuilder.append("void");
-        } else {
-            String typeVariable = bindings.getTypeVariable(arguments.getChild(0).getSymbol().getAbsoluteName());
-            stringBuilder.append(bindings.getLowerTypeBounds(typeVariable));
-            for (int i = 1; i < numberOfArguments; ++i) {
-                typeVariable = bindings.getTypeVariable(arguments.getChild(i).getSymbol().getAbsoluteName());
-                stringBuilder.append(" x ").append(bindings.getLowerTypeBounds(typeVariable));
-            }
-        }
-    }
-
-    private void appendOverloads(StringBuilder stringBuilder, ITSPHPAst functionCall) {
-        stringBuilder.append("\\nExisting overloads:");
+    private List<String> getOverloads(ITSPHPAst functionCall) {
+        List<String> overloads = new ArrayList<>();
         IMinimalMethodSymbol methodSymbol = ((IExpressionVariableSymbol) functionCall.getSymbol()).getMethodSymbol();
         for (IFunctionType functionType : methodSymbol.getOverloads()) {
-            stringBuilder.append("\\n").append(functionType.getSignature());
+            overloads.add(functionType.getSignature());
         }
+        return overloads;
     }
+
+    private List<String> getArguments(IBindingCollection bindings, ITSPHPAst argumentsAst) {
+        List<String> arguments = new ArrayList<>();
+        int numberOfArguments = argumentsAst.getChildCount();
+        if (numberOfArguments == 0) {
+            arguments.add("void");
+        } else {
+            String typeVariable = bindings.getTypeVariable(argumentsAst.getChild(0).getSymbol().getAbsoluteName());
+            arguments.add(bindings.getLowerTypeBounds(typeVariable).getAbsoluteName());
+            for (int i = 1; i < numberOfArguments; ++i) {
+                typeVariable = bindings.getTypeVariable(argumentsAst.getChild(i).getSymbol().getAbsoluteName());
+                arguments.add(bindings.getLowerTypeBounds(typeVariable).getAbsoluteName());
+            }
+        }
+        return arguments;
+    }
+
 
     @Override
     public String getErrMessageOperatorApplication(IBindingCollection bindings, ITSPHPAst operator) {
-        StringBuilder stringBuilder = new StringBuilder("'No applicable overload found for the ")
-                .append(operator.getText()).append(" operator.\\n");
-        appendArgumentTypes(stringBuilder, bindings, operator);
-        appendOverloads(stringBuilder, operator);
-        stringBuilder.append("'");
-        return stringBuilder.toString();
+        List<String> arguments = getArguments(bindings, operator);
+        List<String> overloads = getOverloads(operator);
+        return messageProvider.getWrongApplication("wrongOperatorUsage", operator.getText(), arguments, overloads);
     }
 }

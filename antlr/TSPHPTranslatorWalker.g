@@ -605,15 +605,15 @@ functionDefinition
                             defaultValue={paramDto.defaultValue}
                         ));
                         
-                        if(paramDto.typeHint != null){
-                            StringTemplate typeHint = %type(
-                                prefixModifiers={paramDto.typeHint.prefixModifiers}, 
-                                type={paramDto.typeHint.type},
-                                suffixModifiers={paramDto.typeHint.suffixModifiers}
+                        if(paramDto.localVariableType != null){
+                            StringTemplate localVariableType = %type(
+                                prefixModifiers={paramDto.localVariableType.prefixModifiers}, 
+                                type={paramDto.localVariableType.type},
+                                suffixModifiers={paramDto.localVariableType.suffixModifiers}
                             );
                         
                             StringTemplate localVariable = %variable(
-                                type={typeHint}, 
+                                type={localVariableType}, 
                                 variableId={paramDto.localVariableId}, 
                                 defaultValue={paramDto.parameterId}
                             );
@@ -621,6 +621,13 @@ functionDefinition
                         }
                     }
                  
+                    if(dto.runtimeChecks != null){
+                        int size = dto.runtimeChecks.size();
+                        for(int i = size - 1; i >= 0; --i){
+                            Pair<String, String> pair = dto.runtimeChecks.get(i);
+                            instructions.add(0, %parameterRuntimeCheck(check={pair.first}, message={pair.second}));
+                        }
+                    }
 
                     methods.add(%method(
                         modifier={null},

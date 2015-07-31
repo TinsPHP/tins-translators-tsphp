@@ -35,12 +35,15 @@ import ch.tsphp.tinsphp.symbols.config.HardCodedSymbolsInitialiser;
 import ch.tsphp.tinsphp.translators.tsphp.DtoCreator;
 import ch.tsphp.tinsphp.translators.tsphp.INameTransformer;
 import ch.tsphp.tinsphp.translators.tsphp.IOperatorHelper;
+import ch.tsphp.tinsphp.translators.tsphp.IParameterCheckProvider;
 import ch.tsphp.tinsphp.translators.tsphp.MetaNameTransformer;
 import ch.tsphp.tinsphp.translators.tsphp.MetaOperatorHelper;
+import ch.tsphp.tinsphp.translators.tsphp.MetaParameterCheckProvider;
 import ch.tsphp.tinsphp.translators.tsphp.PrecedenceHelper;
 import ch.tsphp.tinsphp.translators.tsphp.TempVariableHelper;
 import ch.tsphp.tinsphp.translators.tsphp.TranslatorController;
 import ch.tsphp.tinsphp.translators.tsphp.antlrmod.ErrorReportingTSPHPTranslatorWalker;
+import ch.tsphp.tinsphp.translators.tsphp.issues.HardCodedOutputIssueMessageProvider;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.runtime.tree.TreeRuleReturnScope;
@@ -122,15 +125,17 @@ public abstract class ATest implements IIssueLogger
         TempVariableHelper tempVariableHelper = new TempVariableHelper(astAdaptor);
         INameTransformer nameTransformer = createNameTransformer();
         IOperatorHelper operatorHelper = createOperatorHelper(nameTransformer);
+        IParameterCheckProvider parameterCheckProvider = createParameterCheckProvider();
 
-        IDtoCreator dtoCreator = new DtoCreator(tempVariableHelper, nameTransformer);
+        IDtoCreator dtoCreator = new DtoCreator(tempVariableHelper, nameTransformer, parameterCheckProvider);
 
         controller = new TranslatorController(
                 new PrecedenceHelper(),
                 tempVariableHelper,
                 operatorHelper,
                 dtoCreator,
-                nameTransformer);
+                nameTransformer,
+                new HardCodedOutputIssueMessageProvider());
         controller.setMethodSymbols(inferenceEngineInitialiser.getMethodSymbols());
         translator = new ErrorReportingTSPHPTranslatorWalker(
                 commonTreeNodeStream, controller, inferenceEngineInitialiser.getGlobalDefaultNamespace());
@@ -140,6 +145,10 @@ public abstract class ATest implements IIssueLogger
         run();
 
         check();
+    }
+
+    protected IParameterCheckProvider createParameterCheckProvider() {
+        return new MetaParameterCheckProvider();
     }
 
     protected INameTransformer createNameTransformer() {

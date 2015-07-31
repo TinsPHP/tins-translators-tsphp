@@ -50,36 +50,39 @@ public class ExpressionErrorTest extends ATranslatorTest
                         "namespace{\n"
                                 + "\n"
                                 + "    function mixed foo() {\n"
-                                + "        return \\trigger_error('No applicable overload found for the + operator.\\n"
-                                + "Given argument types: int x array\\n"
-                                + "Existing overloads:\\n"
-                                + "int x int -> int\\n"
-                                + "float x float -> float\\n"
-                                + "{as T} x {as T} -> T \\ T <: (float | int)\\n"
+                                + "        return \\trigger_error('"
+                                + "No applicable overload found for the operator +'.PHP_EOL.'"
+                                + "Given argument types: int x array'.PHP_EOL.'"
+                                + "Existing overloads:'.PHP_EOL.'"
+                                + "int x int -> int'.PHP_EOL.'"
+                                + "float x float -> float'.PHP_EOL.'"
+                                + "{as T} x {as T} -> T \\ T <: (float | int)'.PHP_EOL.'"
                                 + "array x array -> array', \\E_USER_ERROR);\n"
                                 + "    }\n"
                                 + "\n"
                                 + "}"
                 },
-//                //wrong function usage
-//                {
-//                        "<?php function foo(array $x){ return $x; } function bar(){ return foo(1);}",
-//                        "namespace{\n"
-//                                + "\n"
-//                                + "    function T foo<T>(T $x) where [T < array] {\n"
-//                                + "        return $x;\n"
-//                                + "    }\n"
-//                                + "\n"
-//                                + "    function mixed bar(){\n"
-//                                + "        return \\trigger_error('No applicable overload found for the function
-// foo.\\n"
-//                                + "Given argument types: int\\n"
-//                                + "Existing overloads:\\n"
-//                                + "T x T -> T \\ T <: array', \\E_USER_ERROR);\n"
-//                                + "    }\n"
-//                                + "\n"
-//                                + "}"
-//                }
+                //TODO TINS-607 type hint and bounded polymorphic function
+                //wrong function usage
+                {
+                        "<?php function foo(array $x){ return $x; } function bar(){ return foo(1);}",
+                        "namespace{\n"
+                                + "\n"
+                                + "    function T foo<T>(array $x_0) where [T <: array] {\n"
+                                + "        T $x = $x_0;\n"
+                                + "        return $x;\n"
+                                + "    }\n"
+                                + "\n"
+                                + "    function mixed bar() {\n"
+                                + "        return \\trigger_error('"
+                                + "No applicable overload found for the function foo()'.PHP_EOL.'"
+                                + "Given argument types: int'.PHP_EOL.'"
+                                + "Existing overloads:'.PHP_EOL.'"
+                                + "T -> T \\ T <: array', \\E_USER_ERROR);\n"
+                                + "    }\n"
+                                + "\n"
+                                + "}"
+                }
         });
     }
 

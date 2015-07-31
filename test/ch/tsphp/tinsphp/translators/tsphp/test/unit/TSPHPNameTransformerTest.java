@@ -6,9 +6,11 @@
 
 package ch.tsphp.tinsphp.translators.tsphp.test.unit;
 
+import ch.tsphp.common.symbols.ITypeSymbol;
 import ch.tsphp.tinsphp.common.symbols.IConvertibleTypeSymbol;
 import ch.tsphp.tinsphp.common.symbols.IIntersectionTypeSymbol;
 import ch.tsphp.tinsphp.common.symbols.IUnionTypeSymbol;
+import ch.tsphp.tinsphp.common.utils.Pair;
 import ch.tsphp.tinsphp.translators.tsphp.INameTransformer;
 import ch.tsphp.tinsphp.translators.tsphp.TSPHPNameTransformer;
 import ch.tsphp.tinsphp.translators.tsphp.test.unit.testutils.ATypeTest;
@@ -25,9 +27,10 @@ public class TSPHPNameTransformerTest extends ATypeTest
         //no arrange necessary
 
         INameTransformer nameTransformer = createNameTransformer();
-        String result = nameTransformer.getTypeName(nullType);
+        Pair<String, Boolean> result = nameTransformer.getTypeName(nullType);
 
-        assertThat(result, is("mixed"));
+        assertThat(result.first, is("mixed"));
+        assertThat(result.second, is(true));
     }
 
     @Test
@@ -35,19 +38,21 @@ public class TSPHPNameTransformerTest extends ATypeTest
         IIntersectionTypeSymbol intersectionTypeSymbol = createIntersectionTypeSymbol(nullType);
 
         INameTransformer nameTransformer = createNameTransformer();
-        String result = nameTransformer.getTypeName(intersectionTypeSymbol);
+        Pair<String, Boolean> result = nameTransformer.getTypeName(intersectionTypeSymbol);
 
-        assertThat(result, is("mixed"));
+        assertThat(result.first, is("mixed"));
+        assertThat(result.second, is(true));
     }
 
     @Test
-    public void getTypeName_NullOrFalseOrTrue_ReturnsNullableBool() {
+    public void getTypeName_NullOrFalseTypeOrTrueType_ReturnsNullableBool() {
         IUnionTypeSymbol unionTypeSymbol = createUnionTypeSymbol(boolType, nullType);
 
         INameTransformer nameTransformer = createNameTransformer();
-        String result = nameTransformer.getTypeName(unionTypeSymbol);
+        Pair<String, Boolean> result = nameTransformer.getTypeName(unionTypeSymbol);
 
-        assertThat(result, is("bool?"));
+        assertThat(result.first, is("bool?"));
+        assertThat(result.second, is(false));
     }
 
     @Test
@@ -55,29 +60,32 @@ public class TSPHPNameTransformerTest extends ATypeTest
         IUnionTypeSymbol unionTypeSymbol = createUnionTypeSymbol(nullType, numType);
 
         INameTransformer nameTransformer = createNameTransformer();
-        String result = nameTransformer.getTypeName(unionTypeSymbol);
+        Pair<String, Boolean> result = nameTransformer.getTypeName(unionTypeSymbol);
 
-        assertThat(result, is("num?"));
+        assertThat(result.first, is("num?"));
+        assertThat(result.second, is(false));
     }
 
     @Test
-    public void getTypeName_NullOrFalseOrTrueOrInt_ReturnsNullableScalar() {
+    public void getTypeName_NullOrFalseTypeOrTrueTypeOrInt_ReturnsNullableScalar() {
         IUnionTypeSymbol unionTypeSymbol = createUnionTypeSymbol(nullType, boolType, intType);
 
         INameTransformer nameTransformer = createNameTransformer();
-        String result = nameTransformer.getTypeName(unionTypeSymbol);
+        Pair<String, Boolean> result = nameTransformer.getTypeName(unionTypeSymbol);
 
-        assertThat(result, is("scalar?"));
+        assertThat(result.first, is("scalar?"));
+        assertThat(result.second, is(true));
     }
 
     @Test
-    public void getTypeName_NullOrFalseOrTrueOrIntOrArray_ReturnsMixed() {
+    public void getTypeName_NullOrFalseTypeOrTrueTypeOrIntOrArray_ReturnsMixed() {
         IUnionTypeSymbol unionTypeSymbol = createUnionTypeSymbol(nullType, boolType, intType, arrayType);
 
         INameTransformer nameTransformer = createNameTransformer();
-        String result = nameTransformer.getTypeName(unionTypeSymbol);
+        Pair<String, Boolean> result = nameTransformer.getTypeName(unionTypeSymbol);
 
-        assertThat(result, is("mixed"));
+        assertThat(result.first, is("mixed"));
+        assertThat(result.second, is(true));
     }
 
     //TODO TINS-332 introduce object pseudo type
@@ -86,9 +94,10 @@ public class TSPHPNameTransformerTest extends ATypeTest
 //        IUnionTypeSymbol unionTypeSymbol = createUnionTypeSymbol(nullType, interfaceAType);
 //
 //        ITypeReducer nameTransformer = createNameTransformer();
-//        String result = nameTransformer.getTypeName(unionTypeSymbol);
+//        Pair<String, Boolean> result = nameTransformer.getTypeName(unionTypeSymbol);
 //
-//        assertThat(result, is("IA"));
+//        assertThat(result.first, is("IA"));
+//        assertThat(result.second, is(false));
 //    }
 
     @Test
@@ -96,9 +105,10 @@ public class TSPHPNameTransformerTest extends ATypeTest
         IUnionTypeSymbol unionTypeSymbol = createUnionTypeSymbol(nullType, interfaceAType, interfaceBType);
 
         INameTransformer nameTransformer = createNameTransformer();
-        String result = nameTransformer.getTypeName(unionTypeSymbol);
+        Pair<String, Boolean> result = nameTransformer.getTypeName(unionTypeSymbol);
 
-        assertThat(result, is("mixed"));
+        assertThat(result.first, is("mixed"));
+        assertThat(result.second, is(true));
     }
 
     @Test
@@ -106,9 +116,10 @@ public class TSPHPNameTransformerTest extends ATypeTest
         IUnionTypeSymbol unionTypeSymbol = createUnionTypeSymbol(nullType, falseType);
 
         INameTransformer nameTransformer = createNameTransformer();
-        String result = nameTransformer.getTypeName(unionTypeSymbol);
+        Pair<String, Boolean> result = nameTransformer.getTypeName(unionTypeSymbol);
 
-        assertThat(result, is("bool?"));
+        assertThat(result.first, is("bool?"));
+        assertThat(result.second, is(true));
     }
 
     @Test
@@ -116,9 +127,10 @@ public class TSPHPNameTransformerTest extends ATypeTest
         //no arrange necessary
 
         INameTransformer nameTransformer = createNameTransformer();
-        String result = nameTransformer.getTypeName(falseType);
+        Pair<String, Boolean> result = nameTransformer.getTypeName(falseType);
 
-        assertThat(result, is("bool"));
+        assertThat(result.first, is("bool"));
+        assertThat(result.second, is(true));
     }
 
     @Test
@@ -126,9 +138,10 @@ public class TSPHPNameTransformerTest extends ATypeTest
         IUnionTypeSymbol unionTypeSymbol = createUnionTypeSymbol(falseType);
 
         INameTransformer nameTransformer = createNameTransformer();
-        String result = nameTransformer.getTypeName(unionTypeSymbol);
+        Pair<String, Boolean> result = nameTransformer.getTypeName(unionTypeSymbol);
 
-        assertThat(result, is("bool"));
+        assertThat(result.first, is("bool"));
+        assertThat(result.second, is(true));
     }
 
     @Test
@@ -137,9 +150,10 @@ public class TSPHPNameTransformerTest extends ATypeTest
         IIntersectionTypeSymbol intersectionTypeSymbol = createIntersectionTypeSymbol(unionTypeSymbol);
 
         INameTransformer nameTransformer = createNameTransformer();
-        String result = nameTransformer.getTypeName(intersectionTypeSymbol);
+        Pair<String, Boolean> result = nameTransformer.getTypeName(intersectionTypeSymbol);
 
-        assertThat(result, is("bool"));
+        assertThat(result.first, is("bool"));
+        assertThat(result.second, is(true));
     }
 
 
@@ -148,121 +162,133 @@ public class TSPHPNameTransformerTest extends ATypeTest
         //no arrange necessary
 
         INameTransformer nameTransformer = createNameTransformer();
-        String result = nameTransformer.getTypeName(trueType);
+        Pair<String, Boolean> result = nameTransformer.getTypeName(trueType);
 
-        assertThat(result, is("bool"));
+        assertThat(result.first, is("bool"));
+        assertThat(result.second, is(true));
     }
 
     @Test
-    public void getTypeName_FalseOrTrue_ReturnsBool() {
+    public void getTypeName_FalseTypeOrTrueType_ReturnsBool() {
         IUnionTypeSymbol unionTypeSymbol = boolType;
 
         INameTransformer nameTransformer = createNameTransformer();
-        String result = nameTransformer.getTypeName(unionTypeSymbol);
+        Pair<String, Boolean> result = nameTransformer.getTypeName(unionTypeSymbol);
 
-        assertThat(result, is("bool"));
+        assertThat(result.first, is("bool"));
+        assertThat(result.second, is(false));
     }
 
 
     @Test
-    public void getTypeName_FalseOrTrueInIntersection_ReturnsBool() {
+    public void getTypeName_FalseTypeOrTrueTypeInIntersection_ReturnsBool() {
         IUnionTypeSymbol unionTypeSymbol = boolType;
         IIntersectionTypeSymbol intersectionTypeSymbol = createIntersectionTypeSymbol(unionTypeSymbol);
 
         INameTransformer nameTransformer = createNameTransformer();
-        String result = nameTransformer.getTypeName(intersectionTypeSymbol);
+        Pair<String, Boolean> result = nameTransformer.getTypeName(intersectionTypeSymbol);
 
-        assertThat(result, is("bool"));
+        assertThat(result.first, is("bool"));
+        assertThat(result.second, is(false));
     }
 
     @Test
-    public void getTypeName_FalseOrInt_ReturnsFalseableInt() {
+    public void getTypeName_FalseTypeOrInt_ReturnsFalseableInt() {
         IUnionTypeSymbol unionTypeSymbol = createUnionTypeSymbol(falseType, intType);
 
         INameTransformer nameTransformer = createNameTransformer();
-        String result = nameTransformer.getTypeName(unionTypeSymbol);
+        Pair<String, Boolean> result = nameTransformer.getTypeName(unionTypeSymbol);
 
-        assertThat(result, is("int!"));
+        assertThat(result.first, is("int!"));
+        assertThat(result.second, is(false));
     }
 
     @Test
-    public void getTypeName_FalseOrFloat_ReturnsFalseableFloat() {
+    public void getTypeName_FalseTypeOrFloat_ReturnsFalseableFloat() {
         IUnionTypeSymbol unionTypeSymbol = createUnionTypeSymbol(falseType, floatType);
 
         INameTransformer nameTransformer = createNameTransformer();
-        String result = nameTransformer.getTypeName(unionTypeSymbol);
+        Pair<String, Boolean> result = nameTransformer.getTypeName(unionTypeSymbol);
 
-        assertThat(result, is("float!"));
+        assertThat(result.first, is("float!"));
+        assertThat(result.second, is(false));
     }
 
     @Test
-    public void getTypeName_FalseOrIntOrFloat_ReturnsFalseableInt() {
+    public void getTypeName_FalseTypeOrIntOrFloat_ReturnsFalseableInt() {
         IUnionTypeSymbol unionTypeSymbol = createUnionTypeSymbol(falseType, intType, floatType);
 
         INameTransformer nameTransformer = createNameTransformer();
-        String result = nameTransformer.getTypeName(unionTypeSymbol);
+        Pair<String, Boolean> result = nameTransformer.getTypeName(unionTypeSymbol);
 
-        assertThat(result, is("num!"));
+        assertThat(result.first, is("num!"));
+        assertThat(result.second, is(false));
     }
 
     @Test
-    public void getTypeName_FalseOrTrueOrInt_ReturnsScalar() {
+    public void getTypeName_FalseTypeOrTrueTypeOrInt_ReturnsScalar() {
         IUnionTypeSymbol unionTypeSymbol = createUnionTypeSymbol(falseType, trueType, intType);
 
         INameTransformer nameTransformer = createNameTransformer();
-        String result = nameTransformer.getTypeName(unionTypeSymbol);
+        Pair<String, Boolean> result = nameTransformer.getTypeName(unionTypeSymbol);
 
-        assertThat(result, is("scalar"));
+        assertThat(result.first, is("scalar"));
+        assertThat(result.second, is(true));
     }
 
     @Test
-    public void getTypeName_FalseOrArray_ReturnsFalseableArray() {
+    public void getTypeName_FalseTypeOrArray_ReturnsFalseableArray() {
         IUnionTypeSymbol unionTypeSymbol = createUnionTypeSymbol(falseType, arrayType);
 
         INameTransformer nameTransformer = createNameTransformer();
-        String result = nameTransformer.getTypeName(unionTypeSymbol);
+        Pair<String, Boolean> result = nameTransformer.getTypeName(unionTypeSymbol);
 
-        assertThat(result, is("array!"));
+        assertThat(result.first, is("array!"));
+        assertThat(result.second, is(false));
     }
 
     @Test
-    public void getTypeName_FalseOrArrayOrString_ReturnsMixed() {
+    public void getTypeName_FalseTypeOrArrayOrString_ReturnsMixed() {
         IUnionTypeSymbol unionTypeSymbol = createUnionTypeSymbol(falseType, arrayType, stringType);
 
         INameTransformer nameTransformer = createNameTransformer();
-        String result = nameTransformer.getTypeName(unionTypeSymbol);
+        Pair<String, Boolean> result = nameTransformer.getTypeName(unionTypeSymbol);
 
-        assertThat(result, is("mixed"));
+        assertThat(result.first, is("mixed"));
+        assertThat(result.second, is(true));
     }
 
     @Test
-    public void getTypeName_FalseOrNullOrInt_ReturnsNullableFalseableInt() {
+    public void getTypeName_FalseTypeOrNullOrInt_ReturnsNullableFalseableInt() {
         IUnionTypeSymbol unionTypeSymbol = createUnionTypeSymbol(falseType, nullType, intType);
 
         INameTransformer nameTransformer = createNameTransformer();
-        String result = nameTransformer.getTypeName(unionTypeSymbol);
+        Pair<String, Boolean> result = nameTransformer.getTypeName(unionTypeSymbol);
 
-        assertThat(result, is("int!?"));
+        assertThat(result.first, is("int!?"));
+        assertThat(result.second, is(false));
     }
 
     @Test
-    public void getTypeName_FalseOrFloatOrNullOrInt_ReturnsNullableFalseableNum() {
+    public void getTypeName_FalseTypeOrFloatOrNullOrInt_ReturnsNullableFalseableNum() {
         IUnionTypeSymbol unionTypeSymbol = createUnionTypeSymbol(falseType, floatType, nullType, intType);
 
         INameTransformer nameTransformer = createNameTransformer();
-        String result = nameTransformer.getTypeName(unionTypeSymbol);
+        Pair<String, Boolean> result = nameTransformer.getTypeName(unionTypeSymbol);
 
-        assertThat(result, is("num!?"));
+        assertThat(result.first, is("num!?"));
+        assertThat(result.second, is(false));
     }
 
     @Test
-    public void getTypeName_FalseOrNullOrString_ReturnsNullableFalseableString() {
+    public void getTypeName_FalseTypeOrNullOrString_ReturnsNullableFalseableString() {
         IUnionTypeSymbol unionTypeSymbol = createUnionTypeSymbol(falseType, nullType, stringType);
 
         INameTransformer nameTransformer = createNameTransformer();
-        String result = nameTransformer.getTypeName(unionTypeSymbol);
+        Pair<String, Boolean> result = nameTransformer.getTypeName(unionTypeSymbol);
 
-        assertThat(result, is("string!?"));
+        assertThat(result.first, is("string!?"));
+        assertThat(result.second, is(false));
     }
 
     @Test
@@ -270,9 +296,10 @@ public class TSPHPNameTransformerTest extends ATypeTest
         IUnionTypeSymbol unionTypeSymbol = numType;
 
         INameTransformer nameTransformer = createNameTransformer();
-        String result = nameTransformer.getTypeName(unionTypeSymbol);
+        Pair<String, Boolean> result = nameTransformer.getTypeName(unionTypeSymbol);
 
-        assertThat(result, is("num"));
+        assertThat(result.first, is("num"));
+        assertThat(result.second, is(false));
     }
 
     @Test
@@ -280,9 +307,10 @@ public class TSPHPNameTransformerTest extends ATypeTest
         IConvertibleTypeSymbol convertibleTypeSymbol = createConvertibleTypeSymbol(intType);
 
         INameTransformer nameTransformer = createNameTransformer();
-        String result = nameTransformer.getTypeName(convertibleTypeSymbol);
+        Pair<String, Boolean> result = nameTransformer.getTypeName(convertibleTypeSymbol);
 
-        assertThat(result, is("{as int}"));
+        assertThat(result.first, is("{as int}"));
+        assertThat(result.second, is(false));
     }
 
     @Test
@@ -291,9 +319,10 @@ public class TSPHPNameTransformerTest extends ATypeTest
         IConvertibleTypeSymbol convertibleTypeSymbol = createConvertibleTypeSymbol(unionTypeSymbol);
 
         INameTransformer nameTransformer = createNameTransformer();
-        String result = nameTransformer.getTypeName(convertibleTypeSymbol);
+        Pair<String, Boolean> result = nameTransformer.getTypeName(convertibleTypeSymbol);
 
-        assertThat(result, is("{as bool}"));
+        assertThat(result.first, is("{as bool}"));
+        assertThat(result.second, is(false));
     }
 
     @Test
@@ -303,9 +332,10 @@ public class TSPHPNameTransformerTest extends ATypeTest
         IUnionTypeSymbol unionTypeSymbol2 = createUnionTypeSymbol(convertibleTypeSymbol);
 
         INameTransformer nameTransformer = createNameTransformer();
-        String result = nameTransformer.getTypeName(unionTypeSymbol2);
+        Pair<String, Boolean> result = nameTransformer.getTypeName(unionTypeSymbol2);
 
-        assertThat(result, is("{as bool}"));
+        assertThat(result.first, is("{as bool}"));
+        assertThat(result.second, is(false));
     }
 
     @Test
@@ -314,9 +344,10 @@ public class TSPHPNameTransformerTest extends ATypeTest
         IConvertibleTypeSymbol convertibleTypeSymbol = createConvertibleTypeSymbol(unionTypeSymbol);
 
         INameTransformer nameTransformer = createNameTransformer();
-        String result = nameTransformer.getTypeName(convertibleTypeSymbol);
+        Pair<String, Boolean> result = nameTransformer.getTypeName(convertibleTypeSymbol);
 
-        assertThat(result, is("{as num}"));
+        assertThat(result.first, is("{as num}"));
+        assertThat(result.second, is(false));
     }
 
     @Test
@@ -326,12 +357,17 @@ public class TSPHPNameTransformerTest extends ATypeTest
         IIntersectionTypeSymbol intersectionTypeSymbol = createIntersectionTypeSymbol(convertibleTypeSymbol);
 
         INameTransformer nameTransformer = createNameTransformer();
-        String result = nameTransformer.getTypeName(intersectionTypeSymbol);
+        Pair<String, Boolean> result = nameTransformer.getTypeName(intersectionTypeSymbol);
 
-        assertThat(result, is("{as num}"));
+        assertThat(result.first, is("{as num}"));
+        assertThat(result.second, is(false));
     }
 
     protected INameTransformer createNameTransformer() {
-        return new TSPHPNameTransformer(symbolFactory, typeHelper, primitiveTypes);
+        ITypeSymbol tsphpBoolTypeSymbol = symbolFactory.createPseudoTypeSymbol("bool", mixedType);
+        ITypeSymbol tsphpNumTypeSymbol = symbolFactory.createPseudoTypeSymbol("num", mixedType);
+        ITypeSymbol tsphpScalarTypeSymbol = symbolFactory.createPseudoTypeSymbol("scalar", mixedType);
+        return new TSPHPNameTransformer(
+                typeHelper, primitiveTypes, tsphpBoolTypeSymbol, tsphpNumTypeSymbol, tsphpScalarTypeSymbol);
     }
 }

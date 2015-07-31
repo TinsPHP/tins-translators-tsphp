@@ -27,14 +27,18 @@ import ch.tsphp.tinsphp.common.utils.ITypeHelper;
 import ch.tsphp.tinsphp.translators.tsphp.DtoCreator;
 import ch.tsphp.tinsphp.translators.tsphp.INameTransformer;
 import ch.tsphp.tinsphp.translators.tsphp.IOperatorHelper;
+import ch.tsphp.tinsphp.translators.tsphp.IParameterCheckProvider;
 import ch.tsphp.tinsphp.translators.tsphp.IPrecedenceHelper;
 import ch.tsphp.tinsphp.translators.tsphp.ITempVariableHelper;
 import ch.tsphp.tinsphp.translators.tsphp.PrecedenceHelper;
 import ch.tsphp.tinsphp.translators.tsphp.TSPHPNameTransformer;
 import ch.tsphp.tinsphp.translators.tsphp.TSPHPOperatorHelper;
+import ch.tsphp.tinsphp.translators.tsphp.TSPHPParameterCheckProvider;
 import ch.tsphp.tinsphp.translators.tsphp.TSPHPTranslator;
 import ch.tsphp.tinsphp.translators.tsphp.TempVariableHelper;
 import ch.tsphp.tinsphp.translators.tsphp.TranslatorController;
+import ch.tsphp.tinsphp.translators.tsphp.issues.HardCodedOutputIssueMessageProvider;
+import ch.tsphp.tinsphp.translators.tsphp.issues.IOutputIssueMessageProvider;
 import org.antlr.stringtemplate.StringTemplateGroup;
 
 import java.io.IOException;
@@ -69,15 +73,26 @@ public class HardCodedTSPHPTranslatorInitialiser implements ITranslatorInitialis
         Map<String, ITypeSymbol> primitiveTypes = theCoreInitialiser.getCore().getPrimitiveTypes();
         ITypeHelper typeHelper = theSymbolsInitialiser.getTypeHelper();
         ISymbolFactory symbolFactory = theSymbolsInitialiser.getSymbolFactory();
-        INameTransformer nameTransformer = new TSPHPNameTransformer(symbolFactory, typeHelper, primitiveTypes);
+        ITypeSymbol mixedTypeSymbol = symbolFactory.getMixedTypeSymbol();
+        ITypeSymbol tsphpBoolTypeSymbol = symbolFactory.createPseudoTypeSymbol("bool", mixedTypeSymbol);
+        ITypeSymbol tsphpNumTypeSymbol = symbolFactory.createPseudoTypeSymbol("num", mixedTypeSymbol);
+        ITypeSymbol tsphpScalarTypeSymbol = symbolFactory.createPseudoTypeSymbol("scalar", mixedTypeSymbol);
+
+        INameTransformer nameTransformer = new TSPHPNameTransformer(
+                typeHelper, primitiveTypes, tsphpBoolTypeSymbol, tsphpNumTypeSymbol, tsphpScalarTypeSymbol);
         IOperatorHelper operatorHelper = new TSPHPOperatorHelper(typeHelper, primitiveTypes, nameTransformer);
-        IDtoCreator dtoCreator = new DtoCreator(tempVariableHelper, nameTransformer);
+        IOutputIssueMessageProvider outputIssueMessageProvider = new HardCodedOutputIssueMessageProvider();
+        IParameterCheckProvider parameterCheckProvider = new TSPHPParameterCheckProvider(
+                outputIssueMessageProvider, tsphpBoolTypeSymbol);
+        IDtoCreator dtoCreator = new DtoCreator(tempVariableHelper, nameTransformer, parameterCheckProvider);
+
         controller = new TranslatorController(
                 precedenceHelper,
                 tempVariableHelper,
                 operatorHelper,
                 dtoCreator,
-                nameTransformer);
+                nameTransformer,
+                outputIssueMessageProvider);
 
         loadStringTemplate();
     }

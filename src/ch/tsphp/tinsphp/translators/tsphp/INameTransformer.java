@@ -10,6 +10,7 @@ import ch.tsphp.common.symbols.ITypeSymbol;
 import ch.tsphp.tinsphp.common.inference.constraints.IBindingCollection;
 import ch.tsphp.tinsphp.common.symbols.IContainerTypeSymbol;
 import ch.tsphp.tinsphp.common.symbols.IConvertibleTypeSymbol;
+import ch.tsphp.tinsphp.common.utils.Pair;
 
 import java.util.Collection;
 
@@ -18,13 +19,25 @@ import java.util.Collection;
  */
 public interface INameTransformer
 {
-    String getTypeName(IBindingCollection bindingCollection, String typeVariable);
+    /**
+     * Returns the transformed name and indicates whether the type had to be widened (e.g. fallback to mixed)
+     */
+    Pair<String, Boolean> getTypeName(IBindingCollection bindingCollection, String typeVariable);
 
-    String getTypeName(ITypeSymbol typeSymbol);
+    /**
+     * Returns the transformed name and indicates whether the type had to be widened (e.g. fallback to mixed)
+     */
+    Pair<String, Boolean> getTypeName(ITypeSymbol typeSymbol);
 
-    String getTypeName(IContainerTypeSymbol containerTypeSymbol);
+    /**
+     * Returns the transformed name and indicates whether the type had to be widened (e.g. fallback to mixed)
+     */
+    Pair<String, Boolean> getTypeName(IContainerTypeSymbol containerTypeSymbol);
 
-    String getTypeName(IConvertibleTypeSymbol convertibleTypeSymbol);
+    /**
+     * Returns the transformed name and indicates whether the type had to be widened (e.g. fallback to mixed)
+     */
+    Pair<String, Boolean> getTypeName(IConvertibleTypeSymbol convertibleTypeSymbol);
 
     Collection<String> getTypeBounds(IContainerTypeSymbol typeBounds);
 

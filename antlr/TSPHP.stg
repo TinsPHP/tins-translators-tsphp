@@ -83,11 +83,15 @@ bound(bounds, moreThanOne, sep) ::=<<
 <if(moreThanOne)>(<endif><bounds; separator=sep><if(moreThanOne)>)<endif>
 >>
 
-
 parameter(type, variableId, defaultValue) ::=<<
 <type> <variableId><if(defaultValue)> = <defaultValue><endif>
 >>
 
+parameterRuntimeCheck(check, message) ::=<<
+if (<check>) {
+    \trigger_error('<message>', \E_USER_ERROR);
+}
+>>
 
 variable(type, variableId, defaultValue) ::=<<
 <type> <variableId><if(defaultValue)> = <defaultValue><endif>;

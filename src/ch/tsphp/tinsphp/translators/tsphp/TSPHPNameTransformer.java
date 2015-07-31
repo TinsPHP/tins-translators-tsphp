@@ -11,11 +11,11 @@ import ch.tsphp.tinsphp.common.inference.constraints.IBindingCollection;
 import ch.tsphp.tinsphp.common.symbols.IContainerTypeSymbol;
 import ch.tsphp.tinsphp.common.symbols.IConvertibleTypeSymbol;
 import ch.tsphp.tinsphp.common.symbols.IIntersectionTypeSymbol;
-import ch.tsphp.tinsphp.common.symbols.ISymbolFactory;
 import ch.tsphp.tinsphp.common.symbols.IUnionTypeSymbol;
 import ch.tsphp.tinsphp.common.symbols.PrimitiveTypeNames;
 import ch.tsphp.tinsphp.common.utils.ERelation;
 import ch.tsphp.tinsphp.common.utils.ITypeHelper;
+import ch.tsphp.tinsphp.common.utils.Pair;
 import ch.tsphp.tinsphp.common.utils.TypeHelperDto;
 
 import java.util.ArrayList;
@@ -24,6 +24,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
+
+import static ch.tsphp.tinsphp.common.utils.Pair.pair;
 
 public class TSPHPNameTransformer implements INameTransformer
 {
@@ -39,17 +41,19 @@ public class TSPHPNameTransformer implements INameTransformer
     private final ITypeSymbol tsphpScalarTypeSymbol;
 
     public TSPHPNameTransformer(
-            ISymbolFactory theSymbolFactory,
             ITypeHelper theTypeHelper,
-            Map<String, ITypeSymbol> thePrimitiveTypes) {
+            Map<String, ITypeSymbol> thePrimitiveTypes,
+            ITypeSymbol theTsphpBoolTypeSymbol,
+            ITypeSymbol theTsphpNumTypeSymbol,
+            ITypeSymbol theTsphpScalarTypeSymbol) {
         typeHelper = theTypeHelper;
         primitiveTypes = thePrimitiveTypes;
         mixedTypeSymbol = primitiveTypes.get(PrimitiveTypeNames.MIXED);
         nullTypeSymbol = primitiveTypes.get(PrimitiveTypeNames.NULL_TYPE);
         falseTypeSymbol = primitiveTypes.get(PrimitiveTypeNames.FALSE_TYPE);
-        tsphpScalarTypeSymbol = theSymbolFactory.createPseudoTypeSymbol("scalar", mixedTypeSymbol);
-        tsphpBoolTypeSymbol = theSymbolFactory.createPseudoTypeSymbol("bool", mixedTypeSymbol);
-        tsphpNumTypeSymbol = theSymbolFactory.createPseudoTypeSymbol("num", mixedTypeSymbol);
+        tsphpBoolTypeSymbol = theTsphpBoolTypeSymbol;
+        tsphpNumTypeSymbol = theTsphpNumTypeSymbol;
+        tsphpScalarTypeSymbol = theTsphpScalarTypeSymbol;
     }
 
     /**
@@ -61,7 +65,7 @@ public class TSPHPNameTransformer implements INameTransformer
      * @return The absolute name of the calculated type.
      */
     @Override
-    public String getTypeName(IBindingCollection bindingCollection, String typeVariable) {
+    public Pair<String, Boolean> getTypeName(IBindingCollection bindingCollection, String typeVariable) {
         IContainerTypeSymbol containerTypeSymbol;
         if (bindingCollection.hasUpperTypeBounds(typeVariable)) {
             containerTypeSymbol = bindingCollection.getUpperTypeBounds(typeVariable);
@@ -78,27 +82,27 @@ public class TSPHPNameTransformer implements INameTransformer
      * @return The absolute name of the calculated type.
      */
     @Override
-    public String getTypeName(ITypeSymbol typeSymbol) {
+    public Pair<String, Boolean> getTypeName(ITypeSymbol typeSymbol) {
         if (typeSymbol instanceof IContainerTypeSymbol) {
             return getTypeName((IContainerTypeSymbol) typeSymbol);
         }
         return getTypeFromNonContainer(typeSymbol);
     }
 
-    private String getTypeFromNonContainer(ITypeSymbol typeSymbol) {
-        String typeName;
+    private Pair<String, Boolean> getTypeFromNonContainer(ITypeSymbol typeSymbol) {
+        Pair<String, Boolean> pair;
         if (typeSymbol instanceof IConvertibleTypeSymbol) {
-            typeName = getTypeName((IConvertibleTypeSymbol) typeSymbol);
+            pair = getTypeName((IConvertibleTypeSymbol) typeSymbol);
         } else if (typeHelper.areSame(typeSymbol, primitiveTypes.get(PrimitiveTypeNames.FALSE_TYPE))) {
-            typeName = "bool";
+            pair = pair("bool", true);
         } else if (typeHelper.areSame(typeSymbol, primitiveTypes.get(PrimitiveTypeNames.TRUE_TYPE))) {
-            typeName = "bool";
+            pair = pair("bool", true);
         } else if (typeHelper.areSame(typeSymbol, primitiveTypes.get(PrimitiveTypeNames.NULL_TYPE))) {
-            typeName = "mixed";
+            pair = pair("mixed", true);
         } else {
-            typeName = typeSymbol.getAbsoluteName();
+            pair = pair(typeSymbol.getAbsoluteName(), false);
         }
-        return typeName;
+        return pair;
     }
 
     /**
@@ -108,7 +112,7 @@ public class TSPHPNameTransformer implements INameTransformer
      * @return The absolute name of the calculated type.
      */
     @Override
-    public String getTypeName(IContainerTypeSymbol containerTypeSymbol) {
+    public Pair<String, Boolean> getTypeName(IContainerTypeSymbol containerTypeSymbol) {
         if (containerTypeSymbol.getTypeSymbols().size() == 1) {
             ITypeSymbol tmp = containerTypeSymbol.getTypeSymbols().values().iterator().next();
             while (tmp instanceof IContainerTypeSymbol) {
@@ -122,28 +126,28 @@ public class TSPHPNameTransformer implements INameTransformer
             }
         }
 
-        String typeName;
+        Pair<String, Boolean> pair;
         if (containerTypeSymbol.getTypeSymbols().size() > 1) {
             if (containerTypeSymbol instanceof IIntersectionTypeSymbol) {
                 ITypeSymbol firstType = containerTypeSymbol.getTypeSymbols().values().iterator().next();
-                typeName = getTypeName(firstType);
+                pair = getTypeName(firstType);
             } else {
-                typeName = reduceToOneTypeOnly((IUnionTypeSymbol) containerTypeSymbol);
+                pair = reduceToOneTypeOnly((IUnionTypeSymbol) containerTypeSymbol);
             }
         } else {
-            typeName = getTypeFromNonContainer(containerTypeSymbol.getTypeSymbols().values().iterator().next());
+            pair = getTypeFromNonContainer(containerTypeSymbol.getTypeSymbols().values().iterator().next());
         }
-        return typeName;
+        return pair;
     }
 
     @Override
-    public String getTypeName(IConvertibleTypeSymbol convertibleTypeSymbol) {
+    public Pair<String, Boolean> getTypeName(IConvertibleTypeSymbol convertibleTypeSymbol) {
         if (convertibleTypeSymbol.isFixed()) {
-            String innerTypeName = getTypeName(
+            Pair<String, Boolean> pair = getTypeName(
                     convertibleTypeSymbol.getBindingCollection(), convertibleTypeSymbol.getTypeVariable());
-            return "{as " + innerTypeName + "}";
+            return pair("{as " + pair.first + "}", pair.second);
         }
-        return convertibleTypeSymbol.getAbsoluteName();
+        return pair(convertibleTypeSymbol.getAbsoluteName(), false);
     }
 
     /**
@@ -155,8 +159,8 @@ public class TSPHPNameTransformer implements INameTransformer
     @Override
     public Collection<String> getTypeBounds(IContainerTypeSymbol typeBounds) {
         List<String> list = new ArrayList<>(1);
-        String type = getTypeName(typeBounds);
-        list.add(type);
+        Pair<String, Boolean> pair = getTypeName(typeBounds);
+        list.add(pair.first);
         return list;
     }
 
@@ -172,16 +176,23 @@ public class TSPHPNameTransformer implements INameTransformer
         return new TreeSet<>(bindingCollection.getLowerRefBounds(typeVariable));
     }
 
-    private String reduceToOneTypeOnly(IUnionTypeSymbol containerTypeSymbol) {
-        ITypeSymbol leastUpperTypeBound = calculateLeastUpperTypeBound(containerTypeSymbol);
+    private Pair<String, Boolean> reduceToOneTypeOnly(IUnionTypeSymbol containerTypeSymbol) {
+        Pair<ITypeSymbol, Boolean> leastUpperTypeBoundPair = calculateLeastUpperTypeBound(containerTypeSymbol);
+        ITypeSymbol leastUpperTypeBound = leastUpperTypeBoundPair.first;
+        boolean wasWidened = leastUpperTypeBoundPair.second;
+
         Map<String, ITypeSymbol> typeSymbols = containerTypeSymbol.getTypeSymbols();
         String suffix = "";
         //identity check is enough for tsphpXyTypeSymbol since they are created in this run
-        if (typeSymbols.containsKey(falseTypeSymbol.getAbsoluteName())
-                && leastUpperTypeBound != tsphpBoolTypeSymbol
-                && leastUpperTypeBound != tsphpScalarTypeSymbol
-                && !typeHelper.areSame(leastUpperTypeBound, mixedTypeSymbol)) {
-            suffix = "!";
+        if (typeSymbols.containsKey(falseTypeSymbol.getAbsoluteName())) {
+            if (leastUpperTypeBound != tsphpBoolTypeSymbol
+                    && leastUpperTypeBound != tsphpScalarTypeSymbol
+                    && !typeHelper.areSame(leastUpperTypeBound, mixedTypeSymbol)) {
+                suffix = "!";
+            }
+            if (typeSymbols.containsKey(PrimitiveTypeNames.TRUE_TYPE) && leastUpperTypeBound == tsphpBoolTypeSymbol) {
+                wasWidened = false;
+            }
         }
         if (typeSymbols.containsKey(nullTypeSymbol.getAbsoluteName())
                 && !typeHelper.areSame(leastUpperTypeBound, mixedTypeSymbol)) {
@@ -191,16 +202,19 @@ public class TSPHPNameTransformer implements INameTransformer
             suffix += "?";
 //            }
         }
-        return getTypeFromNonContainer(leastUpperTypeBound) + suffix;
+
+        Pair<String, Boolean> pair = getTypeFromNonContainer(leastUpperTypeBound);
+        return pair(pair.first + suffix, wasWidened);
     }
 
-    private ITypeSymbol calculateLeastUpperTypeBound(IUnionTypeSymbol containerTypeSymbol) {
+    private Pair<ITypeSymbol, Boolean> calculateLeastUpperTypeBound(IUnionTypeSymbol containerTypeSymbol) {
         Map<String, ITypeSymbol> typeSymbolsMap = new HashMap<>(containerTypeSymbol.getTypeSymbols());
         Collection<ITypeSymbol> typeSymbols = typeSymbolsMap.values();
         boolean containsFalseType = typeSymbolsMap.remove(falseTypeSymbol.getAbsoluteName()) != null;
         typeSymbolsMap.remove(nullTypeSymbol.getAbsoluteName());
 
         ITypeSymbol leastUpperTypeBound;
+        boolean wasWidened = false;
         int size = typeSymbolsMap.size();
         if (size == 0) {
             if (containsFalseType) {
@@ -209,22 +223,27 @@ public class TSPHPNameTransformer implements INameTransformer
                 //only nullType, in this case we use mixed
                 leastUpperTypeBound = mixedTypeSymbol;
             }
+            wasWidened = true;
         } else if (size == 1) {
             leastUpperTypeBound = typeSymbols.iterator().next();
-            ITypeSymbol trueTypeSymbol = primitiveTypes.get(PrimitiveTypeNames.TRUE_TYPE);
-            if (typeHelper.areSame(leastUpperTypeBound, trueTypeSymbol)) {
+            if (leastUpperTypeBound.getAbsoluteName().equals(PrimitiveTypeNames.TRUE_TYPE)) {
                 leastUpperTypeBound = tsphpBoolTypeSymbol;
+                wasWidened = true;
             }
         } else {
-            leastUpperTypeBound = lookForScalarTypes(typeSymbolsMap, size);
-            if (leastUpperTypeBound == null) {
+            Pair<ITypeSymbol, Boolean> pair = lookForScalarTypes(typeSymbolsMap, size);
+            if (pair == null) {
                 leastUpperTypeBound = calculateLeastUpperTypeBound(typeSymbols);
+                wasWidened = true;
+            } else {
+                leastUpperTypeBound = pair.first;
+                wasWidened = pair.second;
             }
         }
-        return leastUpperTypeBound;
+        return pair(leastUpperTypeBound, wasWidened);
     }
 
-    private ITypeSymbol lookForScalarTypes(Map<String, ITypeSymbol> typeSymbolsMap, int size) {
+    private Pair<ITypeSymbol, Boolean> lookForScalarTypes(Map<String, ITypeSymbol> typeSymbolsMap, int size) {
         String trueTypeName = primitiveTypes.get(PrimitiveTypeNames.TRUE_TYPE).getAbsoluteName();
         String intTypeName = primitiveTypes.get(PrimitiveTypeNames.INT).getAbsoluteName();
         String floatTypeName = primitiveTypes.get(PrimitiveTypeNames.FLOAT).getAbsoluteName();
@@ -235,20 +254,28 @@ public class TSPHPNameTransformer implements INameTransformer
         boolean containsString = typeSymbolsMap.remove(stringTypeName) != null;
 
         ITypeSymbol leastUpperTypeBound = null;
+        boolean wasWidened = false;
         if (containsTrueType || containsInt || containsFloat || containsString) {
             if (!typeSymbolsMap.isEmpty()) {
                 // if a scalar type is in the union type and the other types are not scalar as well,
                 // then we need to fall back to mixed
                 leastUpperTypeBound = mixedTypeSymbol;
+                wasWidened = true;
             } else {
                 if (containsInt && containsFloat && size == 2) {
                     leastUpperTypeBound = tsphpNumTypeSymbol;
                 } else {
                     leastUpperTypeBound = tsphpScalarTypeSymbol;
+                    //falseType, trueType, int, float and string
+                    final int numberOfScalars = 5;
+                    wasWidened = size != numberOfScalars;
                 }
             }
         }
-        return leastUpperTypeBound;
+        if (leastUpperTypeBound == null) {
+            return null;
+        }
+        return pair(leastUpperTypeBound, wasWidened);
     }
 
     private ITypeSymbol calculateLeastUpperTypeBound(Collection<ITypeSymbol> typeSymbols) {

@@ -17,8 +17,11 @@ import ch.tsphp.tinsphp.core.config.HardCodedCoreInitialiser;
 import ch.tsphp.tinsphp.symbols.config.HardCodedSymbolsInitialiser;
 import ch.tsphp.tinsphp.translators.tsphp.INameTransformer;
 import ch.tsphp.tinsphp.translators.tsphp.IOperatorHelper;
+import ch.tsphp.tinsphp.translators.tsphp.IParameterCheckProvider;
 import ch.tsphp.tinsphp.translators.tsphp.TSPHPNameTransformer;
 import ch.tsphp.tinsphp.translators.tsphp.TSPHPOperatorHelper;
+import ch.tsphp.tinsphp.translators.tsphp.TSPHPParameterCheckProvider;
+import ch.tsphp.tinsphp.translators.tsphp.issues.HardCodedOutputIssueMessageProvider;
 import org.junit.Ignore;
 
 import java.util.Map;
@@ -26,18 +29,25 @@ import java.util.Map;
 @Ignore
 public abstract class ATranslatorWithReductionTest extends ATranslatorTest
 {
-    private static ISymbolFactory symbolFactory;
-    private static ITypeHelper typeHelper;
-    private static Map<String, ITypeSymbol> primitiveTypes;
+    private final ITypeHelper typeHelper;
+    private final Map<String, ITypeSymbol> primitiveTypes;
+    private final ITypeSymbol tsphpBoolTypeSymbol;
+    private final ITypeSymbol tsphpNumTypeSymbol;
+    private final ITypeSymbol tsphpScalarTypeSymbol;
+
 
     public ATranslatorWithReductionTest(String theTestString, String theExpectedResult) {
         super(theTestString, theExpectedResult);
         ISymbolsInitialiser symbolsInitialiser = new HardCodedSymbolsInitialiser();
         ICoreInitialiser coreInitialiser = new HardCodedCoreInitialiser(
                 new AstHelper(new TSPHPAstAdaptor()), symbolsInitialiser);
-        symbolFactory = symbolsInitialiser.getSymbolFactory();
         typeHelper = symbolsInitialiser.getTypeHelper();
         primitiveTypes = coreInitialiser.getCore().getPrimitiveTypes();
+        ISymbolFactory symbolFactory = symbolsInitialiser.getSymbolFactory();
+        ITypeSymbol mixedTypeSymbol = symbolFactory.getMixedTypeSymbol();
+        tsphpBoolTypeSymbol = symbolFactory.createPseudoTypeSymbol("bool", mixedTypeSymbol);
+        tsphpNumTypeSymbol = symbolFactory.createPseudoTypeSymbol("num", mixedTypeSymbol);
+        tsphpScalarTypeSymbol = symbolFactory.createPseudoTypeSymbol("scalar", mixedTypeSymbol);
     }
 
     @Override
@@ -47,6 +57,12 @@ public abstract class ATranslatorWithReductionTest extends ATranslatorTest
 
     @Override
     public INameTransformer createNameTransformer() {
-        return new TSPHPNameTransformer(symbolFactory, typeHelper, primitiveTypes);
+        return new TSPHPNameTransformer(
+                typeHelper, primitiveTypes, tsphpBoolTypeSymbol, tsphpNumTypeSymbol, tsphpScalarTypeSymbol);
+    }
+
+    @Override
+    public IParameterCheckProvider createParameterCheckProvider() {
+        return new TSPHPParameterCheckProvider(new HardCodedOutputIssueMessageProvider(), tsphpBoolTypeSymbol);
     }
 }
