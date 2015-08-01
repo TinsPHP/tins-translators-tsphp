@@ -12,8 +12,6 @@ import ch.tsphp.tinsphp.common.inference.constraints.IBindingCollection;
 import ch.tsphp.tinsphp.common.inference.constraints.IFunctionType;
 import ch.tsphp.tinsphp.common.inference.constraints.IVariable;
 import ch.tsphp.tinsphp.common.inference.constraints.OverloadApplicationDto;
-import ch.tsphp.tinsphp.common.symbols.IContainerTypeSymbol;
-import ch.tsphp.tinsphp.common.symbols.IConvertibleTypeSymbol;
 import ch.tsphp.tinsphp.common.symbols.IExpressionVariableSymbol;
 import ch.tsphp.tinsphp.common.symbols.IMethodSymbol;
 import ch.tsphp.tinsphp.common.symbols.IMinimalMethodSymbol;
@@ -37,8 +35,8 @@ public class TranslatorController implements ITranslatorController
     private final ITempVariableHelper tempVariableHelper;
     private final IOperatorHelper operatorHelper;
     private final IDtoCreator dtoCreator;
-    private final INameTransformer nameTransformer;
     private final IOutputIssueMessageProvider messageProvider;
+    private final IRuntimeCheckProvider runtimeCheckProvider;
     private Map<String, Collection<OverloadDto>> methodDtosMap;
 
     public TranslatorController(
@@ -46,16 +44,15 @@ public class TranslatorController implements ITranslatorController
             ITempVariableHelper theTempVariableHelper,
             IOperatorHelper theOperatorHelper,
             IDtoCreator theDtoCreator,
-            INameTransformer theNameTransformer,
+            IRuntimeCheckProvider theRuntimeCheckProvider,
             IOutputIssueMessageProvider theMessageProvider) {
         precedenceHelper = thePrecedenceHelper;
         tempVariableHelper = theTempVariableHelper;
         operatorHelper = theOperatorHelper;
         dtoCreator = theDtoCreator;
-        nameTransformer = theNameTransformer;
+        runtimeCheckProvider = theRuntimeCheckProvider;
         messageProvider = theMessageProvider;
     }
-
 
     @Override
     public void setMethodSymbols(List<IMethodSymbol> methodSymbols) {
@@ -98,14 +95,14 @@ public class TranslatorController implements ITranslatorController
 
     @Override
     public FunctionApplicationDto getFunctionApplication(
-            IBindingCollection bindings, ITSPHPAst functionCall, ITSPHPAst identifier) {
+            IBindingCollection bindings, ITSPHPAst functionCall, List<Object> arguments) {
 
         FunctionApplicationDto dto = null;
 
         String absoluteName = functionCall.getSymbol().getAbsoluteName();
         OverloadApplicationDto appliedOverload = bindings.getAppliedOverload(absoluteName);
         if (appliedOverload != null) {
-
+            ITSPHPAst identifier = functionCall.getChild(0);
             String name = identifier.getText();
             name = name.substring(0, name.length() - 2);
             if (appliedOverload.overload != null) {
@@ -115,55 +112,43 @@ public class TranslatorController implements ITranslatorController
                 }
             }
 
-            Map<Integer, String> runtimeChecks = getRuntimeChecks(appliedOverload);
-            dto = new FunctionApplicationDto(name, runtimeChecks, null);
+            dto = new FunctionApplicationDto(name);
+            dto.arguments = arguments;
+            applyRuntimeChecks(dto, functionCall.getChild(1), appliedOverload);
         }
 
         return dto;
     }
 
-    private Map<Integer, String> getRuntimeChecks(OverloadApplicationDto appliedOverload) {
-        Map<Integer, String> runtimeChecks = null;
+    private void applyRuntimeChecks(
+            FunctionApplicationDto dto, ITSPHPAst argumentsAst, OverloadApplicationDto appliedOverload) {
+        List<Object> arguments = dto.arguments;
         if (appliedOverload.runtimeChecks != null) {
-            runtimeChecks = new HashMap<>();
             for (Map.Entry<Integer, Pair<ITypeSymbol, List<ITypeSymbol>>> entry
                     : appliedOverload.runtimeChecks.entrySet()) {
-                addToRuntimeChecks(runtimeChecks, entry.getKey(), entry.getValue().first);
+                int argumentIndex = entry.getKey();
+                if (dto.argumentsRequiringConversion == null
+                        || !dto.argumentsRequiringConversion.contains(argumentIndex)) {
+                    Object argument = runtimeCheckProvider.addTypeCheck(
+                            argumentsAst.getChild(argumentIndex), arguments.get(argumentIndex), entry.getValue().first);
+                    arguments.set(argumentIndex, argument);
+                }
             }
-        }
-        return runtimeChecks;
-    }
-
-    private void addToRuntimeChecks(Map<Integer, String> runtimeChecks, int argumentNumber, ITypeSymbol typeSymbol) {
-        if (typeSymbol instanceof IContainerTypeSymbol) {
-            //TODO TINS-604 runtime check with union type
-//            IContainerTypeSymbol containerTypeSymbol = (IContainerTypeSymbol) typeSymbol;
-//            for (ITypeSymbol innerTypeSymbol : containerTypeSymbol.getTypeSymbols().values()) {
-//                addToRuntimeChecks(runtimeChecks, argumentNumber, innerTypeSymbol);
-//            }
-            runtimeChecks.put(argumentNumber, typeSymbol.getAbsoluteName());
-        } else {
-            String typeName;
-            if (typeSymbol instanceof IConvertibleTypeSymbol) {
-                Pair<String, Boolean> pair = nameTransformer.getTypeName((IConvertibleTypeSymbol) typeSymbol);
-                typeName = pair.first;
-            } else {
-                typeName = typeSymbol.getAbsoluteName();
-            }
-            runtimeChecks.put(argumentNumber, typeName);
         }
     }
 
     @Override
-    public FunctionApplicationDto getOperatorApplication(IBindingCollection bindings, ITSPHPAst operator) {
+    public FunctionApplicationDto getOperatorApplication(
+            IBindingCollection bindings, ITSPHPAst operator, List<Object> arguments) {
         FunctionApplicationDto dto = null;
 
         String absoluteName = operator.getSymbol().getAbsoluteName();
         OverloadApplicationDto appliedOverload = bindings.getAppliedOverload(absoluteName);
         if (appliedOverload != null) {
             dto = new FunctionApplicationDto();
-            dto.runtimeChecks = getRuntimeChecks(appliedOverload);
+            dto.arguments = arguments;
             operatorHelper.turnIntoMigrationFunctionIfRequired(dto, appliedOverload, bindings, operator, operator);
+            applyRuntimeChecks(dto, operator, appliedOverload);
         }
 
         return dto;
@@ -201,7 +186,6 @@ public class TranslatorController implements ITranslatorController
         }
         return arguments;
     }
-
 
     @Override
     public String getErrMessageOperatorApplication(IBindingCollection bindings, ITSPHPAst operator) {

@@ -11,16 +11,19 @@ import ch.tsphp.common.TSPHPAstAdaptor;
 import ch.tsphp.common.symbols.ITypeSymbol;
 import ch.tsphp.tinsphp.common.config.ICoreInitialiser;
 import ch.tsphp.tinsphp.common.config.ISymbolsInitialiser;
-import ch.tsphp.tinsphp.common.symbols.ISymbolFactory;
+import ch.tsphp.tinsphp.common.symbols.IUnionTypeSymbol;
+import ch.tsphp.tinsphp.common.symbols.PrimitiveTypeNames;
 import ch.tsphp.tinsphp.common.utils.ITypeHelper;
 import ch.tsphp.tinsphp.core.config.HardCodedCoreInitialiser;
 import ch.tsphp.tinsphp.symbols.config.HardCodedSymbolsInitialiser;
-import ch.tsphp.tinsphp.translators.tsphp.INameTransformer;
 import ch.tsphp.tinsphp.translators.tsphp.IOperatorHelper;
-import ch.tsphp.tinsphp.translators.tsphp.IParameterCheckProvider;
-import ch.tsphp.tinsphp.translators.tsphp.TSPHPNameTransformer;
+import ch.tsphp.tinsphp.translators.tsphp.IRuntimeCheckProvider;
+import ch.tsphp.tinsphp.translators.tsphp.ITypeTransformer;
 import ch.tsphp.tinsphp.translators.tsphp.TSPHPOperatorHelper;
-import ch.tsphp.tinsphp.translators.tsphp.TSPHPParameterCheckProvider;
+import ch.tsphp.tinsphp.translators.tsphp.TSPHPRuntimeCheckProvider;
+import ch.tsphp.tinsphp.translators.tsphp.TSPHPTypeTransformer;
+import ch.tsphp.tinsphp.translators.tsphp.TempVariableHelper;
+import ch.tsphp.tinsphp.translators.tsphp.TsphpUnionTypeSymbol;
 import ch.tsphp.tinsphp.translators.tsphp.issues.HardCodedOutputIssueMessageProvider;
 import org.junit.Ignore;
 
@@ -43,26 +46,35 @@ public abstract class ATranslatorWithReductionTest extends ATranslatorTest
                 new AstHelper(new TSPHPAstAdaptor()), symbolsInitialiser);
         typeHelper = symbolsInitialiser.getTypeHelper();
         primitiveTypes = coreInitialiser.getCore().getPrimitiveTypes();
-        ISymbolFactory symbolFactory = symbolsInitialiser.getSymbolFactory();
-        ITypeSymbol mixedTypeSymbol = symbolFactory.getMixedTypeSymbol();
-        tsphpBoolTypeSymbol = symbolFactory.createPseudoTypeSymbol("bool", mixedTypeSymbol);
-        tsphpNumTypeSymbol = symbolFactory.createPseudoTypeSymbol("num", mixedTypeSymbol);
-        tsphpScalarTypeSymbol = symbolFactory.createPseudoTypeSymbol("scalar", mixedTypeSymbol);
+        IUnionTypeSymbol unionTypeSymbol = (IUnionTypeSymbol) primitiveTypes.get(PrimitiveTypeNames.BOOL);
+        tsphpBoolTypeSymbol = new TsphpUnionTypeSymbol("bool", unionTypeSymbol);
+        unionTypeSymbol = (IUnionTypeSymbol) primitiveTypes.get(PrimitiveTypeNames.NUM);
+        tsphpNumTypeSymbol = new TsphpUnionTypeSymbol("num", unionTypeSymbol);
+        unionTypeSymbol = (IUnionTypeSymbol) primitiveTypes.get(PrimitiveTypeNames.SCALAR);
+        tsphpScalarTypeSymbol = new TsphpUnionTypeSymbol("scalar", unionTypeSymbol);
     }
 
     @Override
-    public IOperatorHelper createOperatorHelper(INameTransformer nameTransformer) {
-        return new TSPHPOperatorHelper(typeHelper, primitiveTypes, nameTransformer);
+    public IOperatorHelper createOperatorHelper(IRuntimeCheckProvider runtimeCheckProvider,
+            ITypeTransformer nameTransformer) {
+        return new TSPHPOperatorHelper(typeHelper, primitiveTypes, runtimeCheckProvider, nameTransformer);
     }
 
     @Override
-    public INameTransformer createNameTransformer() {
-        return new TSPHPNameTransformer(
-                typeHelper, primitiveTypes, tsphpBoolTypeSymbol, tsphpNumTypeSymbol, tsphpScalarTypeSymbol);
+    public ITypeTransformer createNameTransformer() {
+        return new TSPHPTypeTransformer(
+                symbolsInitialiser.getSymbolFactory(),
+                typeHelper,
+                primitiveTypes,
+                tsphpBoolTypeSymbol,
+                tsphpNumTypeSymbol,
+                tsphpScalarTypeSymbol);
     }
 
     @Override
-    public IParameterCheckProvider createParameterCheckProvider() {
-        return new TSPHPParameterCheckProvider(new HardCodedOutputIssueMessageProvider(), tsphpBoolTypeSymbol);
+    public IRuntimeCheckProvider createRuntimeCheckProvider(ITypeTransformer nameTransformer, TempVariableHelper
+            tempVariableHelper) {
+        return new TSPHPRuntimeCheckProvider(
+                nameTransformer, tempVariableHelper, new HardCodedOutputIssueMessageProvider(), tsphpBoolTypeSymbol);
     }
 }

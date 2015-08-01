@@ -33,12 +33,12 @@ import ch.tsphp.tinsphp.inference_engine.config.HardCodedInferenceEngineInitiali
 import ch.tsphp.tinsphp.parser.config.HardCodedParserInitialiser;
 import ch.tsphp.tinsphp.symbols.config.HardCodedSymbolsInitialiser;
 import ch.tsphp.tinsphp.translators.tsphp.DtoCreator;
-import ch.tsphp.tinsphp.translators.tsphp.INameTransformer;
 import ch.tsphp.tinsphp.translators.tsphp.IOperatorHelper;
-import ch.tsphp.tinsphp.translators.tsphp.IParameterCheckProvider;
-import ch.tsphp.tinsphp.translators.tsphp.MetaNameTransformer;
+import ch.tsphp.tinsphp.translators.tsphp.IRuntimeCheckProvider;
+import ch.tsphp.tinsphp.translators.tsphp.ITypeTransformer;
 import ch.tsphp.tinsphp.translators.tsphp.MetaOperatorHelper;
-import ch.tsphp.tinsphp.translators.tsphp.MetaParameterCheckProvider;
+import ch.tsphp.tinsphp.translators.tsphp.MetaRuntimeCheckProvider;
+import ch.tsphp.tinsphp.translators.tsphp.MetaTypeTransformer;
 import ch.tsphp.tinsphp.translators.tsphp.PrecedenceHelper;
 import ch.tsphp.tinsphp.translators.tsphp.TempVariableHelper;
 import ch.tsphp.tinsphp.translators.tsphp.TranslatorController;
@@ -123,18 +123,18 @@ public abstract class ATest implements IIssueLogger
         commonTreeNodeStream.reset();
 
         TempVariableHelper tempVariableHelper = new TempVariableHelper(astAdaptor);
-        INameTransformer nameTransformer = createNameTransformer();
-        IOperatorHelper operatorHelper = createOperatorHelper(nameTransformer);
-        IParameterCheckProvider parameterCheckProvider = createParameterCheckProvider();
+        ITypeTransformer nameTransformer = createNameTransformer();
+        IRuntimeCheckProvider runtimeCheckProvider = createRuntimeCheckProvider(nameTransformer, tempVariableHelper);
+        IOperatorHelper operatorHelper = createOperatorHelper(runtimeCheckProvider, nameTransformer);
 
-        IDtoCreator dtoCreator = new DtoCreator(tempVariableHelper, nameTransformer, parameterCheckProvider);
+        IDtoCreator dtoCreator = new DtoCreator(tempVariableHelper, nameTransformer, runtimeCheckProvider);
 
         controller = new TranslatorController(
                 new PrecedenceHelper(),
                 tempVariableHelper,
                 operatorHelper,
                 dtoCreator,
-                nameTransformer,
+                runtimeCheckProvider,
                 new HardCodedOutputIssueMessageProvider());
         controller.setMethodSymbols(inferenceEngineInitialiser.getMethodSymbols());
         translator = new ErrorReportingTSPHPTranslatorWalker(
@@ -147,19 +147,21 @@ public abstract class ATest implements IIssueLogger
         check();
     }
 
-    protected IParameterCheckProvider createParameterCheckProvider() {
-        return new MetaParameterCheckProvider();
+    protected IRuntimeCheckProvider createRuntimeCheckProvider(
+            ITypeTransformer nameTransformer, TempVariableHelper tempVariableHelper) {
+        return new MetaRuntimeCheckProvider();
     }
 
-    protected INameTransformer createNameTransformer() {
-        return new MetaNameTransformer();
+    protected ITypeTransformer createNameTransformer() {
+        return new MetaTypeTransformer();
     }
 
     protected ICoreInitialiser createCoreInitialiser(IAstHelper astHelper, ISymbolsInitialiser symbolsInitialiser) {
         return new HardCodedCoreInitialiser(astHelper, symbolsInitialiser);
     }
 
-    protected IOperatorHelper createOperatorHelper(INameTransformer nameTransformer) {
+    protected IOperatorHelper createOperatorHelper(IRuntimeCheckProvider runtimeCheckProvider,
+            ITypeTransformer nameTransformer) {
         return new MetaOperatorHelper();
     }
 

@@ -17,33 +17,33 @@ import java.util.TreeSet;
 
 import static ch.tsphp.tinsphp.common.utils.Pair.pair;
 
-public class MetaNameTransformer implements INameTransformer
+public class MetaTypeTransformer implements ITypeTransformer
 {
 
     @Override
-    public Pair<String, Boolean> getTypeName(IBindingCollection bindingCollection, String typeVariable) {
+    public Pair<ITypeSymbol, Boolean> getType(IBindingCollection bindingCollection, String typeVariable) {
         IContainerTypeSymbol containerTypeSymbol;
         if (bindingCollection.hasUpperTypeBounds(typeVariable)) {
             containerTypeSymbol = bindingCollection.getUpperTypeBounds(typeVariable);
         } else {
             containerTypeSymbol = bindingCollection.getLowerTypeBounds(typeVariable);
         }
-        return pair(containerTypeSymbol.getAbsoluteName(), false);
+        return new Pair<ITypeSymbol, Boolean>(containerTypeSymbol, false);
     }
 
     @Override
-    public Pair<String, Boolean> getTypeName(ITypeSymbol typeSymbol) {
-        return pair(typeSymbol.getAbsoluteName(), false);
+    public Pair<ITypeSymbol, Boolean> getType(ITypeSymbol typeSymbol) {
+        return pair(typeSymbol, false);
     }
 
     @Override
-    public Pair<String, Boolean> getTypeName(IContainerTypeSymbol typeSymbol) {
-        return pair(typeSymbol.getAbsoluteName(), false);
+    public Pair<ITypeSymbol, Boolean> getType(IContainerTypeSymbol typeSymbol) {
+        return new Pair<ITypeSymbol, Boolean>(typeSymbol, false);
     }
 
     @Override
-    public Pair<String, Boolean> getTypeName(IConvertibleTypeSymbol convertibleTypeSymbol) {
-        return pair(convertibleTypeSymbol.getAbsoluteName(), false);
+    public Pair<ITypeSymbol, Boolean> getType(IConvertibleTypeSymbol convertibleTypeSymbol) {
+        return new Pair<ITypeSymbol, Boolean>(convertibleTypeSymbol, false);
     }
 
     @Override

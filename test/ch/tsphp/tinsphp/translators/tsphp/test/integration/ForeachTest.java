@@ -147,7 +147,7 @@ public class ForeachTest extends ATranslatorTest
                                 + "\n        $v = $v4_0;"
                                 + "\n    }"
                                 + "\n    if ($v != null) {"
-                                + "\n        echo ({as string}) ($v);"
+                                + "\n        echo cast($v, {as string});"
                                 + "\n    }"
                                 + "\n}"
                 }

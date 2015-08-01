@@ -102,32 +102,12 @@ private StringTemplate getFunctionApplication(
         IErrorMessageCaller errorMessageCaller){
 
     StringTemplate stringTemplate;
-        
+
     if (dto != null) {
-        if(arguments != null){
-            Map<Integer, Pair<String, SortedSet<String>>> conversions = dto.conversions;
-            if(conversions == null) {
-                conversions = new HashMap<>(0);
-            }
-
-            Map<Integer, String> runtimeChecks = dto.runtimeChecks;
-            if(runtimeChecks == null){
-                runtimeChecks = new HashMap<>(0);
-            }
-
-            int numberOfArguments = arguments.size();
-            for(int i = 0; i < numberOfArguments; ++i){
-                Object argument = arguments.get(i);
-                if(conversions.containsKey(i)){
-                    Pair<String, SortedSet<String>> conversion = conversions.get(i);
-                    argument = %conversion(expression={argument}, targetType={conversion.first}, ifTypes={conversion.second}, needParentheses={false});
-                } else if(runtimeChecks.containsKey(i)) {
-                    argument = %runtimeCheck(expression={argument}, type={runtimeChecks.get(i)}, needParentheses={false});
-                }
-                arguments.set(i, argument);
-            }
+        stringTemplate = %functionCall(identifier={dto.name}, arguments={dto.arguments});
+        if (dto.returnRuntimeCheck != null) {
+            stringTemplate = new StringTemplate(templateLib, dto.returnRuntimeCheck.replace("\%returnRuntimeCheck\%", stringTemplate.toString()));
         }
-        stringTemplate = %functionCall(identifier={dto.name}, arguments={arguments});
     } else {
         stringTemplate = getErrorMessage(functionCall, identifier, errorMessageCaller);
     }
@@ -136,7 +116,8 @@ private StringTemplate getFunctionApplication(
 
 private StringTemplate getOperatorOrFunctionApplication(
         FunctionApplicationDto dto,
-        List<Pair<String, Object>> arguments,
+        List<Object> arguments,
+        List<String> argumentNames,
         ITSPHPAst operatorAst,
         String operatorFunction,
         StringTemplate operator,
@@ -144,19 +125,14 @@ private StringTemplate getOperatorOrFunctionApplication(
 
     StringTemplate stringTemplate;
     if (dto != null) {
-        //there is no operator without arguments, therefore the check is not necessary
-        int numberOfArguments = arguments.size();
         if (dto.name != null) {
-            List<Object> functionArguments = new ArrayList<>(numberOfArguments);
-            for(int i = 0; i < numberOfArguments; ++i){
-                functionArguments.add(arguments.get(i).second);
-            }
-            stringTemplate = getFunctionApplication(dto, functionArguments, operatorAst, operatorAst, operatorErrorMessageCaller);
+            stringTemplate = getFunctionApplication(dto, arguments, operatorAst, operatorAst, operatorErrorMessageCaller);
         } else {
-            stringTemplate = getOperatorApplication(dto, arguments, operatorFunction, operator, needParentheses);
-        }
-        if (dto.returnRuntimeCheck != null) {
-            stringTemplate = %runtimeCheck(expression={stringTemplate}, type={dto.returnRuntimeCheck}, needParentheses={false});
+            stringTemplate = getOperatorApplication(dto, arguments, argumentNames, operatorFunction, operator, needParentheses);
+            if (dto.returnRuntimeCheck != null) {
+                stringTemplate = new StringTemplate(
+                    templateLib, dto.returnRuntimeCheck.replace("\%returnRuntimeCheck\%", stringTemplate.getTemplate()));
+            }
         }
     } else {
         stringTemplate = getErrorMessage(operatorAst, operatorAst, operatorErrorMessageCaller);
@@ -167,33 +143,18 @@ private StringTemplate getOperatorOrFunctionApplication(
 
 private StringTemplate getOperatorApplication(
         FunctionApplicationDto dto,
-        List<Pair<String, Object>> arguments,
+        List<Object> arguments,
+        List<String> argumentNames,
         String operatorFunction,
         StringTemplate operator,
         boolean needParentheses) {
-            
-    Map<Integer, Pair<String, SortedSet<String>>> conversions = dto.conversions;
-    if(conversions == null) {
-        conversions = new HashMap<>(0);
-    }
-    
-    Map<Integer, String> runtimeChecks = dto.runtimeChecks;
-    if(runtimeChecks == null){
-        runtimeChecks = new HashMap<>(0);
-    }
 
     int numberOfArguments = arguments.size();
     STAttrMap map = new STAttrMap().put("operator", operator).put("needParentheses", needParentheses);
     for(int i = 0; i < numberOfArguments; ++i){
-        Pair<String, Object> pair = arguments.get(i);
-        Object argument = pair.second;
-        if(conversions.containsKey(i)){
-            Pair<String, SortedSet<String>> conversion = conversions.get(i);
-            argument = %conversion(expression={argument}, targetType={conversion.first}, ifTypes={conversion.second}, needParentheses={false});
-        } else if(runtimeChecks.containsKey(i)) {
-            argument = %runtimeCheck(expression={argument}, type={runtimeChecks.get(i)}, needParentheses={false});
-        }
-        map.put(pair.first, argument);
+        String argumentName = argumentNames.get(i);
+        Object argument = arguments.get(i);
+        map.put(argumentName, argument);
     }
     return templateLib.getInstanceOf(operatorFunction, map);
 }
@@ -667,12 +628,15 @@ instruction
     |   ^('throw' expression)           -> throw(expression = {$expression.st})
     |   ^(Echo exprs+=expression+)
         {
-            FunctionApplicationDto dto = controller.getOperatorApplication(currentBindings, $Echo);
-            List<Pair<String, Object>> arguments = new ArrayList<>(2);
-            arguments.add(new Pair<String, Object>("expressions", $exprs));
+            List<String> argumentNames = new ArrayList<>(1);
+            List<Object> arguments = new ArrayList<>(1);
+            argumentNames.add("expressions");
+            arguments.add($exprs.get(0));            
+            FunctionApplicationDto dto = controller.getOperatorApplication(currentBindings, $Echo, arguments);
             $st = getOperatorOrFunctionApplication(
                 dto, 
                 arguments,
+                argumentNames,
                 $Echo,
                 "echo",
                 null,
@@ -831,12 +795,15 @@ staticAccess
 operator
     :   ^(unaryPreOperator expr=expression)
         {
-            FunctionApplicationDto dto = controller.getOperatorApplication(currentBindings, $unaryPreOperator.start);
-            List<Pair<String, Object>> arguments = new ArrayList<>(1);
-            arguments.add(new Pair<String, Object>("expression",$expr.st));
+            List<String> argumentNames = new ArrayList<>(1);
+            List<Object> arguments = new ArrayList<>(1);
+            argumentNames.add("expression");
+            arguments.add($expr.st);
+            FunctionApplicationDto dto = controller.getOperatorApplication(currentBindings, $unaryPreOperator.start, arguments);
             $st = getOperatorOrFunctionApplication(
                 dto, 
                 arguments,
+                argumentNames,
                 $unaryPreOperator.start, 
                 "unaryPreOperator",
                 $unaryPreOperator.st,
@@ -845,12 +812,15 @@ operator
 
     |   ^(unaryPostOperator expr=expression)
         {
-            FunctionApplicationDto dto = controller.getOperatorApplication(currentBindings, $unaryPostOperator.start);
-            List<Pair<String, Object>> arguments = new ArrayList<>(1);
-            arguments.add(new Pair<String, Object>("expression",$expr.st));
+            List<String> argumentNames = new ArrayList<>(1);
+            List<Object> arguments = new ArrayList<>(1);
+            argumentNames.add("expression");
+            arguments.add($expr.st);
+            FunctionApplicationDto dto = controller.getOperatorApplication(currentBindings, $unaryPostOperator.start, arguments);
             $st = getOperatorOrFunctionApplication(
                 dto, 
                 arguments,
+                argumentNames,
                 $unaryPostOperator.start, 
                 "unaryPostOperator",
                 $unaryPostOperator.st,
@@ -859,13 +829,17 @@ operator
     
     |   ^(binaryOperator left=expression right=expression)
         {
-            FunctionApplicationDto dto = controller.getOperatorApplication(currentBindings, $binaryOperator.start);
-            List<Pair<String, Object>> arguments = new ArrayList<>(2);
-            arguments.add(new Pair<String, Object>("left", $left.st));
-            arguments.add(new Pair<String, Object>("right", $right.st));
-            $st = getOperatorOrFunctionApplication(
+            List<String> argumentNames = new ArrayList<>(2);
+            List<Object> arguments = new ArrayList<>(2);
+            argumentNames.add("left");
+            arguments.add($left.st);
+            argumentNames.add("right");
+            arguments.add($right.st);
+            FunctionApplicationDto dto = controller.getOperatorApplication(currentBindings, $binaryOperator.start, arguments);
+           $st = getOperatorOrFunctionApplication(
                 dto, 
                 arguments,
+                argumentNames,
                 $binaryOperator.start, 
                 "binaryOperator",
                 $binaryOperator.st,
@@ -874,14 +848,19 @@ operator
 
     |   ^(QuestionMark cond=expression ifCase=expression elseCase=expression)
         {
-            FunctionApplicationDto dto = controller.getOperatorApplication(currentBindings, $QuestionMark);
-            List<Pair<String, Object>> arguments = new ArrayList<>(2);
-            arguments.add(new Pair<String, Object>("cond", $cond.st));
-            arguments.add(new Pair<String, Object>("ifCase", $ifCase.st));
-            arguments.add(new Pair<String, Object>("elseCase", $elseCase.st));
+            List<String> argumentNames = new ArrayList<>(3);
+            List<Object> arguments = new ArrayList<>(3);
+            argumentNames.add("cond");
+            arguments.add($cond.st);
+            argumentNames.add("ifCase");
+            arguments.add($ifCase.st);
+            argumentNames.add("elseCase");
+            arguments.add($elseCase.st);
+            FunctionApplicationDto dto = controller.getOperatorApplication(currentBindings, $QuestionMark, arguments);
             $st = getOperatorOrFunctionApplication(
                 dto, 
                 arguments,
+                argumentNames,
                 $QuestionMark, 
                 "ternaryOperator",
                 null,
@@ -895,13 +874,17 @@ operator
     */
     |   ^(Instanceof expr=expression (type=TYPE_NAME|type=VariableId))
         {
-            FunctionApplicationDto dto = controller.getOperatorApplication(currentBindings, $Instanceof);
-            List<Pair<String, Object>> arguments = new ArrayList<>(2);
-            arguments.add(new Pair<String, Object>("expression", $expr.st));
-            arguments.add(new Pair<String, Object>("type", $type.text));
+            List<String> argumentNames = new ArrayList<>(3);
+            List<Object> arguments = new ArrayList<>(2);
+            argumentNames.add("expression");
+            arguments.add($expr.st);
+            argumentNames.add("type");
+            arguments.add($type.text);
+            FunctionApplicationDto dto = controller.getOperatorApplication(currentBindings, $Instanceof, arguments);
             $st = getOperatorOrFunctionApplication(
                 dto, 
                 arguments,
+                argumentNames,
                 $Instanceof,
                 "instanceof",
                 null,
@@ -1009,8 +992,7 @@ functionCall
     :   ^(FUNCTION_CALL identifier=TYPE_NAME actualParameters)
         {
             FunctionApplicationDto dto = controller.getFunctionApplication(
-                currentBindings, $FUNCTION_CALL, $identifier);
-                
+                currentBindings, $FUNCTION_CALL, $actualParameters.parameters);
             $st = getFunctionApplication(
                 dto, 
                 $actualParameters.parameters,

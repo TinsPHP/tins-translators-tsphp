@@ -37,13 +37,13 @@ import static ch.tsphp.tinsphp.common.utils.Pair.pair;
 public class DtoCreator implements IDtoCreator
 {
     private final ITempVariableHelper tempVariableHelper;
-    private final INameTransformer nameTransformer;
-    private final IParameterCheckProvider parameterCheckProvider;
+    private final ITypeTransformer nameTransformer;
+    private final IRuntimeCheckProvider parameterCheckProvider;
 
     public DtoCreator(
             ITempVariableHelper theTempVariableHelper,
-            INameTransformer theNameTransformer,
-            IParameterCheckProvider theParameterCheckProvider) {
+            ITypeTransformer theNameTransformer,
+            IRuntimeCheckProvider theParameterCheckProvider) {
         tempVariableHelper = theTempVariableHelper;
         nameTransformer = theNameTransformer;
         parameterCheckProvider = theParameterCheckProvider;
@@ -109,7 +109,7 @@ public class DtoCreator implements IDtoCreator
             boolean typeHintWasUsed = parameterDto.localVariableType == null;
             Boolean wasWidened = pair.second;
             if (isCheckPossible && wasWidened && typeHintWasUsed) {
-                isCheckPossible = parameterCheckProvider.addParameterChecks(
+                isCheckPossible = parameterCheckProvider.addParameterCheck(
                         newName + "()", parameterRuntimeChecks, bindings, parameter, i, parameterDto);
             }
             parameterDtos.add(parameterDto);
@@ -240,16 +240,16 @@ public class DtoCreator implements IDtoCreator
     private Pair<TypeDto, Boolean> createParameterTypeDto(
             ITypeVariableReference reference, IBindingCollection bindings) {
         String typeVariable = reference.getTypeVariable();
-        String type;
+        String typeName;
         boolean wasWidened = false;
         if (reference.hasFixedType()) {
-            Pair<String, Boolean> pair = nameTransformer.getTypeName(bindings, typeVariable);
-            type = pair.first;
+            Pair<ITypeSymbol, Boolean> pair = nameTransformer.getType(bindings, typeVariable);
+            typeName = pair.first.getAbsoluteName();
             wasWidened = pair.second;
         } else {
-            type = typeVariable;
+            typeName = typeVariable;
         }
-        return pair(new TypeDto(null, type, null), wasWidened);
+        return pair(new TypeDto(null, typeName, null), wasWidened);
     }
 
     @Override
@@ -269,8 +269,8 @@ public class DtoCreator implements IDtoCreator
         if (typeVariable.startsWith("T")) {
             typeDto = new TypeDto(null, typeVariable, null);
         } else if (reference.hasFixedType()) {
-            Pair<String, Boolean> pair = nameTransformer.getTypeName(bindings, typeVariable);
-            typeDto = new TypeDto(null, pair.first, null);
+            Pair<ITypeSymbol, Boolean> pair = nameTransformer.getType(bindings, typeVariable);
+            typeDto = new TypeDto(null, pair.first.getAbsoluteName(), null);
         } else {
             typeParameterDto = createTypeParameterDto(bindings, typeVariable);
         }

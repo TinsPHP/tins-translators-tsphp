@@ -24,6 +24,8 @@ import ch.tsphp.tinsphp.common.utils.Pair;
 import ch.tsphp.tinsphp.common.utils.TypeHelperDto;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
@@ -35,7 +37,8 @@ public class TSPHPOperatorHelper implements IOperatorHelper
 {
     private final ITypeHelper typeHelper;
     private final Map<String, ITypeSymbol> primitiveTypes;
-    private final INameTransformer nameTransformer;
+    private final ITypeTransformer nameTransformer;
+    private final IRuntimeCheckProvider runtimeCheckProvider;
 
     private final Map<Integer, Map<String, Pair<String, ITypeSymbol>>> migrationFunctions = new HashMap<>();
     private final Map<Integer, Pair<String, ITypeSymbol>> dynamicFunctions = new HashMap<>();
@@ -43,9 +46,11 @@ public class TSPHPOperatorHelper implements IOperatorHelper
     public TSPHPOperatorHelper(
             ITypeHelper theTypeHelper,
             Map<String, ITypeSymbol> thePrimitiveTypes,
-            INameTransformer theNameTransformer) {
+            IRuntimeCheckProvider theRuntimeCheckProvider,
+            ITypeTransformer theNameTransformer) {
         typeHelper = theTypeHelper;
         primitiveTypes = thePrimitiveTypes;
+        runtimeCheckProvider = theRuntimeCheckProvider;
         nameTransformer = theNameTransformer;
         init();
     }
@@ -93,7 +98,7 @@ public class TSPHPOperatorHelper implements IOperatorHelper
             OverloadApplicationDto overloadApplicationDto,
             IBindingCollection currentBindings,
             ITSPHPAst leftHandSide,
-            ITSPHPAst arguments) {
+            ITSPHPAst argumentsAst) {
 
         int operatorType = leftHandSide.getType();
 
@@ -103,15 +108,15 @@ public class TSPHPOperatorHelper implements IOperatorHelper
                 Map<String, Pair<String, ITypeSymbol>> overloads = migrationFunctions.get(operatorType);
                 String signature = overload.getSignature();
                 Pair<String, ITypeSymbol> pair = overloads.get(signature);
-                switchToMigrationFunction(dto, currentBindings, leftHandSide, arguments, pair);
+                switchToMigrationFunction(dto, currentBindings, leftHandSide, argumentsAst, pair);
             }
 
             if (dto.name == null && overload.hasConvertibleParameterTypes()) {
-                handleConvertibleTypes(dto, overloadApplicationDto, currentBindings, arguments);
+                handleConvertibleTypes(dto, overloadApplicationDto, currentBindings, argumentsAst);
             }
         } else {
             Pair<String, ITypeSymbol> pair = dynamicFunctions.get(operatorType);
-            switchToMigrationFunction(dto, currentBindings, leftHandSide, arguments, pair);
+            switchToMigrationFunction(dto, currentBindings, leftHandSide, argumentsAst, pair);
         }
     }
 
@@ -119,10 +124,9 @@ public class TSPHPOperatorHelper implements IOperatorHelper
             FunctionApplicationDto dto,
             OverloadApplicationDto overloadApplicationDto,
             IBindingCollection currentBindings,
-            ITSPHPAst arguments) {
+            ITSPHPAst argumentsAst) {
 
         IBindingCollection rightBindings = overloadApplicationDto.overload.getBindingCollection();
-        dto.conversions = new HashMap<>();
         List<IVariable> parameters = overloadApplicationDto.overload.getParameters();
         int numberOfParameters = parameters.size();
 
@@ -140,21 +144,21 @@ public class TSPHPOperatorHelper implements IOperatorHelper
                 if (next instanceof IConvertibleTypeSymbol) {
                     IConvertibleTypeSymbol convertibleTypeSymbol = (IConvertibleTypeSymbol) next;
                     IIntersectionTypeSymbol targetType = convertibleTypeSymbol.getUpperTypeBounds();
-                    ITypeSymbol argumentType = getTypeSymbol(currentBindings, arguments.getChild(i));
+                    ITypeSymbol argumentType = getTypeSymbol(currentBindings, argumentsAst.getChild(i));
                     TypeHelperDto result = typeHelper.isFirstSameOrSubTypeOfSecond(argumentType, targetType);
+                    //no conversion required if it is already a subtype
                     if (result.relation != ERelation.HAS_RELATION) {
                         SortedSet<String> ifTypes = new TreeSet<>();
                         if (runtimeChecks.containsKey(i)) {
                             Pair<ITypeSymbol, List<ITypeSymbol>> pair = runtimeChecks.get(i);
                             if (pair.second != null) {
                                 //runtime checks are covered in the as operator via if types
-                                dto.runtimeChecks.remove(i);
                                 for (ITypeSymbol typeSymbol : pair.second) {
                                     String typeName;
                                     if (typeSymbol instanceof IConvertibleTypeSymbol) {
-                                        Pair<String, Boolean> nameTransformerPair = nameTransformer.getTypeName(
+                                        Pair<ITypeSymbol, Boolean> nameTransformerPair = nameTransformer.getType(
                                                 (IConvertibleTypeSymbol) typeSymbol);
-                                        typeName = nameTransformerPair.first;
+                                        typeName = nameTransformerPair.first.getAbsoluteName();
                                     } else {
                                         typeName = typeSymbol.getAbsoluteName();
                                     }
@@ -162,10 +166,21 @@ public class TSPHPOperatorHelper implements IOperatorHelper
                                 }
                             }
                         }
-                        Pair<String, Boolean> nameTransformerPair = nameTransformer.getTypeName(targetType);
-                        dto.conversions.put(i, pair(nameTransformerPair.first, ifTypes));
-                    } else {
-                        //no conversion required since it is already a subtype
+                        Pair<ITypeSymbol, Boolean> nameTransformerPair = nameTransformer.getType(targetType);
+                        StringBuilder stringBuilder = new StringBuilder(dto.arguments.get(i).toString())
+                                .append(" as ").append(nameTransformerPair.first.getAbsoluteName());
+                        Iterator<String> iterator = ifTypes.iterator();
+                        if (iterator.hasNext()) {
+                            stringBuilder.append(" if ").append(iterator.next());
+                        }
+                        while (iterator.hasNext()) {
+                            stringBuilder.append(", ").append(iterator.next());
+                        }
+                        dto.arguments.set(i, stringBuilder);
+                        if (dto.argumentsRequiringConversion == null) {
+                            dto.argumentsRequiringConversion = new HashSet<>();
+                        }
+                        dto.argumentsRequiringConversion.add(i);
                     }
                 }
             }
@@ -209,12 +224,12 @@ public class TSPHPOperatorHelper implements IOperatorHelper
                     TypeHelperDto result = typeHelper.isFirstSameOrSubTypeOfSecond(returnType, typeSymbol);
                     //if the left hand side is more specific than the return type then we need to cast
                     if (result.relation == ERelation.HAS_NO_RELATION) {
-                        Pair<String, Boolean> nameTransformerPair = nameTransformer.getTypeName(typeSymbol);
-                        functionApplicationDto.returnRuntimeCheck = nameTransformerPair.first;
+                        functionApplicationDto.returnRuntimeCheck = runtimeCheckProvider.addTypeCheck(
+                                leftHandSide, "%returnRuntimeCheck%", typeSymbol).toString();
                     }
                 } else {
                     //if overload is parametric polymorphic then we need to cast to the parametric type
-                    functionApplicationDto.returnRuntimeCheck = lhsTypeVariable;
+                    functionApplicationDto.returnRuntimeCheck = "cast(%returnRuntimeCheck%, " + lhsTypeVariable + ")";
                 }
             }
         }

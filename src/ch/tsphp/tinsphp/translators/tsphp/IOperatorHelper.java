@@ -18,5 +18,5 @@ public interface IOperatorHelper
             OverloadApplicationDto dto,
             IBindingCollection currentBindings,
             ITSPHPAst leftHandSide,
-            ITSPHPAst arguments);
+            ITSPHPAst argumentsAst);
 }

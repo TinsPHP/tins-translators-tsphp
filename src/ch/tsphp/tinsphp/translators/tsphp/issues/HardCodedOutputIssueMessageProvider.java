@@ -17,6 +17,12 @@ public class HardCodedOutputIssueMessageProvider implements IOutputIssueMessageP
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Argument ").append(parameterIndex).append(" passed to ").append(identifier)
                 .append(" (parameter ").append(parameterName).append(") must be a value of type ");
+        appendTypes(stringBuilder, types);
+        stringBuilder.append(".");
+        return stringBuilder.toString();
+    }
+
+    private void appendTypes(StringBuilder stringBuilder, List<String> types) {
         stringBuilder.append(types.get(0));
         int size = types.size();
         int typeIndex = 1;
@@ -27,6 +33,14 @@ public class HardCodedOutputIssueMessageProvider implements IOutputIssueMessageP
         if (typeIndex < size) {
             stringBuilder.append(" or ").append(types.get(typeIndex));
         }
+    }
+
+    @Override
+    public String getTypeCheckError(String variableId, List<String> types) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("The variable " + variableId + " must hold a value of type ");
+        appendTypes(stringBuilder, types);
+        stringBuilder.append(".");
         return stringBuilder.toString();
     }
 

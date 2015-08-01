@@ -6,6 +6,8 @@
 
 package ch.tsphp.tinsphp.translators.tsphp;
 
+import ch.tsphp.common.ITSPHPAst;
+import ch.tsphp.common.symbols.ITypeSymbol;
 import ch.tsphp.tinsphp.common.inference.constraints.IBindingCollection;
 import ch.tsphp.tinsphp.common.inference.constraints.IVariable;
 import ch.tsphp.tinsphp.common.translation.dtos.ParameterDto;
@@ -13,16 +15,18 @@ import ch.tsphp.tinsphp.common.utils.Pair;
 
 import java.util.List;
 
-public interface IParameterCheckProvider
+public interface IRuntimeCheckProvider
 {
     /**
      * Adds a check to the given parameterRuntimeChecks if required and indicates whether a check can be performed.
      */
-    boolean addParameterChecks(
+    boolean addParameterCheck(
             String identifier,
             List<Pair<String, String>> parameterRuntimeChecks,
             IBindingCollection bindings,
             IVariable parameter,
             int parameterIndex,
             ParameterDto parameterDto);
+
+    Object addTypeCheck(ITSPHPAst argumentAst, Object argument, ITypeSymbol argumentType);
 }

@@ -17,27 +17,28 @@ import java.util.Collection;
 /**
  * Transforms type names and type variable names according to rules of the translation target.
  */
-public interface INameTransformer
+public interface ITypeTransformer
 {
-    /**
-     * Returns the transformed name and indicates whether the type had to be widened (e.g. fallback to mixed)
-     */
-    Pair<String, Boolean> getTypeName(IBindingCollection bindingCollection, String typeVariable);
 
     /**
      * Returns the transformed name and indicates whether the type had to be widened (e.g. fallback to mixed)
      */
-    Pair<String, Boolean> getTypeName(ITypeSymbol typeSymbol);
+    Pair<ITypeSymbol, Boolean> getType(IBindingCollection bindingCollection, String typeVariable);
 
     /**
      * Returns the transformed name and indicates whether the type had to be widened (e.g. fallback to mixed)
      */
-    Pair<String, Boolean> getTypeName(IContainerTypeSymbol containerTypeSymbol);
+    Pair<ITypeSymbol, Boolean> getType(ITypeSymbol typeSymbol);
 
     /**
      * Returns the transformed name and indicates whether the type had to be widened (e.g. fallback to mixed)
      */
-    Pair<String, Boolean> getTypeName(IConvertibleTypeSymbol convertibleTypeSymbol);
+    Pair<ITypeSymbol, Boolean> getType(IContainerTypeSymbol containerTypeSymbol);
+
+    /**
+     * Returns the transformed name and indicates whether the type had to be widened (e.g. fallback to mixed)
+     */
+    Pair<ITypeSymbol, Boolean> getType(IConvertibleTypeSymbol convertibleTypeSymbol);
 
     Collection<String> getTypeBounds(IContainerTypeSymbol typeBounds);
 

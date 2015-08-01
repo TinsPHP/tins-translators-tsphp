@@ -146,11 +146,11 @@ public class MigrationFunctionTest extends ATranslatorWithReductionTest
         return Arrays.asList(new String[][]{
                 {
                         "<?php $a = 'a' " + op + " 1.2;",
-                        "namespace{\n    float $a;\n    $a = (float) (" + oldSchool + "('a', 1.2));\n}"
+                        "namespace{\n    float $a;\n    $a = cast(" + oldSchool + "('a', 1.2), float);\n}"
                 },
                 {
                         "<?php $a = 1.2 " + op + " true;",
-                        "namespace{\n    float $a;\n    $a = (float) (" + oldSchool + "(1.2, true));\n}"
+                        "namespace{\n    float $a;\n    $a = cast(" + oldSchool + "(1.2, true), float);\n}"
                 },
                 {
                         "<?php $a = 'a' " + op + " 1;",
@@ -166,7 +166,7 @@ public class MigrationFunctionTest extends ATranslatorWithReductionTest
                 },
                 {
                         "<?php $a = true " + op + " false;",
-                        "namespace{\n    int $a;\n    $a = (int) (" + oldSchool + "(true, false));\n}"
+                        "namespace{\n    int $a;\n    $a = cast(" + oldSchool + "(true, false), int);\n}"
                 },
                 //will use the overload float x {as num} but since arguments are float x int it should use +
                 {"<?php $a = 1.2 " + op + " 1;", "namespace{\n    float $a;\n    $a = 1.2 " + op + " 1;\n}"},
@@ -182,7 +182,7 @@ public class MigrationFunctionTest extends ATranslatorWithReductionTest
                                 + "    function int foo1(array $x_0) {\n"
                                 + "        mixed $x = $x_0;\n"
                                 + "        $x = 1;\n"
-                                + "        return (int) (" + oldSchool + "((int) ($x), 1));\n"
+                                + "        return cast(" + oldSchool + "(cast($x, int), 1), int);\n"
                                 + "    }\n"
                                 + "\n"
                                 + "}"
@@ -194,7 +194,7 @@ public class MigrationFunctionTest extends ATranslatorWithReductionTest
                                 + "    function float foo2(array $x_0) {\n"
                                 + "        mixed $x = $x_0;\n"
                                 + "        $x = 1.5;\n"
-                                + "        return (float) (" + oldSchool + "(1.2, (float) ($x)));\n"
+                                + "        return cast(" + oldSchool + "(1.2, cast($x, float)), float);\n"
                                 + "    }\n"
                                 + "\n"
                                 + "}"
@@ -206,7 +206,7 @@ public class MigrationFunctionTest extends ATranslatorWithReductionTest
                                 + "    function float foo3(array $x_0) {\n"
                                 + "        mixed $x = $x_0;\n"
                                 + "        $x = 1.5;\n"
-                                + "        return (float) (" + oldSchool + "(1.2, (float) ($x))) " + op + " 1;\n"
+                                + "        return cast(" + oldSchool + "(1.2, cast($x, float)), float) " + op + " 1;\n"
                                 + "    }\n"
                                 + "\n"
                                 + "}"
@@ -218,7 +218,7 @@ public class MigrationFunctionTest extends ATranslatorWithReductionTest
                                 + "    function num foo4(array $x_0) {\n"
                                 + "        mixed $x = $x_0;\n"
                                 + "        $x = 1;\n"
-                                + "        return " + oldSchool + "((int) ($x), '1');\n"
+                                + "        return " + oldSchool + "(cast($x, int), '1');\n"
                                 + "    }\n"
                                 + "\n"
                                 + "}"
@@ -230,7 +230,7 @@ public class MigrationFunctionTest extends ATranslatorWithReductionTest
                                 + "    function float foo5(array $x_0) {\n"
                                 + "        mixed $x = $x_0;\n"
                                 + "        $x = 1.2;\n"
-                                + "        return (float) (" + oldSchool + "((float) ($x), '1'));\n"
+                                + "        return cast(" + oldSchool + "(cast($x, float), '1'), float);\n"
                                 + "    }\n"
                                 + "\n"
                                 + "}"
@@ -252,7 +252,7 @@ public class MigrationFunctionTest extends ATranslatorWithReductionTest
                                 + "    }\n"
                                 + "\n"
                                 + "    function T foo63<T>({as T} $x, {as T} $y) where [T <: num] {\n"
-                                + "        return (T) (oldSchoolAddition($x, $y));\n"
+                                + "        return cast(oldSchoolAddition($x, $y), T);\n"
                                 + "    }\n"
                                 + "\n"
                                 + "}"
