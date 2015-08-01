@@ -41,7 +41,7 @@ public class TsphpUnionTypeSymbol implements IUnionTypeSymbol
     }
 
     @Override
-    public void remove(String absoluteName) {
+    public void remove(String theAbsoluteName) {
         throw new UnsupportedOperationException("You are dealing with a TsphpUnionTypeSymbol");
     }
 
