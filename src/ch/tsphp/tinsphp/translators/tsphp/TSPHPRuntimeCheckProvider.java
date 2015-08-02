@@ -86,7 +86,7 @@ public class TSPHPRuntimeCheckProvider implements IRuntimeCheckProvider
             ok = false;
         } else {
             String typeName = typeSymbol.getAbsoluteName();
-            stringBuilder.append("!").append(getTypeCheckExpression(typeName, parameterId));
+            stringBuilder.append("!(").append(getTypeCheckExpression(typeName, parameterId)).append(")");
             types.add(typeName);
         }
         return ok;
@@ -96,16 +96,16 @@ public class TSPHPRuntimeCheckProvider implements IRuntimeCheckProvider
         String typeCheckExpression;
         switch (typeName) {
             case PrimitiveTypeNames.FALSE_TYPE:
-                typeCheckExpression = "(" + variableId + " !== false)";
+                typeCheckExpression = "" + variableId + " !== false";
                 break;
             case PrimitiveTypeNames.TRUE_TYPE:
-                typeCheckExpression = "(" + variableId + " !== true)";
+                typeCheckExpression = "" + variableId + " !== true";
                 break;
             case PrimitiveTypeNames.NULL_TYPE:
-                typeCheckExpression = "(" + variableId + " !== null)";
+                typeCheckExpression = "" + variableId + " !== null";
                 break;
             default:
-                typeCheckExpression = "(" + variableId + " <: " + typeName + ")";
+                typeCheckExpression = "" + variableId + " <: " + typeName;
                 break;
         }
         return typeCheckExpression;
@@ -241,9 +241,8 @@ public class TSPHPRuntimeCheckProvider implements IRuntimeCheckProvider
     }
 
     private boolean appendTypeCheck(StringBuilder stringBuilder, String firstExpression, String tempVariable,
-            IUnionTypeSymbol typeSymbol, String suffixCheck, List<String> types) {
+            IUnionTypeSymbol unionTypeSymbol, String suffixCheck, List<String> types) {
         boolean ok;
-        IUnionTypeSymbol unionTypeSymbol = (IUnionTypeSymbol) typeSymbol;
         SortedMap<String, ITypeSymbol> typeSymbols = new TreeMap<>(unionTypeSymbol.getTypeSymbols());
         if (typeSymbols.containsKey(PrimitiveTypeNames.FALSE_TYPE)
                 && typeSymbols.containsKey(PrimitiveTypeNames.TRUE_TYPE)) {
@@ -252,13 +251,14 @@ public class TSPHPRuntimeCheckProvider implements IRuntimeCheckProvider
             typeSymbols.put(tsphpBoolTypeSymbol.getAbsoluteName(), tsphpBoolTypeSymbol);
         }
         boolean allOk = true;
+        String expression = firstExpression;
         for (ITypeSymbol innerTypeSymbols : typeSymbols.values()) {
             if (!appendTypeCheck(
-                    stringBuilder, firstExpression, tempVariable, innerTypeSymbols, suffixCheck, types)) {
+                    stringBuilder, expression, tempVariable, innerTypeSymbols, suffixCheck, types)) {
                 allOk = false;
                 break;
             }
-
+            expression = tempVariable;
         }
         ok = allOk;
         return ok;
@@ -283,7 +283,7 @@ public class TSPHPRuntimeCheckProvider implements IRuntimeCheckProvider
                 typeCast = "null";
                 break;
             default:
-                typeCast = getTypeCast(typeName, firstExpression, tempVariable);
+                typeCast = getTypeCast(typeName, tempVariable, tempVariable);
                 break;
         }
 

@@ -9,6 +9,7 @@ package ch.tsphp.tinsphp.translators.tsphp.test.unit;
 import ch.tsphp.common.ITSPHPAst;
 import ch.tsphp.common.symbols.ITypeSymbol;
 import ch.tsphp.tinsphp.common.gen.TokenTypes;
+import ch.tsphp.tinsphp.common.symbols.IUnionTypeSymbol;
 import ch.tsphp.tinsphp.translators.tsphp.IRuntimeCheckProvider;
 import ch.tsphp.tinsphp.translators.tsphp.ITempVariableHelper;
 import ch.tsphp.tinsphp.translators.tsphp.ITypeTransformer;
@@ -229,6 +230,75 @@ public class TSPHPRuntimeCheckProviderTest extends ATypeTest
         Object result = runtimeCheckProvider.getTypeCheck(argumentAst, expression, boolType);
 
         assertThat(result.toString(), is("cast(" + expression + ", bool)"));
+    }
+
+    @Test
+    public void getTypeCheck_NumAndIsVariable_ReturnsCheckIfFloatOrIntWithCasts() {
+        ITSPHPAst argumentAst = mock(ITSPHPAst.class);
+        when(argumentAst.getType()).thenReturn(TokenTypes.VariableId);
+        String expression = "$x";
+        when(argumentAst.getText()).thenReturn(expression);
+        ITempVariableHelper tempVariableHelper = createTempVariableHelperIsVariable();
+
+        IRuntimeCheckProvider runtimeCheckProvider = createRuntimeCheckProvider(tempVariableHelper);
+        Object result = runtimeCheckProvider.getTypeCheck(argumentAst, expression, numType);
+
+        assertThat(result.toString(), is("($x <: float ? cast($x, float) : $x <: int ? cast($x, int) : "
+                + "\\trigger_error('The variable $x must hold a value of type [float, int].', \\E_USER_ERROR))"));
+    }
+
+    @Test
+    public void getTypeCheck_NumAndIsNotVariable_ReturnsCheckIfFloatOrIntWithCastsAndTempVariable() {
+        ITSPHPAst argumentAst = mock(ITSPHPAst.class);
+        when(argumentAst.getType()).thenReturn(TokenTypes.VariableId);
+        String expression = "$x + 1";
+        when(argumentAst.getText()).thenReturn(expression);
+        ITempVariableHelper tempVariableHelper = createTempVariableHelperIsNotVariable("$t");
+
+        IRuntimeCheckProvider runtimeCheckProvider = createRuntimeCheckProvider(tempVariableHelper);
+        Object result = runtimeCheckProvider.getTypeCheck(argumentAst, expression, numType);
+
+        assertThat(result.toString(), is("(($t = ($x + 1)) <: float ? cast($t, float) : $t <: int ? cast($t, int) : "
+                + "\\trigger_error('The variable $t must hold a value of type [float, int].', \\E_USER_ERROR))"));
+    }
+
+    @Test
+    public void getTypeCheck_NumOrArrayAndIsVariable_ReturnsCheckIfArrayOrFloatOrIntWithCasts() {
+        ITSPHPAst argumentAst = mock(ITSPHPAst.class);
+        when(argumentAst.getType()).thenReturn(TokenTypes.VariableId);
+        String expression = "$x";
+        when(argumentAst.getText()).thenReturn(expression);
+        ITempVariableHelper tempVariableHelper = createTempVariableHelperIsVariable();
+        IUnionTypeSymbol numOrArray = symbolFactory.createUnionTypeSymbol();
+        numOrArray.addTypeSymbol(numType);
+        numOrArray.addTypeSymbol(arrayType);
+
+        IRuntimeCheckProvider runtimeCheckProvider = createRuntimeCheckProvider(tempVariableHelper);
+        Object result = runtimeCheckProvider.getTypeCheck(argumentAst, expression, numOrArray);
+
+        assertThat(result.toString(), is("($x <: array ? cast($x, array) : $x <: float ? cast($x, float) : "
+                + "$x <: int ? cast($x, int) : \\trigger_error('The variable $x must hold a value of type "
+                + "[array, float, int].', \\E_USER_ERROR))"));
+    }
+
+    @Test
+    public void getTypeCheck_NumOrArrayAndIsNotVariable_ReturnsCheckIfArrayOrFloatOrIntWithCastsAndTempVariable() {
+        ITSPHPAst argumentAst = mock(ITSPHPAst.class);
+        when(argumentAst.getType()).thenReturn(TokenTypes.VariableId);
+        String expression = "$x + 1";
+        when(argumentAst.getText()).thenReturn(expression);
+        ITempVariableHelper tempVariableHelper = createTempVariableHelperIsNotVariable("$t");
+        IUnionTypeSymbol numOrArray = symbolFactory.createUnionTypeSymbol();
+        numOrArray.addTypeSymbol(numType);
+        numOrArray.addTypeSymbol(arrayType);
+
+        IRuntimeCheckProvider runtimeCheckProvider = createRuntimeCheckProvider(tempVariableHelper);
+        Object result = runtimeCheckProvider.getTypeCheck(argumentAst, expression, numOrArray);
+
+        assertThat(result.toString(), is("(($t = ($x + 1)) <: array ? cast($t, array) : "
+                + "$t <: float ? cast($t, float) : $t <: int ? cast($t, int) : "
+                + "\\trigger_error('The variable $t must hold a value of type [array, float, int].', " +
+                "\\E_USER_ERROR))"));
     }
 
     private ITempVariableHelper createTempVariableHelperIsVariable() {
