@@ -307,24 +307,24 @@ public class TSPHPRuntimeCheckProvider implements IRuntimeCheckProvider
     }
 
     private String getTypeCast(String typeName, String firstExpression, String tempVariable) {
-        String typeCast;
+        String typeCast = null;
         String value = null;
         switch (typeName) {
             case PrimitiveTypeNames.FALSE_TYPE:
                 value = "false";
+                break;
             case PrimitiveTypeNames.TRUE_TYPE:
-                if (value == null) {
-                    value = "true";
-                }
+                value = "true";
+                break;
             case PrimitiveTypeNames.NULL_TYPE:
-                if (value == null) {
-                    value = "null";
-                }
-                typeCast = "(" + firstExpression + " === " + value + " ? " + value + " : \\trigger_error('" +
-                        messageProvider.getValueCheckError(tempVariable, value) + "', \\E_USER_ERROR))";
+                value = "null";
                 break;
             default:
                 typeCast = "cast(" + firstExpression + ", " + typeName + ")";
+        }
+        if (typeCast == null) {
+            typeCast = "(" + firstExpression + " === " + value + " ? " + value + " : \\trigger_error('"
+                    + messageProvider.getValueCheckError(tempVariable, value) + "', \\E_USER_ERROR))";
         }
         return typeCast;
     }

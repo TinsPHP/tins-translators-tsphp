@@ -9,6 +9,9 @@ package ch.tsphp.tinsphp.translators.tsphp.antlrmod;
 import ch.tsphp.common.ITSPHPAst;
 import ch.tsphp.tinsphp.common.inference.constraints.IBindingCollection;
 
+/**
+ * Represents a delegate to get the correct output error message.
+ */
 public interface IErrorMessageCaller
 {
     String getErrMessage(IBindingCollection currentBindings, ITSPHPAst rootNode, ITSPHPAst identifier);

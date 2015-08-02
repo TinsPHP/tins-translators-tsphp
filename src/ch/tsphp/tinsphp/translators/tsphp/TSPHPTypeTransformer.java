@@ -112,7 +112,8 @@ public class TSPHPTypeTransformer implements ITypeTransformer
     }
 
     @Override
-    public Pair<ITypeSymbol, Boolean> getType(IContainerTypeSymbol containerTypeSymbol) {
+    public Pair<ITypeSymbol, Boolean> getType(final IContainerTypeSymbol theContainerTypeSymbol) {
+        IContainerTypeSymbol containerTypeSymbol = theContainerTypeSymbol;
         if (containerTypeSymbol.getTypeSymbols().size() == 1) {
             ITypeSymbol tmp = containerTypeSymbol.getTypeSymbols().values().iterator().next();
             while (tmp instanceof IContainerTypeSymbol) {
