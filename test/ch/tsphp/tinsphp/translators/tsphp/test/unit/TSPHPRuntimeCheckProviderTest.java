@@ -20,7 +20,11 @@ import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
+import java.util.ArrayDeque;
+
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyList;
@@ -37,11 +41,13 @@ public class TSPHPRuntimeCheckProviderTest extends ATypeTest
         String expression = "$x";
         when(argumentAst.getText()).thenReturn(expression);
         ITempVariableHelper tempVariableHelper = createTempVariableHelperIsVariable();
+        ArrayDeque<String> statements = new ArrayDeque<>();
 
         IRuntimeCheckProvider runtimeCheckProvider = createRuntimeCheckProvider(tempVariableHelper);
-        Object result = runtimeCheckProvider.getTypeCheck(argumentAst, expression, intType);
+        Object result = runtimeCheckProvider.getTypeCheck(statements, argumentAst, expression, intType);
 
         assertThat(result.toString(), is("cast($x, int)"));
+        assertThat(statements, empty());
     }
 
     @Test
@@ -51,11 +57,13 @@ public class TSPHPRuntimeCheckProviderTest extends ATypeTest
         String expression = "$x + 1";
         when(argumentAst.getText()).thenReturn(expression);
         ITempVariableHelper tempVariableHelper = createTempVariableHelperIsNotVariable("$t");
+        ArrayDeque<String> statements = new ArrayDeque<>();
 
         IRuntimeCheckProvider runtimeCheckProvider = createRuntimeCheckProvider(tempVariableHelper);
-        Object result = runtimeCheckProvider.getTypeCheck(argumentAst, expression, intType);
+        Object result = runtimeCheckProvider.getTypeCheck(statements, argumentAst, expression, intType);
 
         assertThat(result.toString(), is("cast(" + expression + ", int)"));
+        assertThat(statements, empty());
     }
 
     @Test
@@ -65,11 +73,13 @@ public class TSPHPRuntimeCheckProviderTest extends ATypeTest
         String expression = "$x";
         when(argumentAst.getText()).thenReturn(expression);
         ITempVariableHelper tempVariableHelper = createTempVariableHelperIsVariable();
+        ArrayDeque<String> statements = new ArrayDeque<>();
 
         IRuntimeCheckProvider runtimeCheckProvider = createRuntimeCheckProvider(tempVariableHelper);
-        Object result = runtimeCheckProvider.getTypeCheck(argumentAst, expression, floatType);
+        Object result = runtimeCheckProvider.getTypeCheck(statements, argumentAst, expression, floatType);
 
         assertThat(result.toString(), is("cast($x, float)"));
+        assertThat(statements, empty());
     }
 
     @Test
@@ -79,11 +89,13 @@ public class TSPHPRuntimeCheckProviderTest extends ATypeTest
         String expression = "$x + 1";
         when(argumentAst.getText()).thenReturn(expression);
         ITempVariableHelper tempVariableHelper = createTempVariableHelperIsNotVariable("$t");
+        ArrayDeque<String> statements = new ArrayDeque<>();
 
         IRuntimeCheckProvider runtimeCheckProvider = createRuntimeCheckProvider(tempVariableHelper);
-        Object result = runtimeCheckProvider.getTypeCheck(argumentAst, expression, floatType);
+        Object result = runtimeCheckProvider.getTypeCheck(statements, argumentAst, expression, floatType);
 
         assertThat(result.toString(), is("cast(" + expression + ", float)"));
+        assertThat(statements, empty());
     }
 
     @Test
@@ -93,11 +105,14 @@ public class TSPHPRuntimeCheckProviderTest extends ATypeTest
         String expression = "$x";
         when(argumentAst.getText()).thenReturn(expression);
         ITempVariableHelper tempVariableHelper = createTempVariableHelperIsVariable();
+        ArrayDeque<String> statements = new ArrayDeque<>();
 
         IRuntimeCheckProvider runtimeCheckProvider = createRuntimeCheckProvider(tempVariableHelper);
-        Object result = runtimeCheckProvider.getTypeCheck(argumentAst, expression, stringType);
+        Object result = runtimeCheckProvider.getTypeCheck(statements, argumentAst, expression,
+                stringType);
 
         assertThat(result.toString(), is("cast($x, string)"));
+        assertThat(statements, empty());
     }
 
     @Test
@@ -107,11 +122,14 @@ public class TSPHPRuntimeCheckProviderTest extends ATypeTest
         String expression = "$x + 1";
         when(argumentAst.getText()).thenReturn(expression);
         ITempVariableHelper tempVariableHelper = createTempVariableHelperIsNotVariable("$t");
+        ArrayDeque<String> statements = new ArrayDeque<>();
 
         IRuntimeCheckProvider runtimeCheckProvider = createRuntimeCheckProvider(tempVariableHelper);
-        Object result = runtimeCheckProvider.getTypeCheck(argumentAst, expression, stringType);
+        Object result = runtimeCheckProvider.getTypeCheck(statements, argumentAst, expression,
+                stringType);
 
         assertThat(result.toString(), is("cast(" + expression + ", string)"));
+        assertThat(statements, empty());
     }
 
     @Test
@@ -121,12 +139,14 @@ public class TSPHPRuntimeCheckProviderTest extends ATypeTest
         String expression = "$x";
         when(argumentAst.getText()).thenReturn(expression);
         ITempVariableHelper tempVariableHelper = createTempVariableHelperIsVariable();
+        ArrayDeque<String> statements = new ArrayDeque<>();
 
         IRuntimeCheckProvider runtimeCheckProvider = createRuntimeCheckProvider(tempVariableHelper);
-        Object result = runtimeCheckProvider.getTypeCheck(argumentAst, expression, falseType);
+        Object result = runtimeCheckProvider.getTypeCheck(statements, argumentAst, expression, falseType);
 
         assertThat(result.toString(), is("($x === false ? false : "
                 + "\\trigger_error('The variable $x must hold the value false.', \\E_USER_ERROR))"));
+        assertThat(statements, empty());
     }
 
     @Test
@@ -136,12 +156,14 @@ public class TSPHPRuntimeCheckProviderTest extends ATypeTest
         String expression = "$x + 1";
         when(argumentAst.getText()).thenReturn(expression);
         ITempVariableHelper tempVariableHelper = createTempVariableHelperIsNotVariable("$t");
+        ArrayDeque<String> statements = new ArrayDeque<>();
 
         IRuntimeCheckProvider runtimeCheckProvider = createRuntimeCheckProvider(tempVariableHelper);
-        Object result = runtimeCheckProvider.getTypeCheck(argumentAst, expression, falseType);
+        Object result = runtimeCheckProvider.getTypeCheck(statements, argumentAst, expression, falseType);
 
         assertThat(result.toString(), is("(($t = (" + expression + ")) === false ? false : "
                 + "\\trigger_error('The variable $t must hold the value false.', \\E_USER_ERROR))"));
+        assertThat(statements, contains("mixed $t;"));
     }
 
     @Test
@@ -151,12 +173,14 @@ public class TSPHPRuntimeCheckProviderTest extends ATypeTest
         String expression = "$x";
         when(argumentAst.getText()).thenReturn(expression);
         ITempVariableHelper tempVariableHelper = createTempVariableHelperIsVariable();
+        ArrayDeque<String> statements = new ArrayDeque<>();
 
         IRuntimeCheckProvider runtimeCheckProvider = createRuntimeCheckProvider(tempVariableHelper);
-        Object result = runtimeCheckProvider.getTypeCheck(argumentAst, expression, trueType);
+        Object result = runtimeCheckProvider.getTypeCheck(statements, argumentAst, expression, trueType);
 
         assertThat(result.toString(), is("($x === true ? true : "
                 + "\\trigger_error('The variable $x must hold the value true.', \\E_USER_ERROR))"));
+        assertThat(statements, empty());
     }
 
     @Test
@@ -166,12 +190,14 @@ public class TSPHPRuntimeCheckProviderTest extends ATypeTest
         String expression = "$x + 1";
         when(argumentAst.getText()).thenReturn(expression);
         ITempVariableHelper tempVariableHelper = createTempVariableHelperIsNotVariable("$t");
+        ArrayDeque<String> statements = new ArrayDeque<>();
 
         IRuntimeCheckProvider runtimeCheckProvider = createRuntimeCheckProvider(tempVariableHelper);
-        Object result = runtimeCheckProvider.getTypeCheck(argumentAst, expression, trueType);
+        Object result = runtimeCheckProvider.getTypeCheck(statements, argumentAst, expression, trueType);
 
         assertThat(result.toString(), is("(($t = (" + expression + ")) === true ? true : "
                 + "\\trigger_error('The variable $t must hold the value true.', \\E_USER_ERROR))"));
+        assertThat(statements, contains("mixed $t;"));
     }
 
     @Test
@@ -181,12 +207,14 @@ public class TSPHPRuntimeCheckProviderTest extends ATypeTest
         String expression = "$x";
         when(argumentAst.getText()).thenReturn(expression);
         ITempVariableHelper tempVariableHelper = createTempVariableHelperIsVariable();
+        ArrayDeque<String> statements = new ArrayDeque<>();
 
         IRuntimeCheckProvider runtimeCheckProvider = createRuntimeCheckProvider(tempVariableHelper);
-        Object result = runtimeCheckProvider.getTypeCheck(argumentAst, expression, nullType);
+        Object result = runtimeCheckProvider.getTypeCheck(statements, argumentAst, expression, nullType);
 
         assertThat(result.toString(), is("($x === null ? null : "
                 + "\\trigger_error('The variable $x must hold the value null.', \\E_USER_ERROR))"));
+        assertThat(statements, empty());
     }
 
     @Test
@@ -196,12 +224,14 @@ public class TSPHPRuntimeCheckProviderTest extends ATypeTest
         String expression = "$x + 1";
         when(argumentAst.getText()).thenReturn(expression);
         ITempVariableHelper tempVariableHelper = createTempVariableHelperIsNotVariable("$t");
+        ArrayDeque<String> statements = new ArrayDeque<>();
 
         IRuntimeCheckProvider runtimeCheckProvider = createRuntimeCheckProvider(tempVariableHelper);
-        Object result = runtimeCheckProvider.getTypeCheck(argumentAst, expression, nullType);
+        Object result = runtimeCheckProvider.getTypeCheck(statements, argumentAst, expression, nullType);
 
         assertThat(result.toString(), is("(($t = (" + expression + ")) === null ? null : "
                 + "\\trigger_error('The variable $t must hold the value null.', \\E_USER_ERROR))"));
+        assertThat(statements, contains("mixed $t;"));
     }
 
     @Test
@@ -211,11 +241,13 @@ public class TSPHPRuntimeCheckProviderTest extends ATypeTest
         String expression = "$x";
         when(argumentAst.getText()).thenReturn(expression);
         ITempVariableHelper tempVariableHelper = createTempVariableHelperIsVariable();
+        ArrayDeque<String> statements = new ArrayDeque<>();
 
         IRuntimeCheckProvider runtimeCheckProvider = createRuntimeCheckProvider(tempVariableHelper);
-        Object result = runtimeCheckProvider.getTypeCheck(argumentAst, expression, boolType);
+        Object result = runtimeCheckProvider.getTypeCheck(statements, argumentAst, expression, boolType);
 
         assertThat(result.toString(), is("cast($x, bool)"));
+        assertThat(statements, empty());
     }
 
     @Test
@@ -225,11 +257,13 @@ public class TSPHPRuntimeCheckProviderTest extends ATypeTest
         String expression = "$x + 1";
         when(argumentAst.getText()).thenReturn(expression);
         ITempVariableHelper tempVariableHelper = createTempVariableHelperIsNotVariable("$t");
+        ArrayDeque<String> statements = new ArrayDeque<>();
 
         IRuntimeCheckProvider runtimeCheckProvider = createRuntimeCheckProvider(tempVariableHelper);
-        Object result = runtimeCheckProvider.getTypeCheck(argumentAst, expression, boolType);
+        Object result = runtimeCheckProvider.getTypeCheck(statements, argumentAst, expression, boolType);
 
         assertThat(result.toString(), is("cast(" + expression + ", bool)"));
+        assertThat(statements, empty());
     }
 
     @Test
@@ -239,12 +273,14 @@ public class TSPHPRuntimeCheckProviderTest extends ATypeTest
         String expression = "$x";
         when(argumentAst.getText()).thenReturn(expression);
         ITempVariableHelper tempVariableHelper = createTempVariableHelperIsVariable();
+        ArrayDeque<String> statements = new ArrayDeque<>();
 
         IRuntimeCheckProvider runtimeCheckProvider = createRuntimeCheckProvider(tempVariableHelper);
-        Object result = runtimeCheckProvider.getTypeCheck(argumentAst, expression, numType);
+        Object result = runtimeCheckProvider.getTypeCheck(statements, argumentAst, expression, numType);
 
         assertThat(result.toString(), is("($x <: float ? cast($x, float) : $x <: int ? cast($x, int) : "
                 + "\\trigger_error('The variable $x must hold a value of type [float, int].', \\E_USER_ERROR))"));
+        assertThat(statements, empty());
     }
 
     @Test
@@ -254,12 +290,14 @@ public class TSPHPRuntimeCheckProviderTest extends ATypeTest
         String expression = "$x + 1";
         when(argumentAst.getText()).thenReturn(expression);
         ITempVariableHelper tempVariableHelper = createTempVariableHelperIsNotVariable("$t");
+        ArrayDeque<String> statements = new ArrayDeque<>();
 
         IRuntimeCheckProvider runtimeCheckProvider = createRuntimeCheckProvider(tempVariableHelper);
-        Object result = runtimeCheckProvider.getTypeCheck(argumentAst, expression, numType);
+        Object result = runtimeCheckProvider.getTypeCheck(statements, argumentAst, expression, numType);
 
         assertThat(result.toString(), is("(($t = ($x + 1)) <: float ? cast($t, float) : $t <: int ? cast($t, int) : "
                 + "\\trigger_error('The variable $t must hold a value of type [float, int].', \\E_USER_ERROR))"));
+        assertThat(statements, contains("mixed $t;"));
     }
 
     @Test
@@ -272,13 +310,16 @@ public class TSPHPRuntimeCheckProviderTest extends ATypeTest
         IUnionTypeSymbol numOrArray = symbolFactory.createUnionTypeSymbol();
         numOrArray.addTypeSymbol(numType);
         numOrArray.addTypeSymbol(arrayType);
+        ArrayDeque<String> statements = new ArrayDeque<>();
 
         IRuntimeCheckProvider runtimeCheckProvider = createRuntimeCheckProvider(tempVariableHelper);
-        Object result = runtimeCheckProvider.getTypeCheck(argumentAst, expression, numOrArray);
+        Object result = runtimeCheckProvider.getTypeCheck(statements, argumentAst, expression,
+                numOrArray);
 
         assertThat(result.toString(), is("($x <: array ? cast($x, array) : $x <: float ? cast($x, float) : "
                 + "$x <: int ? cast($x, int) : \\trigger_error('The variable $x must hold a value of type "
                 + "[array, float, int].', \\E_USER_ERROR))"));
+        assertThat(statements, empty());
     }
 
     @Test
@@ -291,14 +332,17 @@ public class TSPHPRuntimeCheckProviderTest extends ATypeTest
         IUnionTypeSymbol numOrArray = symbolFactory.createUnionTypeSymbol();
         numOrArray.addTypeSymbol(numType);
         numOrArray.addTypeSymbol(arrayType);
+        ArrayDeque<String> statements = new ArrayDeque<>();
 
         IRuntimeCheckProvider runtimeCheckProvider = createRuntimeCheckProvider(tempVariableHelper);
-        Object result = runtimeCheckProvider.getTypeCheck(argumentAst, expression, numOrArray);
+        Object result = runtimeCheckProvider.getTypeCheck(statements, argumentAst, expression,
+                numOrArray);
 
         assertThat(result.toString(), is("(($t = ($x + 1)) <: array ? cast($t, array) : "
                 + "$t <: float ? cast($t, float) : $t <: int ? cast($t, int) : "
                 + "\\trigger_error('The variable $t must hold a value of type [array, float, int].', " +
                 "\\E_USER_ERROR))"));
+        assertThat(statements, contains("mixed $t;"));
     }
 
     private ITempVariableHelper createTempVariableHelperIsVariable() {

@@ -19,6 +19,7 @@ import ch.tsphp.tinsphp.common.translation.IDtoCreator;
 import ch.tsphp.tinsphp.common.translation.ITranslatorController;
 import ch.tsphp.tinsphp.common.translation.dtos.FunctionApplicationDto;
 import ch.tsphp.tinsphp.common.translation.dtos.OverloadDto;
+import ch.tsphp.tinsphp.common.translation.dtos.TranslationScopeDto;
 import ch.tsphp.tinsphp.common.translation.dtos.VariableDto;
 import ch.tsphp.tinsphp.common.utils.Pair;
 import ch.tsphp.tinsphp.translators.tsphp.issues.IOutputIssueMessageProvider;
@@ -95,18 +96,18 @@ public class TranslatorController implements ITranslatorController
 
     @Override
     public FunctionApplicationDto getFunctionApplication(
-            IBindingCollection bindings, ITSPHPAst functionCall, List<Object> arguments) {
+            TranslationScopeDto translationScopeDto, ITSPHPAst functionCall, List<Object> arguments) {
 
         FunctionApplicationDto dto = null;
-
         String absoluteName = functionCall.getSymbol().getAbsoluteName();
-        OverloadApplicationDto appliedOverload = bindings.getAppliedOverload(absoluteName);
-        if (appliedOverload != null) {
+        OverloadApplicationDto appliedOverloadDto
+                = translationScopeDto.bindingCollection.getAppliedOverload(absoluteName);
+        if (appliedOverloadDto != null) {
             ITSPHPAst identifier = functionCall.getChild(0);
             String name = identifier.getText();
             name = name.substring(0, name.length() - 2);
-            if (appliedOverload.overload != null) {
-                String suffix = appliedOverload.overload.getSuffix(TSPHPTranslator.TRANSLATOR_ID);
+            if (appliedOverloadDto.overload != null) {
+                String suffix = appliedOverloadDto.overload.getSuffix(TSPHPTranslator.TRANSLATOR_ID);
                 if (suffix != null) {
                     name += suffix;
                 }
@@ -114,22 +115,28 @@ public class TranslatorController implements ITranslatorController
 
             dto = new FunctionApplicationDto(name);
             dto.arguments = arguments;
-            applyRuntimeChecks(dto, functionCall.getChild(1), appliedOverload);
+            applyRuntimeChecks(translationScopeDto, dto, functionCall.getChild(1), appliedOverloadDto);
         }
 
         return dto;
     }
 
     private void applyRuntimeChecks(
-            FunctionApplicationDto dto, ITSPHPAst argumentsAst, OverloadApplicationDto appliedOverload) {
+            TranslationScopeDto translationScopeDto,
+            FunctionApplicationDto dto,
+            ITSPHPAst argumentsAst,
+            OverloadApplicationDto appliedOverloadDto) {
         List<Object> arguments = dto.arguments;
-        if (appliedOverload.runtimeChecks != null) {
+        if (appliedOverloadDto.runtimeChecks != null) {
             for (Map.Entry<Integer, Pair<ITypeSymbol, List<ITypeSymbol>>> entry
-                    : appliedOverload.runtimeChecks.entrySet()) {
+                    : appliedOverloadDto.runtimeChecks.entrySet()) {
                 int argumentIndex = entry.getKey();
                 if (dto.checkedArguments == null || !dto.checkedArguments.contains(argumentIndex)) {
                     Object argument = runtimeCheckProvider.getTypeCheck(
-                            argumentsAst.getChild(argumentIndex), arguments.get(argumentIndex), entry.getValue().first);
+                            translationScopeDto.statements,
+                            argumentsAst.getChild(argumentIndex),
+                            arguments.get(argumentIndex),
+                            entry.getValue().first);
                     arguments.set(argumentIndex, argument);
                 }
             }
@@ -138,18 +145,20 @@ public class TranslatorController implements ITranslatorController
 
     @Override
     public FunctionApplicationDto getOperatorApplication(
-            IBindingCollection bindings, ITSPHPAst operator, List<Object> arguments) {
+            TranslationScopeDto translationScopeDto, ITSPHPAst operator, List<Object> arguments) {
         FunctionApplicationDto dto = null;
 
         String absoluteName = operator.getSymbol().getAbsoluteName();
-        OverloadApplicationDto appliedOverload = bindings.getAppliedOverload(absoluteName);
-        if (appliedOverload != null) {
+        OverloadApplicationDto appliedOverloadDto
+                = translationScopeDto.bindingCollection.getAppliedOverload(absoluteName);
+        if (appliedOverloadDto != null) {
             dto = new FunctionApplicationDto();
             dto.arguments = arguments;
-            operatorHelper.turnIntoMigrationFunctionIfRequired(dto, appliedOverload, bindings, operator, operator);
+            operatorHelper.turnIntoMigrationFunctionIfRequired(
+                    translationScopeDto, dto, appliedOverloadDto, operator, operator);
             //runtime checks are not required if a migration function is used.
             if (dto.name == null) {
-                applyRuntimeChecks(dto, operator, appliedOverload);
+                applyRuntimeChecks(translationScopeDto, dto, operator, appliedOverloadDto);
             }
         }
 

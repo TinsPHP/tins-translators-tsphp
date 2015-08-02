@@ -36,6 +36,7 @@ import ch.tsphp.tinsphp.common.translation.ITranslatorController;
 import ch.tsphp.tinsphp.common.translation.dtos.FunctionApplicationDto;
 import ch.tsphp.tinsphp.common.translation.dtos.OverloadDto;
 import ch.tsphp.tinsphp.common.translation.dtos.ParameterDto;
+import ch.tsphp.tinsphp.common.translation.dtos.TranslationScopeDto;
 import ch.tsphp.tinsphp.common.translation.dtos.TypeParameterDto;
 import ch.tsphp.tinsphp.common.translation.dtos.VariableDto;
 import ch.tsphp.tinsphp.translators.tsphp.antlrmod.IErrorMessageCaller;
@@ -46,12 +47,14 @@ import ch.tsphp.tinsphp.common.utils.Pair;
 import java.util.Map;
 import java.util.Collection;
 import java.util.SortedSet;
+import java.util.Deque;
+import java.util.ArrayDeque;
 
 }
 
 @members{
 private ITranslatorController controller;
-private IBindingCollection currentBindings;
+private TranslationScopeDto translationScopeDto;
 private boolean isFunctionBefore;
 private IErrorMessageCaller functionErrorMessageCaller;
 private IErrorMessageCaller operatorErrorMessageCaller;
@@ -63,9 +66,11 @@ public TSPHPTranslatorWalker(
     this(input);
     controller = theController;
     List<IBindingCollection> bindingCollections = globalDefaultNamespaceScope.getBindings();
+    IBindingCollection currentBindings = null;
     if (bindingCollections != null && !bindingCollections.isEmpty()){
         currentBindings = bindingCollections.get(0);
     }
+    translationScopeDto = new TranslationScopeDto(currentBindings, new ArrayDeque<String>());
     functionErrorMessageCaller = new FunctionErrorMessageCaller(controller);
     operatorErrorMessageCaller = new OperatorErrorMessageCaller(controller);
 }
@@ -165,7 +170,7 @@ private StringTemplate getErrorMessage(
     StringTemplate stringTemplate;
     String functionName = "\\trigger_error";
     List<String> functionArguments = new ArrayList<>(2);
-    String errMessage = errorMessageCaller.getErrMessage(currentBindings, functionCall, identifier);
+    String errMessage = errorMessageCaller.getErrMessage(translationScopeDto.bindingCollection, functionCall, identifier);
     functionArguments.add(errMessage);
     functionArguments.add("\\E_USER_ERROR");
     stringTemplate = %functionCall(identifier={functionName}, arguments={functionArguments});
@@ -174,8 +179,16 @@ private StringTemplate getErrorMessage(
 
 }
 
-compilationUnit    
-    :   (n+=namespace+) -> file(namespaces={$n})
+compilationUnit
+    :   (n+=namespace+)
+        {
+            List<Object> namespaces = $n;
+            if (!translationScopeDto.statements.isEmpty()) {
+                StringTemplate body = %body(statements={translationScopeDto.statements});
+                namespaces.add(%namespace(body={body}));
+            }
+            $st = %file(namespaces={namespaces});
+        }
     ;
     
 namespace
@@ -278,7 +291,7 @@ constantDefinitionList
 constantDefinition
     :   ^(Identifier unaryPrimitiveAtom)
         {
-             VariableDto dto = controller.createVariableDtoForConstant(currentBindings, $Identifier);
+             VariableDto dto = controller.createVariableDtoForConstant(translationScopeDto.bindingCollection, $Identifier);
              StringTemplate type = %type(
                  prefixModifiers={dto.type.prefixModifiers}, 
                  type={dto.type.type},
@@ -329,7 +342,7 @@ localVariableDefinitionList
 localVariableDefinition
     :   ^(VariableId defaultValue=unaryPrimitiveAtom?)
         {
-            VariableDto dto = controller.createVariableDto(currentBindings, $VariableId);
+            VariableDto dto = controller.createVariableDto(translationScopeDto.bindingCollection, $VariableId);
             StringTemplate type = getType(dto);
         }
         -> variable(type={type}, variableId={dto.variableId}, defaultValue={$unaryPrimitiveAtom.st})
@@ -505,7 +518,7 @@ interfaceMethodDeclaration
 functionDefinition
 @init{
     List<StringTemplate> methods = new ArrayList<>();
-    IBindingCollection tmp = currentBindings;
+    TranslationScopeDto tmp = translationScopeDto;
 }
     :   ^(Function
             FUNCTION_MODIFIER
@@ -516,7 +529,7 @@ functionDefinition
                 ITSPHPAst function = $Function;
                 int childIndex = function.getChildIndex();
                 boolean isNotMethodBefore = true;
-                if(childIndex != 0){
+                if (childIndex != 0) {
                     ITSPHPAst parent = (ITSPHPAst) function.getParent();
                     isNotMethodBefore = parent.getChild(childIndex - 1).getType() != Function;
                 }
@@ -549,8 +562,8 @@ functionDefinition
                         }
                     }
                     
-                                         
-                    currentBindings = dto.bindings;
+
+                    translationScopeDto = dto.translationScopeDto;
                     List<Object> instructions = block().instructions;
                     
                     List<StringTemplate> parameters = new ArrayList<>();
@@ -566,7 +579,7 @@ functionDefinition
                             defaultValue={paramDto.defaultValue}
                         ));
                         
-                        if(paramDto.localVariableType != null){
+                        if (paramDto.localVariableType != null) {
                             StringTemplate localVariableType = %type(
                                 prefixModifiers={paramDto.localVariableType.prefixModifiers}, 
                                 type={paramDto.localVariableType.type},
@@ -582,11 +595,9 @@ functionDefinition
                         }
                     }
                  
-                    if(dto.runtimeChecks != null){
-                        int size = dto.runtimeChecks.size();
-                        for(int i = size - 1; i >= 0; --i){
-                            Pair<String, String> pair = dto.runtimeChecks.get(i);
-                            instructions.add(0, %parameterRuntimeCheck(check={pair.first}, message={pair.second}));
+                    if (translationScopeDto.statements != null) {
+                        for (String statement : translationScopeDto.statements) {
+                            instructions.add(0, statement);
                         }
                     }
 
@@ -610,7 +621,7 @@ functionDefinition
         -> methods(methods={methods})
     ;
 finally{
-    currentBindings = tmp;
+    translationScopeDto = tmp;
 }
 
 instruction
@@ -632,7 +643,7 @@ instruction
             List<Object> arguments = new ArrayList<>(1);
             argumentNames.add("expressions");
             arguments.add($exprs.get(0));            
-            FunctionApplicationDto dto = controller.getOperatorApplication(currentBindings, $Echo, arguments);
+            FunctionApplicationDto dto = controller.getOperatorApplication(translationScopeDto, $Echo, arguments);
             $st = getOperatorOrFunctionApplication(
                 dto, 
                 arguments,
@@ -799,7 +810,8 @@ operator
             List<Object> arguments = new ArrayList<>(1);
             argumentNames.add("expression");
             arguments.add($expr.st);
-            FunctionApplicationDto dto = controller.getOperatorApplication(currentBindings, $unaryPreOperator.start, arguments);
+            FunctionApplicationDto dto = controller.getOperatorApplication(
+                    translationScopeDto, $unaryPreOperator.start, arguments);
             $st = getOperatorOrFunctionApplication(
                 dto, 
                 arguments,
@@ -816,7 +828,8 @@ operator
             List<Object> arguments = new ArrayList<>(1);
             argumentNames.add("expression");
             arguments.add($expr.st);
-            FunctionApplicationDto dto = controller.getOperatorApplication(currentBindings, $unaryPostOperator.start, arguments);
+            FunctionApplicationDto dto = controller.getOperatorApplication(
+                    translationScopeDto, $unaryPostOperator.start, arguments);
             $st = getOperatorOrFunctionApplication(
                 dto, 
                 arguments,
@@ -835,7 +848,8 @@ operator
             arguments.add($left.st);
             argumentNames.add("right");
             arguments.add($right.st);
-            FunctionApplicationDto dto = controller.getOperatorApplication(currentBindings, $binaryOperator.start, arguments);
+            FunctionApplicationDto dto = controller.getOperatorApplication(
+                    translationScopeDto, $binaryOperator.start, arguments);
            $st = getOperatorOrFunctionApplication(
                 dto, 
                 arguments,
@@ -856,7 +870,8 @@ operator
             arguments.add($ifCase.st);
             argumentNames.add("elseCase");
             arguments.add($elseCase.st);
-            FunctionApplicationDto dto = controller.getOperatorApplication(currentBindings, $QuestionMark, arguments);
+            FunctionApplicationDto dto = controller.getOperatorApplication(
+                    translationScopeDto, $QuestionMark, arguments);
             $st = getOperatorOrFunctionApplication(
                 dto, 
                 arguments,
@@ -880,7 +895,8 @@ operator
             arguments.add($expr.st);
             argumentNames.add("type");
             arguments.add($type.text);
-            FunctionApplicationDto dto = controller.getOperatorApplication(currentBindings, $Instanceof, arguments);
+            FunctionApplicationDto dto = controller.getOperatorApplication(
+                    translationScopeDto, $Instanceof, arguments);
             $st = getOperatorOrFunctionApplication(
                 dto, 
                 arguments,
@@ -992,7 +1008,7 @@ functionCall
     :   ^(FUNCTION_CALL identifier=TYPE_NAME actualParameters)
         {
             FunctionApplicationDto dto = controller.getFunctionApplication(
-                currentBindings, $FUNCTION_CALL, $actualParameters.parameters);
+                translationScopeDto, $FUNCTION_CALL, $actualParameters.parameters);
             $st = getFunctionApplication(
                 dto, 
                 $actualParameters.parameters,

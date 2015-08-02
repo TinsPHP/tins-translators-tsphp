@@ -13,7 +13,7 @@
 package ch.tsphp.tinsphp.translators.tsphp.test.integration.with_reduction;
 
 
-import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorWithReductionTest;
+import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorWithWideningTest;
 import org.antlr.runtime.RecognitionException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,7 +26,7 @@ import java.util.Collection;
 import java.util.List;
 
 @RunWith(Parameterized.class)
-public class MigrationFunctionTest extends ATranslatorWithReductionTest
+public class MigrationFunctionTest extends ATranslatorWithWideningTest
 {
 
     public MigrationFunctionTest(String testString, String expectedResult) {

@@ -7,16 +7,16 @@
 package ch.tsphp.tinsphp.translators.tsphp;
 
 import ch.tsphp.common.ITSPHPAst;
-import ch.tsphp.tinsphp.common.inference.constraints.IBindingCollection;
 import ch.tsphp.tinsphp.common.inference.constraints.OverloadApplicationDto;
 import ch.tsphp.tinsphp.common.translation.dtos.FunctionApplicationDto;
+import ch.tsphp.tinsphp.common.translation.dtos.TranslationScopeDto;
 
 public interface IOperatorHelper
 {
     void turnIntoMigrationFunctionIfRequired(
+            TranslationScopeDto translationScopeDto,
             FunctionApplicationDto functionApplicationDto,
-            OverloadApplicationDto dto,
-            IBindingCollection currentBindings,
+            OverloadApplicationDto overloadApplicationDto,
             ITSPHPAst leftHandSide,
             ITSPHPAst argumentsAst);
 }

@@ -20,6 +20,7 @@ import ch.tsphp.tinsphp.common.utils.Pair;
 import ch.tsphp.tinsphp.translators.tsphp.issues.IOutputIssueMessageProvider;
 
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -48,13 +49,14 @@ public class TSPHPRuntimeCheckProvider implements IRuntimeCheckProvider
     @Override
     public boolean addParameterCheck(
             String identifier,
-            List<Pair<String, String>> parameterRuntimeChecks,
+            Deque<String> statements,
             IBindingCollection bindings,
             IVariable parameter,
             int parameterIndex,
             ParameterDto parameterDto) {
 
         StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("if (");
         String parameterId = parameter.getName();
         String typeVariable = bindings.getTypeVariable(parameter.getAbsoluteName());
         IIntersectionTypeSymbol upperTypeBounds = bindings.getUpperTypeBounds(typeVariable);
@@ -63,9 +65,13 @@ public class TSPHPRuntimeCheckProvider implements IRuntimeCheckProvider
                 stringBuilder, parameterId, upperTypeBounds, types);
 
         if (canPerformRuntimeChecks && !types.isEmpty()) {
-            String errorMessage = messageProvider.getParameterRuntimeCheckMessage(
-                    identifier, parameterId, parameterIndex + 1, types);
-            parameterRuntimeChecks.add(new Pair<>(stringBuilder.toString(), errorMessage));
+            stringBuilder.append(") {\n")
+                    .append("    \\trigger_error('")
+                    .append(messageProvider.getParameterRuntimeCheckMessage(
+                            identifier, parameterId, parameterIndex + 1, types))
+                    .append("', \\E_USER_ERROR);\n");
+            stringBuilder.append("}");
+            statements.add(stringBuilder.toString());
         }
         return canPerformRuntimeChecks;
     }
@@ -170,12 +176,15 @@ public class TSPHPRuntimeCheckProvider implements IRuntimeCheckProvider
 
 
     @Override
-    public Object getTypeCheck(ITSPHPAst expressionAst, Object expressionTemplate, ITypeSymbol typeSymbol) {
+    public Object getTypeCheck(
+            Deque<String> statements, ITSPHPAst expressionAst, Object expressionTemplate, ITypeSymbol typeSymbol) {
         StringBuilder stringBuilder = new StringBuilder();
         List<String> types = new ArrayList<>();
         String firstExpression = expressionTemplate.toString();
         String tempVariable = tempVariableHelper.getTempVariableNameIfNotVariable(expressionAst);
+        boolean usesTempVariable = false;
         if (!firstExpression.equals(tempVariable)) {
+            usesTempVariable = true;
             //need to use a temp variable, hence the first expression needs to be the assignment
             firstExpression = "(" + tempVariable + " = (" + expressionTemplate.toString() + "))";
         }
@@ -190,6 +199,7 @@ public class TSPHPRuntimeCheckProvider implements IRuntimeCheckProvider
                         && !typeName.equals(PrimitiveTypeNames.TRUE_TYPE)
                         && !typeName.equals(PrimitiveTypeNames.NULL_TYPE)) {
                     firstExpression = expressionTemplate.toString();
+                    usesTempVariable = false;
                 }
                 newArgument = getTypeCast(typeName, firstExpression, tempVariable);
             } else {
@@ -199,6 +209,10 @@ public class TSPHPRuntimeCheckProvider implements IRuntimeCheckProvider
                 stringBuilder.append(')');
                 newArgument = stringBuilder;
             }
+        }
+
+        if (usesTempVariable) {
+            statements.add("mixed " + tempVariable + ";");
         }
         return newArgument;
     }

@@ -30,7 +30,7 @@ import org.junit.Ignore;
 import java.util.Map;
 
 @Ignore
-public abstract class ATranslatorWithReductionTest extends ATranslatorTest
+public abstract class ATranslatorWithWideningTest extends ATranslatorTest
 {
     private final ITypeHelper typeHelper;
     private final Map<String, ITypeSymbol> primitiveTypes;
@@ -39,7 +39,7 @@ public abstract class ATranslatorWithReductionTest extends ATranslatorTest
     private final ITypeSymbol tsphpScalarTypeSymbol;
 
 
-    public ATranslatorWithReductionTest(String theTestString, String theExpectedResult) {
+    public ATranslatorWithWideningTest(String theTestString, String theExpectedResult) {
         super(theTestString, theExpectedResult);
         ISymbolsInitialiser symbolsInitialiser = new HardCodedSymbolsInitialiser();
         ICoreInitialiser coreInitialiser = new HardCodedCoreInitialiser(

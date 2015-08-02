@@ -17,14 +17,17 @@ import ch.tsphp.tinsphp.common.symbols.IMethodSymbol;
 import ch.tsphp.tinsphp.common.translation.IDtoCreator;
 import ch.tsphp.tinsphp.common.translation.dtos.OverloadDto;
 import ch.tsphp.tinsphp.common.translation.dtos.ParameterDto;
+import ch.tsphp.tinsphp.common.translation.dtos.TranslationScopeDto;
 import ch.tsphp.tinsphp.common.translation.dtos.TypeDto;
 import ch.tsphp.tinsphp.common.translation.dtos.TypeParameterDto;
 import ch.tsphp.tinsphp.common.translation.dtos.VariableDto;
 import ch.tsphp.tinsphp.common.utils.Pair;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Deque;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -95,7 +98,7 @@ public class DtoCreator implements IDtoCreator
 
         Set<String> typeVariablesAdded = new HashSet<>(numberOfParameters + 1);
         List<TypeParameterDto> typeParameters = new ArrayList<>(numberOfParameters + 1);
-        List<Pair<String, String>> parameterRuntimeChecks = new ArrayList<>();
+        Deque<String> statements = new ArrayDeque<>();
 
         List<ParameterDto> parameterDtos = new ArrayList<>();
         boolean isCheckPossible = true;
@@ -110,7 +113,7 @@ public class DtoCreator implements IDtoCreator
             Boolean wasWidened = pair.second;
             if (isCheckPossible && wasWidened && typeHintWasUsed) {
                 isCheckPossible = parameterCheckProvider.addParameterCheck(
-                        newName + "()", parameterRuntimeChecks, bindings, parameter, i, parameterDto);
+                        newName + "()", statements, bindings, parameter, i, parameterDto);
             }
             parameterDtos.add(parameterDto);
         }
@@ -129,16 +132,12 @@ public class DtoCreator implements IDtoCreator
         if (typeParameters.isEmpty()) {
             typeParameters = null;
         }
-        if (parameterRuntimeChecks.isEmpty()) {
-            parameterRuntimeChecks = null;
-        }
         OverloadDto methodDto = new OverloadDto(
                 returnVariable,
                 newName,
                 typeParameters,
                 parameterDtos,
-                bindings,
-                parameterRuntimeChecks);
+                new TranslationScopeDto(bindings, statements));
 
         return pair(methodDto, numbering);
     }

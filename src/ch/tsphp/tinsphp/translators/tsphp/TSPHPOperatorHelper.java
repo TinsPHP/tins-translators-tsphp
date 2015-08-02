@@ -18,6 +18,7 @@ import ch.tsphp.tinsphp.common.symbols.IConvertibleTypeSymbol;
 import ch.tsphp.tinsphp.common.symbols.IIntersectionTypeSymbol;
 import ch.tsphp.tinsphp.common.symbols.PrimitiveTypeNames;
 import ch.tsphp.tinsphp.common.translation.dtos.FunctionApplicationDto;
+import ch.tsphp.tinsphp.common.translation.dtos.TranslationScopeDto;
 import ch.tsphp.tinsphp.common.utils.ERelation;
 import ch.tsphp.tinsphp.common.utils.ITypeHelper;
 import ch.tsphp.tinsphp.common.utils.Pair;
@@ -94,9 +95,9 @@ public class TSPHPOperatorHelper implements IOperatorHelper
 
     @Override
     public void turnIntoMigrationFunctionIfRequired(
+            TranslationScopeDto translationScopeDto,
             FunctionApplicationDto dto,
             OverloadApplicationDto overloadApplicationDto,
-            IBindingCollection currentBindings,
             ITSPHPAst leftHandSide,
             ITSPHPAst argumentsAst) {
 
@@ -108,22 +109,22 @@ public class TSPHPOperatorHelper implements IOperatorHelper
                 Map<String, Pair<String, ITypeSymbol>> overloads = migrationFunctions.get(operatorType);
                 String signature = overload.getSignature();
                 Pair<String, ITypeSymbol> pair = overloads.get(signature);
-                switchToMigrationFunction(dto, currentBindings, leftHandSide, argumentsAst, pair);
+                switchToMigrationFunction(translationScopeDto, dto, leftHandSide, argumentsAst, pair);
             }
 
             if (dto.name == null && overload.hasConvertibleParameterTypes()) {
-                handleConvertibleTypes(dto, overloadApplicationDto, currentBindings, argumentsAst);
+                handleConvertibleTypes(translationScopeDto, dto, overloadApplicationDto, argumentsAst);
             }
         } else {
             Pair<String, ITypeSymbol> pair = dynamicFunctions.get(operatorType);
-            switchToMigrationFunction(dto, currentBindings, leftHandSide, argumentsAst, pair);
+            switchToMigrationFunction(translationScopeDto, dto, leftHandSide, argumentsAst, pair);
         }
     }
 
     private void handleConvertibleTypes(
+            TranslationScopeDto translationScopeDto,
             FunctionApplicationDto dto,
             OverloadApplicationDto overloadApplicationDto,
-            IBindingCollection currentBindings,
             ITSPHPAst argumentsAst) {
 
         IBindingCollection rightBindings = overloadApplicationDto.overload.getBindingCollection();
@@ -144,64 +145,74 @@ public class TSPHPOperatorHelper implements IOperatorHelper
                 if (next instanceof IConvertibleTypeSymbol) {
                     IConvertibleTypeSymbol convertibleTypeSymbol = (IConvertibleTypeSymbol) next;
                     IIntersectionTypeSymbol targetType = convertibleTypeSymbol.getUpperTypeBounds();
-                    ITypeSymbol argumentType = getTypeSymbol(currentBindings, argumentsAst.getChild(i));
+                    ITypeSymbol argumentType = getTypeSymbol(
+                            translationScopeDto.bindingCollection, argumentsAst.getChild(i));
                     TypeHelperDto result = typeHelper.isFirstSameOrSubTypeOfSecond(argumentType, targetType);
                     //no conversion required if it is already a subtype
                     if (result.relation != ERelation.HAS_RELATION) {
-                        SortedSet<String> ifTypes = new TreeSet<>();
-                        if (runtimeChecks.containsKey(i)) {
-                            Pair<ITypeSymbol, List<ITypeSymbol>> pair = runtimeChecks.get(i);
-                            if (pair.second != null) {
-                                //runtime checks are covered in the as operator via if types
-                                for (ITypeSymbol typeSymbol : pair.second) {
-                                    String typeName;
-                                    if (typeSymbol instanceof IConvertibleTypeSymbol) {
-                                        Pair<ITypeSymbol, Boolean> nameTransformerPair = typeTransformer.getType(
-                                                (IConvertibleTypeSymbol) typeSymbol);
-                                        typeName = nameTransformerPair.first.getAbsoluteName();
-                                    } else {
-                                        typeName = typeSymbol.getAbsoluteName();
-                                    }
-                                    ifTypes.add(typeName);
-                                }
-                            }
-                        }
-                        Pair<ITypeSymbol, Boolean> nameTransformerPair = typeTransformer.getType(targetType);
-                        StringBuilder stringBuilder = new StringBuilder(dto.arguments.get(i).toString())
-                                .append(" as ").append(nameTransformerPair.first.getAbsoluteName());
-                        Iterator<String> iterator = ifTypes.iterator();
-                        if (iterator.hasNext()) {
-                            stringBuilder.append(" if ").append(iterator.next());
-                        }
-                        while (iterator.hasNext()) {
-                            stringBuilder.append(", ").append(iterator.next());
-                        }
-                        dto.arguments.set(i, stringBuilder);
-                        if (dto.checkedArguments == null) {
-                            dto.checkedArguments = new HashSet<>();
-                        }
-                        dto.checkedArguments.add(i);
+                        addExplicitConversion(dto, runtimeChecks, i, targetType);
                     }
                 }
             }
         }
     }
 
+    private void addExplicitConversion(
+            FunctionApplicationDto dto,
+            Map<Integer, Pair<ITypeSymbol, List<ITypeSymbol>>> runtimeChecks,
+            int argumentIndex,
+            IIntersectionTypeSymbol targetType) {
+        SortedSet<String> ifTypes = new TreeSet<>();
+        if (runtimeChecks.containsKey(argumentIndex)) {
+            Pair<ITypeSymbol, List<ITypeSymbol>> pair = runtimeChecks.get(argumentIndex);
+            if (pair.second != null) {
+                //runtime checks are covered in the as operator via if types
+                for (ITypeSymbol typeSymbol : pair.second) {
+                    String typeName;
+                    if (typeSymbol instanceof IConvertibleTypeSymbol) {
+                        Pair<ITypeSymbol, Boolean> nameTransformerPair = typeTransformer.getType(
+                                (IConvertibleTypeSymbol) typeSymbol);
+                        typeName = nameTransformerPair.first.getAbsoluteName();
+                    } else {
+                        typeName = typeSymbol.getAbsoluteName();
+                    }
+                    ifTypes.add(typeName);
+                }
+            }
+        }
+        Pair<ITypeSymbol, Boolean> nameTransformerPair = typeTransformer.getType(targetType);
+        StringBuilder stringBuilder = new StringBuilder(dto.arguments.get(argumentIndex).toString())
+                .append(" as ").append(nameTransformerPair.first.getAbsoluteName());
+        Iterator<String> iterator = ifTypes.iterator();
+        if (iterator.hasNext()) {
+            stringBuilder.append(" if ").append(iterator.next());
+        }
+        while (iterator.hasNext()) {
+            stringBuilder.append(", ").append(iterator.next());
+        }
+        dto.arguments.set(argumentIndex, stringBuilder);
+        if (dto.checkedArguments == null) {
+            dto.checkedArguments = new HashSet<>();
+        }
+        dto.checkedArguments.add(argumentIndex);
+    }
+
     private void switchToMigrationFunction(
+            TranslationScopeDto translationScopeDto,
             FunctionApplicationDto functionApplicationDto,
-            IBindingCollection currentBindings,
             ITSPHPAst leftHandSide,
             ITSPHPAst arguments, Pair<String, ITypeSymbol> pair) {
 
         if (pair != null) {
+            IBindingCollection bindingCollection = translationScopeDto.bindingCollection;
             boolean needMigrationFunction = true;
 
             int operatorType = leftHandSide.getType();
             if (operatorType == TokenTypes.Plus
                     || operatorType == TokenTypes.Minus
                     || operatorType == TokenTypes.Multiply) {
-                ITypeSymbol lhs = getTypeSymbol(currentBindings, arguments.getChild(0));
-                ITypeSymbol rhs = getTypeSymbol(currentBindings, arguments.getChild(1));
+                ITypeSymbol lhs = getTypeSymbol(bindingCollection, arguments.getChild(0));
+                ITypeSymbol rhs = getTypeSymbol(bindingCollection, arguments.getChild(1));
                 ITypeSymbol intTypeSymbol = primitiveTypes.get(PrimitiveTypeNames.INT);
                 ITypeSymbol floatTypeSymbol = primitiveTypes.get(PrimitiveTypeNames.FLOAT);
                 if ((typeHelper.areSame(lhs, intTypeSymbol) || typeHelper.areSame(lhs, floatTypeSymbol))
@@ -213,19 +224,22 @@ public class TSPHPOperatorHelper implements IOperatorHelper
             if (needMigrationFunction) {
                 functionApplicationDto.name = pair.first;
                 String leftHandSideId = leftHandSide.getSymbol().getAbsoluteName();
-                ITypeVariableReference reference = currentBindings.getTypeVariableReference(leftHandSideId);
+                ITypeVariableReference reference = bindingCollection.getTypeVariableReference(leftHandSideId);
                 String lhsTypeVariable = reference.getTypeVariable();
                 ITypeSymbol returnType = pair.second;
                 if (reference.hasFixedType()) {
-                    ITypeSymbol typeSymbol = currentBindings.getLowerTypeBounds(lhsTypeVariable);
+                    ITypeSymbol typeSymbol = bindingCollection.getLowerTypeBounds(lhsTypeVariable);
                     if (typeSymbol == null) {
-                        typeSymbol = currentBindings.getUpperTypeBounds(lhsTypeVariable);
+                        typeSymbol = bindingCollection.getUpperTypeBounds(lhsTypeVariable);
                     }
                     TypeHelperDto result = typeHelper.isFirstSameOrSubTypeOfSecond(returnType, typeSymbol);
                     //if the left hand side is more specific than the return type then we need to cast
                     if (result.relation == ERelation.HAS_NO_RELATION) {
                         functionApplicationDto.returnRuntimeCheck = runtimeCheckProvider.getTypeCheck(
-                                leftHandSide, "%returnRuntimeCheck%", typeSymbol).toString();
+                                translationScopeDto.statements,
+                                leftHandSide,
+                                "%returnRuntimeCheck%",
+                                typeSymbol).toString();
                     }
                 } else {
                     //if overload is parametric polymorphic then we need to cast to the parametric type

@@ -15,7 +15,7 @@ package ch.tsphp.tinsphp.translators.tsphp.test.integration.with_reduction;
 
 import ch.tsphp.tinsphp.common.IInferenceEngine;
 import ch.tsphp.tinsphp.common.issues.EIssueSeverity;
-import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorWithReductionTest;
+import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorWithWideningTest;
 import org.antlr.runtime.RecognitionException;
 import org.junit.Assert;
 import org.junit.Test;
@@ -30,7 +30,7 @@ import java.util.EnumSet;
 import java.util.List;
 
 @RunWith(Parameterized.class)
-public class FunctionDefinitionImplicitReturnTest extends ATranslatorWithReductionTest
+public class FunctionDefinitionImplicitReturnTest extends ATranslatorWithWideningTest
 {
 
     public FunctionDefinitionImplicitReturnTest(String testString, String expectedResult) {

@@ -11,9 +11,8 @@ import ch.tsphp.common.symbols.ITypeSymbol;
 import ch.tsphp.tinsphp.common.inference.constraints.IBindingCollection;
 import ch.tsphp.tinsphp.common.inference.constraints.IVariable;
 import ch.tsphp.tinsphp.common.translation.dtos.ParameterDto;
-import ch.tsphp.tinsphp.common.utils.Pair;
 
-import java.util.List;
+import java.util.Deque;
 
 public class MetaRuntimeCheckProvider implements IRuntimeCheckProvider
 {
@@ -21,7 +20,7 @@ public class MetaRuntimeCheckProvider implements IRuntimeCheckProvider
     @Override
     public boolean addParameterCheck(
             String identifier,
-            List<Pair<String, String>> parameterRuntimeChecks,
+            Deque<String> statements,
             IBindingCollection bindings,
             IVariable parameter,
             int parameterIndex,
@@ -30,7 +29,8 @@ public class MetaRuntimeCheckProvider implements IRuntimeCheckProvider
     }
 
     @Override
-    public Object getTypeCheck(ITSPHPAst argumentAst, Object argument, ITypeSymbol argumentType) {
+    public Object getTypeCheck(
+            Deque<String> statements, ITSPHPAst argumentAst, Object argument, ITypeSymbol argumentType) {
         return "cast(" + argument.toString() + ", " + argumentType.getAbsoluteName() + ")";
     }
 }

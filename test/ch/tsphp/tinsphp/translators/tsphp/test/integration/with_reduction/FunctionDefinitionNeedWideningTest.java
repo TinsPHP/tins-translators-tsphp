@@ -13,7 +13,7 @@
 package ch.tsphp.tinsphp.translators.tsphp.test.integration.with_reduction;
 
 
-import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorWithReductionTest;
+import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorWithWideningTest;
 import org.antlr.runtime.RecognitionException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,10 +24,10 @@ import java.util.Arrays;
 import java.util.Collection;
 
 @RunWith(Parameterized.class)
-public class FunctionDefinitionNeedReductionTest extends ATranslatorWithReductionTest
+public class FunctionDefinitionNeedWideningTest extends ATranslatorWithWideningTest
 {
 
-    public FunctionDefinitionNeedReductionTest(String testString, String expectedResult) {
+    public FunctionDefinitionNeedWideningTest(String testString, String expectedResult) {
         super(testString, expectedResult);
     }
 
@@ -113,6 +113,24 @@ public class FunctionDefinitionNeedReductionTest extends ATranslatorWithReductio
                                 + "        foreach ([1] as (int | string) $x1_43 => mixed $v1_49) {\n"
                                 + "            $x = $x1_43;\n"
                                 + "            $v = $v1_49;\n"
+                                + "        }\n"
+                                + "        return $x;\n"
+                                + "    }\n"
+                                + "\n"
+                                + "}"
+                },
+                {
+                        "<?php function foo($x){~($x \n+ 1); try{}catch(Exception \n$x){} return $x;}",
+                        "namespace{\n"
+                                + "\n"
+                                + "    function mixed foo(mixed $x) {\n"
+                                + "        mixed $_t2_0;\n"
+                                + "        ~(($_t2_0 = (oldSchoolAddition($x, 1))) <: float ? cast($_t2_0, " +
+                                "float) : $_t2_0 <: int ? cast($_t2_0, int) : \\trigger_error('The variable $_t2_0" +
+                                " must hold a value of type float or int.', \\E_USER_ERROR));\n"
+                                + "        try {\n"
+                                + "        } catch (Exception $x3_0) {\n"
+                                + "            $x = $x3_0;\n"
                                 + "        }\n"
                                 + "        return $x;\n"
                                 + "    }\n"
