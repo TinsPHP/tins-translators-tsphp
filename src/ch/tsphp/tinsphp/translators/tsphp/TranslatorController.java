@@ -127,8 +127,7 @@ public class TranslatorController implements ITranslatorController
             for (Map.Entry<Integer, Pair<ITypeSymbol, List<ITypeSymbol>>> entry
                     : appliedOverload.runtimeChecks.entrySet()) {
                 int argumentIndex = entry.getKey();
-                if (dto.argumentsRequiringConversion == null
-                        || !dto.argumentsRequiringConversion.contains(argumentIndex)) {
+                if (dto.checkedArguments == null || !dto.checkedArguments.contains(argumentIndex)) {
                     Object argument = runtimeCheckProvider.getTypeCheck(
                             argumentsAst.getChild(argumentIndex), arguments.get(argumentIndex), entry.getValue().first);
                     arguments.set(argumentIndex, argument);
@@ -148,7 +147,10 @@ public class TranslatorController implements ITranslatorController
             dto = new FunctionApplicationDto();
             dto.arguments = arguments;
             operatorHelper.turnIntoMigrationFunctionIfRequired(dto, appliedOverload, bindings, operator, operator);
-            applyRuntimeChecks(dto, operator, appliedOverload);
+            //runtime checks are not required if a migration function is used.
+            if (dto.name == null) {
+                applyRuntimeChecks(dto, operator, appliedOverload);
+            }
         }
 
         return dto;

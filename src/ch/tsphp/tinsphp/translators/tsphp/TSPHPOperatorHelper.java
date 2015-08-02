@@ -177,10 +177,10 @@ public class TSPHPOperatorHelper implements IOperatorHelper
                             stringBuilder.append(", ").append(iterator.next());
                         }
                         dto.arguments.set(i, stringBuilder);
-                        if (dto.argumentsRequiringConversion == null) {
-                            dto.argumentsRequiringConversion = new HashSet<>();
+                        if (dto.checkedArguments == null) {
+                            dto.checkedArguments = new HashSet<>();
                         }
-                        dto.argumentsRequiringConversion.add(i);
+                        dto.checkedArguments.add(i);
                     }
                 }
             }

@@ -45,7 +45,7 @@ public class FunctionDefinitionNeedReductionTest extends ATranslatorWithReductio
                         "namespace{\n"
                                 + "\n    function mixed foo(mixed $x) {"
                                 + "\n        if (true) {"
-                                + "\n            return oldSchoolAddition(cast($x, {as (float | int)}), 1);"
+                                + "\n            return oldSchoolAddition($x, 1);"
                                 + "\n        }"
                                 + "\n        return cast($x, array) + [1];"
                                 + "\n    }"
