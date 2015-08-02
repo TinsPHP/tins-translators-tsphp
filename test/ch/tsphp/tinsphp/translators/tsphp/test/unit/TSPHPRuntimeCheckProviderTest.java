@@ -22,6 +22,7 @@ import org.mockito.stubbing.Answer;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -202,6 +203,34 @@ public class TSPHPRuntimeCheckProviderTest extends ATypeTest
                 + "\\trigger_error('The variable $t must hold the value null.', \\E_USER_ERROR))"));
     }
 
+    @Test
+    public void getTypeCheck_BoolAndIsVariable_ReturnsCastToBool() {
+        ITSPHPAst argumentAst = mock(ITSPHPAst.class);
+        when(argumentAst.getType()).thenReturn(TokenTypes.VariableId);
+        String expression = "$x";
+        when(argumentAst.getText()).thenReturn(expression);
+        ITempVariableHelper tempVariableHelper = createTempVariableHelperIsVariable();
+
+        IRuntimeCheckProvider runtimeCheckProvider = createRuntimeCheckProvider(tempVariableHelper);
+        Object result = runtimeCheckProvider.getTypeCheck(argumentAst, expression, boolType);
+
+        assertThat(result.toString(), is("cast($x, bool)"));
+    }
+
+    @Test
+    public void getTypeCheck_BoolAndIsNotVariable_ReturnsCastToBool() {
+        ITSPHPAst argumentAst = mock(ITSPHPAst.class);
+        when(argumentAst.getType()).thenReturn(TokenTypes.VariableId);
+        String expression = "$x + 1";
+        when(argumentAst.getText()).thenReturn(expression);
+        ITempVariableHelper tempVariableHelper = createTempVariableHelperIsNotVariable("$t");
+
+        IRuntimeCheckProvider runtimeCheckProvider = createRuntimeCheckProvider(tempVariableHelper);
+        Object result = runtimeCheckProvider.getTypeCheck(argumentAst, expression, boolType);
+
+        assertThat(result.toString(), is("cast(" + expression + ", bool)"));
+    }
+
     private ITempVariableHelper createTempVariableHelperIsVariable() {
         ITempVariableHelper tempVariableHelper = mock(ITempVariableHelper.class);
         when(tempVariableHelper.getTempVariableNameIfNotVariable(any(ITSPHPAst.class))).then(new Answer<Object>()
@@ -244,6 +273,14 @@ public class TSPHPRuntimeCheckProviderTest extends ATypeTest
             public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
                 Object[] args = invocationOnMock.getArguments();
                 return "The variable " + args[0] + " must hold the value " + args[1] + ".";
+            }
+        });
+        when(messageProvider.getTypeCheckError(anyString(), anyList())).then(new Answer<Object>()
+        {
+            @Override
+            public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
+                Object[] args = invocationOnMock.getArguments();
+                return "The variable " + args[0] + " must hold a value of type " + args[1] + ".";
             }
         });
 

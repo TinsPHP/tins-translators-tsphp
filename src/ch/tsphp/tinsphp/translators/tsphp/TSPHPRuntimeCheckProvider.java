@@ -213,18 +213,13 @@ public class TSPHPRuntimeCheckProvider implements IRuntimeCheckProvider
 
         boolean ok = true;
         if (typeSymbol instanceof IUnionTypeSymbol) {
-            IUnionTypeSymbol unionTypeSymbol = (IUnionTypeSymbol) typeSymbol;
-            SortedMap<String, ITypeSymbol> typeSymbols = new TreeMap<>(unionTypeSymbol.getTypeSymbols());
-            boolean allOk = true;
-            for (ITypeSymbol innerTypeSymbols : typeSymbols.values()) {
-                if (!appendTypeCheck(
-                        stringBuilder, firstExpression, tempVariable, innerTypeSymbols, suffixCheck, types)) {
-                    allOk = false;
-                    break;
-                }
-
-            }
-            ok = allOk;
+            ok = appendTypeCheck(
+                    stringBuilder,
+                    firstExpression,
+                    tempVariable,
+                    (IUnionTypeSymbol) typeSymbol,
+                    suffixCheck,
+                    types);
         } else if (typeSymbol instanceof IIntersectionTypeSymbol) {
             ok = appendTypeCheck(
                     stringBuilder,
@@ -242,6 +237,30 @@ public class TSPHPRuntimeCheckProvider implements IRuntimeCheckProvider
             String typeName = typeSymbol.getAbsoluteName();
             appendTypeCheck(stringBuilder, firstExpression, tempVariable, suffixCheck, types, typeName);
         }
+        return ok;
+    }
+
+    private boolean appendTypeCheck(StringBuilder stringBuilder, String firstExpression, String tempVariable,
+            IUnionTypeSymbol typeSymbol, String suffixCheck, List<String> types) {
+        boolean ok;
+        IUnionTypeSymbol unionTypeSymbol = (IUnionTypeSymbol) typeSymbol;
+        SortedMap<String, ITypeSymbol> typeSymbols = new TreeMap<>(unionTypeSymbol.getTypeSymbols());
+        if (typeSymbols.containsKey(PrimitiveTypeNames.FALSE_TYPE)
+                && typeSymbols.containsKey(PrimitiveTypeNames.TRUE_TYPE)) {
+            typeSymbols.remove(PrimitiveTypeNames.FALSE_TYPE);
+            typeSymbols.remove(PrimitiveTypeNames.TRUE_TYPE);
+            typeSymbols.put(tsphpBoolTypeSymbol.getAbsoluteName(), tsphpBoolTypeSymbol);
+        }
+        boolean allOk = true;
+        for (ITypeSymbol innerTypeSymbols : typeSymbols.values()) {
+            if (!appendTypeCheck(
+                    stringBuilder, firstExpression, tempVariable, innerTypeSymbols, suffixCheck, types)) {
+                allOk = false;
+                break;
+            }
+
+        }
+        ok = allOk;
         return ok;
     }
 
