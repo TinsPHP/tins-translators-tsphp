@@ -74,4 +74,9 @@ public class HardCodedOutputIssueMessageProvider implements IOutputIssueMessageP
         stringBuilder.append("'");
         return stringBuilder.toString();
     }
+
+    @Override
+    public String getValueCheckError(String variableId, String value) {
+        return "The variable " + variableId + " must hold the value " + value + ".";
+    }
 }

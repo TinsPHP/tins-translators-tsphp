@@ -173,7 +173,7 @@ public class TSPHPRuntimeCheckProvider implements IRuntimeCheckProvider
     public Object getTypeCheck(ITSPHPAst expressionAst, Object expressionTemplate, ITypeSymbol typeSymbol) {
         StringBuilder stringBuilder = new StringBuilder();
         List<String> types = new ArrayList<>();
-        String firstExpression = expressionAst.getText();
+        String firstExpression = expressionTemplate.toString();
         String tempVariable = tempVariableHelper.getTempVariableNameIfNotVariable(expressionAst);
         if (!firstExpression.equals(tempVariable)) {
             //need to use a temp variable, hence the first expression needs to be the assignment
@@ -185,7 +185,13 @@ public class TSPHPRuntimeCheckProvider implements IRuntimeCheckProvider
         Object newArgument = expressionTemplate;
         if (canPerformRuntimeChecks) {
             if (types.size() == 1) {
-                newArgument = getTypeCast(types.get(0), expressionTemplate.toString());
+                String typeName = types.get(0);
+                if (!typeName.equals(PrimitiveTypeNames.FALSE_TYPE)
+                        && !typeName.equals(PrimitiveTypeNames.TRUE_TYPE)
+                        && !typeName.equals(PrimitiveTypeNames.NULL_TYPE)) {
+                    firstExpression = expressionTemplate.toString();
+                }
+                newArgument = getTypeCast(typeName, firstExpression, tempVariable);
             } else {
                 stringBuilder.insert(0, '(');
                 String errorMessage = messageProvider.getTypeCheckError(tempVariable, types);
@@ -246,22 +252,48 @@ public class TSPHPRuntimeCheckProvider implements IRuntimeCheckProvider
             String suffixCheck,
             List<String> types,
             String typeName) {
+        String typeCast;
+        switch (typeName) {
+            case PrimitiveTypeNames.FALSE_TYPE:
+                typeCast = "false";
+                break;
+            case PrimitiveTypeNames.TRUE_TYPE:
+                typeCast = "true";
+                break;
+            case PrimitiveTypeNames.NULL_TYPE:
+                typeCast = "null";
+                break;
+            default:
+                typeCast = getTypeCast(typeName, firstExpression, tempVariable);
+                break;
+        }
+
         stringBuilder.append(getTypeCheckExpression(typeName, firstExpression)).append(suffixCheck)
-                .append(" ? ").append(getTypeCast(typeName, tempVariable)).append(" : ");
+                .append(" ? ").append(typeCast).append(" : ");
         types.add(typeName);
     }
 
-    private String getTypeCast(String typeName, String variableId) {
+    private String getTypeCast(String typeName, String firstExpression, String tempVariable) {
+        String typeCast;
+        String value = null;
         switch (typeName) {
             case PrimitiveTypeNames.FALSE_TYPE:
-                return "false";
+                value = "false";
             case PrimitiveTypeNames.TRUE_TYPE:
-                return "true";
+                if (value == null) {
+                    value = "true";
+                }
             case PrimitiveTypeNames.NULL_TYPE:
-                return "null";
+                if (value == null) {
+                    value = "null";
+                }
+                typeCast = "(" + firstExpression + " === " + value + " ? " + value + " : \\trigger_error('" +
+                        messageProvider.getValueCheckError(tempVariable, value) + "', \\E_USER_ERROR))";
+                break;
             default:
-                return "cast(" + variableId + ", " + typeName + ")";
+                typeCast = "cast(" + firstExpression + ", " + typeName + ")";
         }
+        return typeCast;
     }
 
     private boolean appendTypeCheck(

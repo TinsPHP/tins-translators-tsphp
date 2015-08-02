@@ -13,7 +13,9 @@ public interface IOutputIssueMessageProvider
     String getParameterRuntimeCheckMessage(
             String identifier, String parameterName, int parameterIndex, List<String> types);
 
-    String getTypeCheckError(String tempVariable, List<String> types);
+    String getTypeCheckError(String variableId, List<String> types);
 
-    String getWrongApplication(String key, String text, List<String> arguments, List<String> overloads);
+    String getValueCheckError(String variableId, String value);
+
+    String getWrongApplication(String key, String identifier, List<String> arguments, List<String> overloads);
 }
