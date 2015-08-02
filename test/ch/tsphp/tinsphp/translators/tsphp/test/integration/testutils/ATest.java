@@ -123,11 +123,11 @@ public abstract class ATest implements IIssueLogger
         commonTreeNodeStream.reset();
 
         TempVariableHelper tempVariableHelper = new TempVariableHelper(astAdaptor);
-        ITypeTransformer nameTransformer = createNameTransformer();
-        IRuntimeCheckProvider runtimeCheckProvider = createRuntimeCheckProvider(nameTransformer, tempVariableHelper);
-        IOperatorHelper operatorHelper = createOperatorHelper(runtimeCheckProvider, nameTransformer);
+        ITypeTransformer typeTransformer = createTypeTransformer();
+        IRuntimeCheckProvider runtimeCheckProvider = createRuntimeCheckProvider(typeTransformer, tempVariableHelper);
+        IOperatorHelper operatorHelper = createOperatorHelper(runtimeCheckProvider, typeTransformer);
 
-        IDtoCreator dtoCreator = new DtoCreator(tempVariableHelper, nameTransformer, runtimeCheckProvider);
+        IDtoCreator dtoCreator = new DtoCreator(tempVariableHelper, typeTransformer, runtimeCheckProvider);
 
         controller = new TranslatorController(
                 new PrecedenceHelper(),
@@ -148,11 +148,11 @@ public abstract class ATest implements IIssueLogger
     }
 
     protected IRuntimeCheckProvider createRuntimeCheckProvider(
-            ITypeTransformer nameTransformer, TempVariableHelper tempVariableHelper) {
+            ITypeTransformer typeTransformer, TempVariableHelper tempVariableHelper) {
         return new MetaRuntimeCheckProvider();
     }
 
-    protected ITypeTransformer createNameTransformer() {
+    protected ITypeTransformer createTypeTransformer() {
         return new MetaTypeTransformer();
     }
 
@@ -160,8 +160,8 @@ public abstract class ATest implements IIssueLogger
         return new HardCodedCoreInitialiser(astHelper, symbolsInitialiser);
     }
 
-    protected IOperatorHelper createOperatorHelper(IRuntimeCheckProvider runtimeCheckProvider,
-            ITypeTransformer nameTransformer) {
+    protected IOperatorHelper createOperatorHelper(
+            IRuntimeCheckProvider runtimeCheckProvider, ITypeTransformer typeTransformer) {
         return new MetaOperatorHelper();
     }
 

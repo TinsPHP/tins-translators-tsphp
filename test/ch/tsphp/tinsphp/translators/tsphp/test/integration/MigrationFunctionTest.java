@@ -64,9 +64,9 @@ public class MigrationFunctionTest extends ATranslatorTest
     }
 
     @Override
-    public IOperatorHelper createOperatorHelper(IRuntimeCheckProvider runtimeCheckProvider,
-            ITypeTransformer nameTransformer) {
-        return new TSPHPOperatorHelper(typeHelper, primitiveTypes, runtimeCheckProvider, nameTransformer);
+    public IOperatorHelper createOperatorHelper(
+            IRuntimeCheckProvider runtimeCheckProvider, ITypeTransformer typeTransformer) {
+        return new TSPHPOperatorHelper(typeHelper, primitiveTypes, runtimeCheckProvider, typeTransformer);
     }
 
     @Parameterized.Parameters

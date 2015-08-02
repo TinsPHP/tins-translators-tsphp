@@ -35,11 +35,11 @@ public class TSPHPRuntimeCheckProvider implements IRuntimeCheckProvider
 
 
     public TSPHPRuntimeCheckProvider(
-            ITypeTransformer theNameTransformer,
+            ITypeTransformer theTypeTransformer,
             ITempVariableHelper theTempVariableHelper,
             IOutputIssueMessageProvider theMessageProvider,
             ITypeSymbol theTsphpBoolTypeSymbol) {
-        typeTransformer = theNameTransformer;
+        typeTransformer = theTypeTransformer;
         messageProvider = theMessageProvider;
         tsphpBoolTypeSymbol = theTsphpBoolTypeSymbol;
         tempVariableHelper = theTempVariableHelper;
@@ -170,7 +170,7 @@ public class TSPHPRuntimeCheckProvider implements IRuntimeCheckProvider
 
 
     @Override
-    public Object addTypeCheck(ITSPHPAst expressionAst, Object expressionTemplate, ITypeSymbol typeSymbol) {
+    public Object getTypeCheck(ITSPHPAst expressionAst, Object expressionTemplate, ITypeSymbol typeSymbol) {
         StringBuilder stringBuilder = new StringBuilder();
         List<String> types = new ArrayList<>();
         String firstExpression = expressionAst.getText();

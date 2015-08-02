@@ -84,7 +84,7 @@ public class HardCodedTSPHPTranslatorInitialiser implements ITranslatorInitialis
         unionTypeSymbol = (IUnionTypeSymbol) primitiveTypes.get(PrimitiveTypeNames.SCALAR);
         ITypeSymbol tsphpScalarTypeSymbol = new TsphpUnionTypeSymbol("scalar", unionTypeSymbol);
 
-        ITypeTransformer nameTransformer = new TSPHPTypeTransformer(
+        ITypeTransformer typeTransformer = new TSPHPTypeTransformer(
                 symbolFactory,
                 typeHelper,
                 primitiveTypes,
@@ -94,10 +94,10 @@ public class HardCodedTSPHPTranslatorInitialiser implements ITranslatorInitialis
 
         IOutputIssueMessageProvider outputIssueMessageProvider = new HardCodedOutputIssueMessageProvider();
         IRuntimeCheckProvider runtimeCheckProvider = new TSPHPRuntimeCheckProvider(
-                nameTransformer, tempVariableHelper, outputIssueMessageProvider, tsphpBoolTypeSymbol);
+                typeTransformer, tempVariableHelper, outputIssueMessageProvider, tsphpBoolTypeSymbol);
         IOperatorHelper operatorHelper = new TSPHPOperatorHelper(
-                typeHelper, primitiveTypes, runtimeCheckProvider, nameTransformer);
-        IDtoCreator dtoCreator = new DtoCreator(tempVariableHelper, nameTransformer, runtimeCheckProvider);
+                typeHelper, primitiveTypes, runtimeCheckProvider, typeTransformer);
+        IDtoCreator dtoCreator = new DtoCreator(tempVariableHelper, typeTransformer, runtimeCheckProvider);
 
         controller = new TranslatorController(
                 precedenceHelper,

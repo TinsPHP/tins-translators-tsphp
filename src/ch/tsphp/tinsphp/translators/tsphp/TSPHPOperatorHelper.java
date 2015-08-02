@@ -37,7 +37,7 @@ public class TSPHPOperatorHelper implements IOperatorHelper
 {
     private final ITypeHelper typeHelper;
     private final Map<String, ITypeSymbol> primitiveTypes;
-    private final ITypeTransformer nameTransformer;
+    private final ITypeTransformer typeTransformer;
     private final IRuntimeCheckProvider runtimeCheckProvider;
 
     private final Map<Integer, Map<String, Pair<String, ITypeSymbol>>> migrationFunctions = new HashMap<>();
@@ -47,11 +47,11 @@ public class TSPHPOperatorHelper implements IOperatorHelper
             ITypeHelper theTypeHelper,
             Map<String, ITypeSymbol> thePrimitiveTypes,
             IRuntimeCheckProvider theRuntimeCheckProvider,
-            ITypeTransformer theNameTransformer) {
+            ITypeTransformer theTypeTransformer) {
         typeHelper = theTypeHelper;
         primitiveTypes = thePrimitiveTypes;
         runtimeCheckProvider = theRuntimeCheckProvider;
-        nameTransformer = theNameTransformer;
+        typeTransformer = theTypeTransformer;
         init();
     }
 
@@ -156,7 +156,7 @@ public class TSPHPOperatorHelper implements IOperatorHelper
                                 for (ITypeSymbol typeSymbol : pair.second) {
                                     String typeName;
                                     if (typeSymbol instanceof IConvertibleTypeSymbol) {
-                                        Pair<ITypeSymbol, Boolean> nameTransformerPair = nameTransformer.getType(
+                                        Pair<ITypeSymbol, Boolean> nameTransformerPair = typeTransformer.getType(
                                                 (IConvertibleTypeSymbol) typeSymbol);
                                         typeName = nameTransformerPair.first.getAbsoluteName();
                                     } else {
@@ -166,7 +166,7 @@ public class TSPHPOperatorHelper implements IOperatorHelper
                                 }
                             }
                         }
-                        Pair<ITypeSymbol, Boolean> nameTransformerPair = nameTransformer.getType(targetType);
+                        Pair<ITypeSymbol, Boolean> nameTransformerPair = typeTransformer.getType(targetType);
                         StringBuilder stringBuilder = new StringBuilder(dto.arguments.get(i).toString())
                                 .append(" as ").append(nameTransformerPair.first.getAbsoluteName());
                         Iterator<String> iterator = ifTypes.iterator();
@@ -224,7 +224,7 @@ public class TSPHPOperatorHelper implements IOperatorHelper
                     TypeHelperDto result = typeHelper.isFirstSameOrSubTypeOfSecond(returnType, typeSymbol);
                     //if the left hand side is more specific than the return type then we need to cast
                     if (result.relation == ERelation.HAS_NO_RELATION) {
-                        functionApplicationDto.returnRuntimeCheck = runtimeCheckProvider.addTypeCheck(
+                        functionApplicationDto.returnRuntimeCheck = runtimeCheckProvider.getTypeCheck(
                                 leftHandSide, "%returnRuntimeCheck%", typeSymbol).toString();
                     }
                 } else {

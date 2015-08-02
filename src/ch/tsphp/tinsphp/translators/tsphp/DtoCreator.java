@@ -37,15 +37,15 @@ import static ch.tsphp.tinsphp.common.utils.Pair.pair;
 public class DtoCreator implements IDtoCreator
 {
     private final ITempVariableHelper tempVariableHelper;
-    private final ITypeTransformer nameTransformer;
+    private final ITypeTransformer typeTransformer;
     private final IRuntimeCheckProvider parameterCheckProvider;
 
     public DtoCreator(
             ITempVariableHelper theTempVariableHelper,
-            ITypeTransformer theNameTransformer,
+            ITypeTransformer theTypeTransformer,
             IRuntimeCheckProvider theParameterCheckProvider) {
         tempVariableHelper = theTempVariableHelper;
-        nameTransformer = theNameTransformer;
+        typeTransformer = theTypeTransformer;
         parameterCheckProvider = theParameterCheckProvider;
     }
 
@@ -223,16 +223,16 @@ public class DtoCreator implements IDtoCreator
         if (bindings.hasLowerBounds(typeVariable)) {
             lowerBounds = new ArrayList<>();
             if (bindings.hasLowerTypeBounds(typeVariable)) {
-                lowerBounds.addAll(nameTransformer.getTypeBounds(bindings.getLowerTypeBounds(typeVariable)));
+                lowerBounds.addAll(typeTransformer.getTypeBounds(bindings.getLowerTypeBounds(typeVariable)));
             }
             if (bindings.hasLowerRefBounds(typeVariable)) {
-                lowerBounds.addAll(nameTransformer.getLowerRefBounds(bindings, typeVariable));
+                lowerBounds.addAll(typeTransformer.getLowerRefBounds(bindings, typeVariable));
             }
         }
         List<String> upperBounds = null;
         if (bindings.hasUpperTypeBounds(typeVariable)) {
             upperBounds = new ArrayList<>();
-            upperBounds.addAll(nameTransformer.getTypeBounds(bindings.getUpperTypeBounds(typeVariable)));
+            upperBounds.addAll(typeTransformer.getTypeBounds(bindings.getUpperTypeBounds(typeVariable)));
         }
         return new TypeParameterDto(lowerBounds, typeVariable, upperBounds);
     }
@@ -243,7 +243,7 @@ public class DtoCreator implements IDtoCreator
         String typeName;
         boolean wasWidened = false;
         if (reference.hasFixedType()) {
-            Pair<ITypeSymbol, Boolean> pair = nameTransformer.getType(bindings, typeVariable);
+            Pair<ITypeSymbol, Boolean> pair = typeTransformer.getType(bindings, typeVariable);
             typeName = pair.first.getAbsoluteName();
             wasWidened = pair.second;
         } else {
@@ -269,7 +269,7 @@ public class DtoCreator implements IDtoCreator
         if (typeVariable.startsWith("T")) {
             typeDto = new TypeDto(null, typeVariable, null);
         } else if (reference.hasFixedType()) {
-            Pair<ITypeSymbol, Boolean> pair = nameTransformer.getType(bindings, typeVariable);
+            Pair<ITypeSymbol, Boolean> pair = typeTransformer.getType(bindings, typeVariable);
             typeDto = new TypeDto(null, pair.first.getAbsoluteName(), null);
         } else {
             typeParameterDto = createTypeParameterDto(bindings, typeVariable);

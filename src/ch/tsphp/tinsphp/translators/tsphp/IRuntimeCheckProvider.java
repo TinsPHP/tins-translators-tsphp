@@ -28,5 +28,5 @@ public interface IRuntimeCheckProvider
             int parameterIndex,
             ParameterDto parameterDto);
 
-    Object addTypeCheck(ITSPHPAst argumentAst, Object argument, ITypeSymbol argumentType);
+    Object getTypeCheck(ITSPHPAst argumentAst, Object argument, ITypeSymbol argumentType);
 }

@@ -30,7 +30,7 @@ public class MetaRuntimeCheckProvider implements IRuntimeCheckProvider
     }
 
     @Override
-    public Object addTypeCheck(ITSPHPAst argumentAst, Object argument, ITypeSymbol argumentType) {
+    public Object getTypeCheck(ITSPHPAst argumentAst, Object argument, ITypeSymbol argumentType) {
         return "cast(" + argument.toString() + ", " + argumentType.getAbsoluteName() + ")";
     }
 }

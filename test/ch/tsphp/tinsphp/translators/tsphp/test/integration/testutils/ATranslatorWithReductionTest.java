@@ -55,13 +55,13 @@ public abstract class ATranslatorWithReductionTest extends ATranslatorTest
     }
 
     @Override
-    public IOperatorHelper createOperatorHelper(IRuntimeCheckProvider runtimeCheckProvider,
-            ITypeTransformer nameTransformer) {
-        return new TSPHPOperatorHelper(typeHelper, primitiveTypes, runtimeCheckProvider, nameTransformer);
+    public IOperatorHelper createOperatorHelper(
+            IRuntimeCheckProvider runtimeCheckProvider, ITypeTransformer typeTransformer) {
+        return new TSPHPOperatorHelper(typeHelper, primitiveTypes, runtimeCheckProvider, typeTransformer);
     }
 
     @Override
-    public ITypeTransformer createNameTransformer() {
+    public ITypeTransformer createTypeTransformer() {
         return new TSPHPTypeTransformer(
                 symbolsInitialiser.getSymbolFactory(),
                 typeHelper,
@@ -72,9 +72,9 @@ public abstract class ATranslatorWithReductionTest extends ATranslatorTest
     }
 
     @Override
-    public IRuntimeCheckProvider createRuntimeCheckProvider(ITypeTransformer nameTransformer, TempVariableHelper
+    public IRuntimeCheckProvider createRuntimeCheckProvider(ITypeTransformer typeTransformer, TempVariableHelper
             tempVariableHelper) {
         return new TSPHPRuntimeCheckProvider(
-                nameTransformer, tempVariableHelper, new HardCodedOutputIssueMessageProvider(), tsphpBoolTypeSymbol);
+                typeTransformer, tempVariableHelper, new HardCodedOutputIssueMessageProvider(), tsphpBoolTypeSymbol);
     }
 }

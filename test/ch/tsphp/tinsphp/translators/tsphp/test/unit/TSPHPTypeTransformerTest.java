@@ -21,15 +21,15 @@ import org.junit.Test;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-public class TSPHPNameTransformerTest extends ATypeTest
+public class TSPHPTypeTransformerTest extends ATypeTest
 {
 
     @Test
     public void getTypeName_NullType_ReturnsBool() {
         //no arrange necessary
 
-        ITypeTransformer nameTransformer = createNameTransformer();
-        Pair<ITypeSymbol, Boolean> result = nameTransformer.getType(nullType);
+        ITypeTransformer typeTransformer = createTypeTransformer();
+        Pair<ITypeSymbol, Boolean> result = typeTransformer.getType(nullType);
 
         assertThat(result.first.getAbsoluteName(), is("mixed"));
         assertThat(result.second, is(true));
@@ -39,8 +39,8 @@ public class TSPHPNameTransformerTest extends ATypeTest
     public void getTypeName_NullTypeInIntersection_ReturnsBool() {
         IIntersectionTypeSymbol intersectionTypeSymbol = createIntersectionTypeSymbol(nullType);
 
-        ITypeTransformer nameTransformer = createNameTransformer();
-        Pair<ITypeSymbol, Boolean> result = nameTransformer.getType(intersectionTypeSymbol);
+        ITypeTransformer typeTransformer = createTypeTransformer();
+        Pair<ITypeSymbol, Boolean> result = typeTransformer.getType(intersectionTypeSymbol);
 
         assertThat(result.first.getAbsoluteName(), is("mixed"));
         assertThat(result.second, is(true));
@@ -50,8 +50,8 @@ public class TSPHPNameTransformerTest extends ATypeTest
     public void getTypeName_NullOrFalseTypeOrTrueType_ReturnsNullableBool() {
         IUnionTypeSymbol unionTypeSymbol = createUnionTypeSymbol(boolType, nullType);
 
-        ITypeTransformer nameTransformer = createNameTransformer();
-        Pair<ITypeSymbol, Boolean> result = nameTransformer.getType(unionTypeSymbol);
+        ITypeTransformer typeTransformer = createTypeTransformer();
+        Pair<ITypeSymbol, Boolean> result = typeTransformer.getType(unionTypeSymbol);
 
         assertThat(result.first.getAbsoluteName(), is("bool?"));
         assertThat(result.second, is(false));
@@ -61,8 +61,8 @@ public class TSPHPNameTransformerTest extends ATypeTest
     public void getTypeName_NullOrIntOrFloat_ReturnsNullableBool() {
         IUnionTypeSymbol unionTypeSymbol = createUnionTypeSymbol(nullType, numType);
 
-        ITypeTransformer nameTransformer = createNameTransformer();
-        Pair<ITypeSymbol, Boolean> result = nameTransformer.getType(unionTypeSymbol);
+        ITypeTransformer typeTransformer = createTypeTransformer();
+        Pair<ITypeSymbol, Boolean> result = typeTransformer.getType(unionTypeSymbol);
 
         assertThat(result.first.getAbsoluteName(), is("num?"));
         assertThat(result.second, is(false));
@@ -72,8 +72,8 @@ public class TSPHPNameTransformerTest extends ATypeTest
     public void getTypeName_NullOrFalseTypeOrTrueTypeOrInt_ReturnsNullableScalar() {
         IUnionTypeSymbol unionTypeSymbol = createUnionTypeSymbol(nullType, boolType, intType);
 
-        ITypeTransformer nameTransformer = createNameTransformer();
-        Pair<ITypeSymbol, Boolean> result = nameTransformer.getType(unionTypeSymbol);
+        ITypeTransformer typeTransformer = createTypeTransformer();
+        Pair<ITypeSymbol, Boolean> result = typeTransformer.getType(unionTypeSymbol);
 
         assertThat(result.first.getAbsoluteName(), is("scalar?"));
         assertThat(result.second, is(true));
@@ -83,8 +83,8 @@ public class TSPHPNameTransformerTest extends ATypeTest
     public void getTypeName_NullOrFalseTypeOrTrueTypeOrIntOrArray_ReturnsMixed() {
         IUnionTypeSymbol unionTypeSymbol = createUnionTypeSymbol(nullType, boolType, intType, arrayType);
 
-        ITypeTransformer nameTransformer = createNameTransformer();
-        Pair<ITypeSymbol, Boolean> result = nameTransformer.getType(unionTypeSymbol);
+        ITypeTransformer typeTransformer = createTypeTransformer();
+        Pair<ITypeSymbol, Boolean> result = typeTransformer.getType(unionTypeSymbol);
 
         assertThat(result.first.getAbsoluteName(), is("mixed"));
         assertThat(result.second, is(true));
@@ -95,8 +95,8 @@ public class TSPHPNameTransformerTest extends ATypeTest
 //    public void getTypeName_NullOrIA_ReturnsIA() {
 //        IUnionTypeSymbol unionTypeSymbol = createUnionTypeSymbol(nullType, interfaceAType);
 //
-//        ITypeReducer nameTransformer = createNameTransformer();
-//        Pair<ITypeSymbol, Boolean> result = nameTransformer.getType(unionTypeSymbol);
+//        ITypeTransformer typeTransformer = createTypeTransformer();
+//        Pair<ITypeSymbol, Boolean> result = typeTransformer.getType(unionTypeSymbol);
 //
 //        assertThat(result.first.getAbsoluteName(), is("IA"));
 //        assertThat(result.second, is(false));
@@ -106,8 +106,8 @@ public class TSPHPNameTransformerTest extends ATypeTest
     public void getTypeName_NullOrIAOrIB_ReturnsMixed() {
         IUnionTypeSymbol unionTypeSymbol = createUnionTypeSymbol(nullType, interfaceAType, interfaceBType);
 
-        ITypeTransformer nameTransformer = createNameTransformer();
-        Pair<ITypeSymbol, Boolean> result = nameTransformer.getType(unionTypeSymbol);
+        ITypeTransformer typeTransformer = createTypeTransformer();
+        Pair<ITypeSymbol, Boolean> result = typeTransformer.getType(unionTypeSymbol);
 
         assertThat(result.first.getAbsoluteName(), is("mixed"));
         assertThat(result.second, is(true));
@@ -117,8 +117,8 @@ public class TSPHPNameTransformerTest extends ATypeTest
     public void getTypeName_NullTypeOrFalseType_ReturnsNullableBool() {
         IUnionTypeSymbol unionTypeSymbol = createUnionTypeSymbol(nullType, falseType);
 
-        ITypeTransformer nameTransformer = createNameTransformer();
-        Pair<ITypeSymbol, Boolean> result = nameTransformer.getType(unionTypeSymbol);
+        ITypeTransformer typeTransformer = createTypeTransformer();
+        Pair<ITypeSymbol, Boolean> result = typeTransformer.getType(unionTypeSymbol);
 
         assertThat(result.first.getAbsoluteName(), is("bool?"));
         assertThat(result.second, is(true));
@@ -128,8 +128,8 @@ public class TSPHPNameTransformerTest extends ATypeTest
     public void getTypeName_FalseType_ReturnsBool() {
         //no arrange necessary
 
-        ITypeTransformer nameTransformer = createNameTransformer();
-        Pair<ITypeSymbol, Boolean> result = nameTransformer.getType(falseType);
+        ITypeTransformer typeTransformer = createTypeTransformer();
+        Pair<ITypeSymbol, Boolean> result = typeTransformer.getType(falseType);
 
         assertThat(result.first.getAbsoluteName(), is("bool"));
         assertThat(result.second, is(true));
@@ -139,8 +139,8 @@ public class TSPHPNameTransformerTest extends ATypeTest
     public void getTypeName_FalseTypeInUnion_ReturnsBool() {
         IUnionTypeSymbol unionTypeSymbol = createUnionTypeSymbol(falseType);
 
-        ITypeTransformer nameTransformer = createNameTransformer();
-        Pair<ITypeSymbol, Boolean> result = nameTransformer.getType(unionTypeSymbol);
+        ITypeTransformer typeTransformer = createTypeTransformer();
+        Pair<ITypeSymbol, Boolean> result = typeTransformer.getType(unionTypeSymbol);
 
         assertThat(result.first.getAbsoluteName(), is("bool"));
         assertThat(result.second, is(true));
@@ -151,8 +151,8 @@ public class TSPHPNameTransformerTest extends ATypeTest
         IUnionTypeSymbol unionTypeSymbol = createUnionTypeSymbol(falseType);
         IIntersectionTypeSymbol intersectionTypeSymbol = createIntersectionTypeSymbol(unionTypeSymbol);
 
-        ITypeTransformer nameTransformer = createNameTransformer();
-        Pair<ITypeSymbol, Boolean> result = nameTransformer.getType(intersectionTypeSymbol);
+        ITypeTransformer typeTransformer = createTypeTransformer();
+        Pair<ITypeSymbol, Boolean> result = typeTransformer.getType(intersectionTypeSymbol);
 
         assertThat(result.first.getAbsoluteName(), is("bool"));
         assertThat(result.second, is(true));
@@ -163,8 +163,8 @@ public class TSPHPNameTransformerTest extends ATypeTest
     public void getTypeName_TrueType_ReturnsBool() {
         //no arrange necessary
 
-        ITypeTransformer nameTransformer = createNameTransformer();
-        Pair<ITypeSymbol, Boolean> result = nameTransformer.getType(trueType);
+        ITypeTransformer typeTransformer = createTypeTransformer();
+        Pair<ITypeSymbol, Boolean> result = typeTransformer.getType(trueType);
 
         assertThat(result.first.getAbsoluteName(), is("bool"));
         assertThat(result.second, is(true));
@@ -174,8 +174,8 @@ public class TSPHPNameTransformerTest extends ATypeTest
     public void getTypeName_FalseTypeOrTrueType_ReturnsBool() {
         IUnionTypeSymbol unionTypeSymbol = boolType;
 
-        ITypeTransformer nameTransformer = createNameTransformer();
-        Pair<ITypeSymbol, Boolean> result = nameTransformer.getType(unionTypeSymbol);
+        ITypeTransformer typeTransformer = createTypeTransformer();
+        Pair<ITypeSymbol, Boolean> result = typeTransformer.getType(unionTypeSymbol);
 
         assertThat(result.first.getAbsoluteName(), is("bool"));
         assertThat(result.second, is(false));
@@ -187,8 +187,8 @@ public class TSPHPNameTransformerTest extends ATypeTest
         IUnionTypeSymbol unionTypeSymbol = boolType;
         IIntersectionTypeSymbol intersectionTypeSymbol = createIntersectionTypeSymbol(unionTypeSymbol);
 
-        ITypeTransformer nameTransformer = createNameTransformer();
-        Pair<ITypeSymbol, Boolean> result = nameTransformer.getType(intersectionTypeSymbol);
+        ITypeTransformer typeTransformer = createTypeTransformer();
+        Pair<ITypeSymbol, Boolean> result = typeTransformer.getType(intersectionTypeSymbol);
 
         assertThat(result.first.getAbsoluteName(), is("bool"));
         assertThat(result.second, is(false));
@@ -198,8 +198,8 @@ public class TSPHPNameTransformerTest extends ATypeTest
     public void getTypeName_FalseTypeOrInt_ReturnsFalseableInt() {
         IUnionTypeSymbol unionTypeSymbol = createUnionTypeSymbol(falseType, intType);
 
-        ITypeTransformer nameTransformer = createNameTransformer();
-        Pair<ITypeSymbol, Boolean> result = nameTransformer.getType(unionTypeSymbol);
+        ITypeTransformer typeTransformer = createTypeTransformer();
+        Pair<ITypeSymbol, Boolean> result = typeTransformer.getType(unionTypeSymbol);
 
         assertThat(result.first.getAbsoluteName(), is("int!"));
         assertThat(result.second, is(false));
@@ -209,8 +209,8 @@ public class TSPHPNameTransformerTest extends ATypeTest
     public void getTypeName_FalseTypeOrFloat_ReturnsFalseableFloat() {
         IUnionTypeSymbol unionTypeSymbol = createUnionTypeSymbol(falseType, floatType);
 
-        ITypeTransformer nameTransformer = createNameTransformer();
-        Pair<ITypeSymbol, Boolean> result = nameTransformer.getType(unionTypeSymbol);
+        ITypeTransformer typeTransformer = createTypeTransformer();
+        Pair<ITypeSymbol, Boolean> result = typeTransformer.getType(unionTypeSymbol);
 
         assertThat(result.first.getAbsoluteName(), is("float!"));
         assertThat(result.second, is(false));
@@ -220,8 +220,8 @@ public class TSPHPNameTransformerTest extends ATypeTest
     public void getTypeName_FalseTypeOrIntOrFloat_ReturnsFalseableInt() {
         IUnionTypeSymbol unionTypeSymbol = createUnionTypeSymbol(falseType, intType, floatType);
 
-        ITypeTransformer nameTransformer = createNameTransformer();
-        Pair<ITypeSymbol, Boolean> result = nameTransformer.getType(unionTypeSymbol);
+        ITypeTransformer typeTransformer = createTypeTransformer();
+        Pair<ITypeSymbol, Boolean> result = typeTransformer.getType(unionTypeSymbol);
 
         assertThat(result.first.getAbsoluteName(), is("num!"));
         assertThat(result.second, is(false));
@@ -231,8 +231,8 @@ public class TSPHPNameTransformerTest extends ATypeTest
     public void getTypeName_FalseTypeOrTrueTypeOrInt_ReturnsScalar() {
         IUnionTypeSymbol unionTypeSymbol = createUnionTypeSymbol(falseType, trueType, intType);
 
-        ITypeTransformer nameTransformer = createNameTransformer();
-        Pair<ITypeSymbol, Boolean> result = nameTransformer.getType(unionTypeSymbol);
+        ITypeTransformer typeTransformer = createTypeTransformer();
+        Pair<ITypeSymbol, Boolean> result = typeTransformer.getType(unionTypeSymbol);
 
         assertThat(result.first.getAbsoluteName(), is("scalar"));
         assertThat(result.second, is(true));
@@ -242,8 +242,8 @@ public class TSPHPNameTransformerTest extends ATypeTest
     public void getTypeName_FalseTypeOrArray_ReturnsFalseableArray() {
         IUnionTypeSymbol unionTypeSymbol = createUnionTypeSymbol(falseType, arrayType);
 
-        ITypeTransformer nameTransformer = createNameTransformer();
-        Pair<ITypeSymbol, Boolean> result = nameTransformer.getType(unionTypeSymbol);
+        ITypeTransformer typeTransformer = createTypeTransformer();
+        Pair<ITypeSymbol, Boolean> result = typeTransformer.getType(unionTypeSymbol);
 
         assertThat(result.first.getAbsoluteName(), is("array!"));
         assertThat(result.second, is(false));
@@ -253,8 +253,8 @@ public class TSPHPNameTransformerTest extends ATypeTest
     public void getTypeName_FalseTypeOrArrayOrString_ReturnsMixed() {
         IUnionTypeSymbol unionTypeSymbol = createUnionTypeSymbol(falseType, arrayType, stringType);
 
-        ITypeTransformer nameTransformer = createNameTransformer();
-        Pair<ITypeSymbol, Boolean> result = nameTransformer.getType(unionTypeSymbol);
+        ITypeTransformer typeTransformer = createTypeTransformer();
+        Pair<ITypeSymbol, Boolean> result = typeTransformer.getType(unionTypeSymbol);
 
         assertThat(result.first.getAbsoluteName(), is("mixed"));
         assertThat(result.second, is(true));
@@ -264,8 +264,8 @@ public class TSPHPNameTransformerTest extends ATypeTest
     public void getTypeName_FalseTypeOrNullOrInt_ReturnsNullableFalseableInt() {
         IUnionTypeSymbol unionTypeSymbol = createUnionTypeSymbol(falseType, nullType, intType);
 
-        ITypeTransformer nameTransformer = createNameTransformer();
-        Pair<ITypeSymbol, Boolean> result = nameTransformer.getType(unionTypeSymbol);
+        ITypeTransformer typeTransformer = createTypeTransformer();
+        Pair<ITypeSymbol, Boolean> result = typeTransformer.getType(unionTypeSymbol);
 
         assertThat(result.first.getAbsoluteName(), is("int!?"));
         assertThat(result.second, is(false));
@@ -275,8 +275,8 @@ public class TSPHPNameTransformerTest extends ATypeTest
     public void getTypeName_FalseTypeOrFloatOrNullOrInt_ReturnsNullableFalseableNum() {
         IUnionTypeSymbol unionTypeSymbol = createUnionTypeSymbol(falseType, floatType, nullType, intType);
 
-        ITypeTransformer nameTransformer = createNameTransformer();
-        Pair<ITypeSymbol, Boolean> result = nameTransformer.getType(unionTypeSymbol);
+        ITypeTransformer typeTransformer = createTypeTransformer();
+        Pair<ITypeSymbol, Boolean> result = typeTransformer.getType(unionTypeSymbol);
 
         assertThat(result.first.getAbsoluteName(), is("num!?"));
         assertThat(result.second, is(false));
@@ -286,8 +286,8 @@ public class TSPHPNameTransformerTest extends ATypeTest
     public void getTypeName_FalseTypeOrNullOrString_ReturnsNullableFalseableString() {
         IUnionTypeSymbol unionTypeSymbol = createUnionTypeSymbol(falseType, nullType, stringType);
 
-        ITypeTransformer nameTransformer = createNameTransformer();
-        Pair<ITypeSymbol, Boolean> result = nameTransformer.getType(unionTypeSymbol);
+        ITypeTransformer typeTransformer = createTypeTransformer();
+        Pair<ITypeSymbol, Boolean> result = typeTransformer.getType(unionTypeSymbol);
 
         assertThat(result.first.getAbsoluteName(), is("string!?"));
         assertThat(result.second, is(false));
@@ -297,8 +297,8 @@ public class TSPHPNameTransformerTest extends ATypeTest
     public void getTypeName_IntOrFloat_ReturnsNum() {
         IUnionTypeSymbol unionTypeSymbol = numType;
 
-        ITypeTransformer nameTransformer = createNameTransformer();
-        Pair<ITypeSymbol, Boolean> result = nameTransformer.getType(unionTypeSymbol);
+        ITypeTransformer typeTransformer = createTypeTransformer();
+        Pair<ITypeSymbol, Boolean> result = typeTransformer.getType(unionTypeSymbol);
 
         assertThat(result.first.getAbsoluteName(), is("num"));
         assertThat(result.second, is(false));
@@ -308,8 +308,8 @@ public class TSPHPNameTransformerTest extends ATypeTest
     public void getTypeName_AsInt_ReturnsAsInt() {
         IConvertibleTypeSymbol convertibleTypeSymbol = createConvertibleTypeSymbol(intType);
 
-        ITypeTransformer nameTransformer = createNameTransformer();
-        Pair<ITypeSymbol, Boolean> result = nameTransformer.getType(convertibleTypeSymbol);
+        ITypeTransformer typeTransformer = createTypeTransformer();
+        Pair<ITypeSymbol, Boolean> result = typeTransformer.getType(convertibleTypeSymbol);
 
         assertThat(result.first.getAbsoluteName(), is("{as int}"));
         assertThat(result.second, is(false));
@@ -320,8 +320,8 @@ public class TSPHPNameTransformerTest extends ATypeTest
         IUnionTypeSymbol unionTypeSymbol = createUnionTypeSymbol(falseType, trueType);
         IConvertibleTypeSymbol convertibleTypeSymbol = createConvertibleTypeSymbol(unionTypeSymbol);
 
-        ITypeTransformer nameTransformer = createNameTransformer();
-        Pair<ITypeSymbol, Boolean> result = nameTransformer.getType(convertibleTypeSymbol);
+        ITypeTransformer typeTransformer = createTypeTransformer();
+        Pair<ITypeSymbol, Boolean> result = typeTransformer.getType(convertibleTypeSymbol);
 
         assertThat(result.first.getAbsoluteName(), is("{as bool}"));
         assertThat(result.second, is(false));
@@ -333,8 +333,8 @@ public class TSPHPNameTransformerTest extends ATypeTest
         IConvertibleTypeSymbol convertibleTypeSymbol = createConvertibleTypeSymbol(unionTypeSymbol1);
         IUnionTypeSymbol unionTypeSymbol2 = createUnionTypeSymbol(convertibleTypeSymbol);
 
-        ITypeTransformer nameTransformer = createNameTransformer();
-        Pair<ITypeSymbol, Boolean> result = nameTransformer.getType(unionTypeSymbol2);
+        ITypeTransformer typeTransformer = createTypeTransformer();
+        Pair<ITypeSymbol, Boolean> result = typeTransformer.getType(unionTypeSymbol2);
 
         assertThat(result.first.getAbsoluteName(), is("{as bool}"));
         assertThat(result.second, is(false));
@@ -345,8 +345,8 @@ public class TSPHPNameTransformerTest extends ATypeTest
         IUnionTypeSymbol unionTypeSymbol = createUnionTypeSymbol(intType, floatType);
         IConvertibleTypeSymbol convertibleTypeSymbol = createConvertibleTypeSymbol(unionTypeSymbol);
 
-        ITypeTransformer nameTransformer = createNameTransformer();
-        Pair<ITypeSymbol, Boolean> result = nameTransformer.getType(convertibleTypeSymbol);
+        ITypeTransformer typeTransformer = createTypeTransformer();
+        Pair<ITypeSymbol, Boolean> result = typeTransformer.getType(convertibleTypeSymbol);
 
         assertThat(result.first.getAbsoluteName(), is("{as num}"));
         assertThat(result.second, is(false));
@@ -358,14 +358,14 @@ public class TSPHPNameTransformerTest extends ATypeTest
         IConvertibleTypeSymbol convertibleTypeSymbol = createConvertibleTypeSymbol(unionTypeSymbol);
         IIntersectionTypeSymbol intersectionTypeSymbol = createIntersectionTypeSymbol(convertibleTypeSymbol);
 
-        ITypeTransformer nameTransformer = createNameTransformer();
-        Pair<ITypeSymbol, Boolean> result = nameTransformer.getType(intersectionTypeSymbol);
+        ITypeTransformer typeTransformer = createTypeTransformer();
+        Pair<ITypeSymbol, Boolean> result = typeTransformer.getType(intersectionTypeSymbol);
 
         assertThat(result.first.getAbsoluteName(), is("{as num}"));
         assertThat(result.second, is(false));
     }
 
-    protected ITypeTransformer createNameTransformer() {
+    protected ITypeTransformer createTypeTransformer() {
         IUnionTypeSymbol unionTypeSymbol = (IUnionTypeSymbol) primitiveTypes.get(PrimitiveTypeNames.BOOL);
         ITypeSymbol tsphpBoolTypeSymbol = new TsphpUnionTypeSymbol("bool", unionTypeSymbol);
         unionTypeSymbol = (IUnionTypeSymbol) primitiveTypes.get(PrimitiveTypeNames.NUM);
