@@ -23,7 +23,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class TSPHPRuntimeCheckProviderGetTypeCheck2Test extends ATSPHPRuntimeCheckProviderTest
+public class TSPHPRuntimeCheckProviderGetTypeCheckTest extends ATSPHPRuntimeCheckProviderTest
 {
     @Test
     public void getTypeCheck_IntAndIsVariable_ReturnsCastToInt() {
