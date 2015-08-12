@@ -113,7 +113,7 @@ public class DtoCreator implements IDtoCreator
             Boolean wasWidened = pair.second;
             if (isCheckPossible && wasWidened && typeHintWasUsed) {
                 isCheckPossible = parameterCheckProvider.addParameterCheck(
-                        newName + "()", statements, bindings, parameter, i, parameterDto);
+                        newName + "()", statements, bindings, parameter, i);
             }
             parameterDtos.add(parameterDto);
         }

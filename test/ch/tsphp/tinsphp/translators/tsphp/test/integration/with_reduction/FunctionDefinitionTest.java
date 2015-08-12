@@ -261,31 +261,31 @@ public class FunctionDefinitionTest extends ATranslatorWithWideningTest
                 //TODO TINS-584 find least upper reference bound
                 //TINS-479 local vars with multiple lower ref to params
                 {
-                        "<?php function fooK($x, $y){ $a = 1; $a = $x + $y; return $a;}",
+                        "<?php function fooB($x, $y){ $a = 1; $a = $x + $y; return $a;}",
                         "namespace{\n"
                                 + "\n"
-                                + "    function mixed fooK0(array $x, array $y) {\n"
+                                + "    function mixed fooB0(array $x, array $y) {\n"
                                 + "        mixed $a;\n"
                                 + "        $a = 1;\n"
                                 + "        $a = $x + $y;\n"
                                 + "        return $a;\n"
                                 + "    }\n"
                                 + "\n"
-                                + "    function num fooK1(float $x, float $y) {\n"
+                                + "    function num fooB1(float $x, float $y) {\n"
                                 + "        num $a;\n"
                                 + "        $a = 1;\n"
                                 + "        $a = $x + $y;\n"
                                 + "        return $a;\n"
                                 + "    }\n"
                                 + "\n"
-                                + "    function int fooK2(int $x, int $y) {\n"
+                                + "    function int fooB2(int $x, int $y) {\n"
                                 + "        int $a;\n"
                                 + "        $a = 1;\n"
                                 + "        $a = $x + $y;\n"
                                 + "        return $a;\n"
                                 + "    }\n"
                                 + "\n"
-                                + "    function (int | T) fooK3<T>({as T} $x, {as T} $y) where [T <: num] {\n"
+                                + "    function (int | T) fooB3<T>({as T} $x, {as T} $y) where [T <: num] {\n"
                                 + "        (int | T) $a;\n"
                                 + "        $a = 1;\n"
                                 + "        $a = cast(oldSchoolAddition($x, $y), T);\n"
@@ -293,7 +293,34 @@ public class FunctionDefinitionTest extends ATranslatorWithWideningTest
                                 + "    }\n"
                                 + "\n"
                                 + "}"
-                }
+                },
+                //TODO TINS-413 remove falseType and trueType overloads
+                {
+                        "<?php function fooC($x){echo $x; return $x && true; }",
+                        "namespace{\n"
+                                + "\n"
+                                + "    function bool fooC0(({as bool} & {as string}) $x) {\n"
+                                + "        echo $x as string;\n"
+                                + "        return $x as bool && true;\n"
+                                + "    }\n"
+                                + "\n"
+                                + "    function bool fooC1(bool $x) {\n"
+                                + "        if (!($x === false)) {\n"
+                                + "            \\trigger_error('Argument 1 passed to fooC1() (parameter $x) must be a" +
+                                " value of type falseType.', \\E_USER_ERROR);\n"
+                                + "        }\n"
+                                + "        echo $x as string;\n"
+                                + "        return $x && true;\n"
+                                + "    }\n"
+                                + "\n"
+                                + "    function bool fooC2(string $x) {\n"
+                                + "        echo $x;\n"
+                                + "        return $x as bool && true;\n"
+                                + "    }\n"
+                                + "\n"
+                                + "}" +
+                                ""
+                },
         });
     }
 }

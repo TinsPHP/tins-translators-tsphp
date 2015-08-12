@@ -10,7 +10,6 @@ import ch.tsphp.common.ITSPHPAst;
 import ch.tsphp.common.symbols.ITypeSymbol;
 import ch.tsphp.tinsphp.common.inference.constraints.IBindingCollection;
 import ch.tsphp.tinsphp.common.inference.constraints.IVariable;
-import ch.tsphp.tinsphp.common.translation.dtos.ParameterDto;
 
 import java.util.Deque;
 
@@ -24,8 +23,7 @@ public interface IRuntimeCheckProvider
             Deque<String> statements,
             IBindingCollection bindings,
             IVariable parameter,
-            int parameterIndex,
-            ParameterDto parameterDto);
+            int parameterIndex);
 
     Object getTypeCheck(Deque<String> statements, ITSPHPAst argumentAst, Object argument, ITypeSymbol argumentType);
 }

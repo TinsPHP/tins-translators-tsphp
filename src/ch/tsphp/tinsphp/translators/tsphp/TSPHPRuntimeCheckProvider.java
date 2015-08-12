@@ -15,7 +15,6 @@ import ch.tsphp.tinsphp.common.symbols.IConvertibleTypeSymbol;
 import ch.tsphp.tinsphp.common.symbols.IIntersectionTypeSymbol;
 import ch.tsphp.tinsphp.common.symbols.IUnionTypeSymbol;
 import ch.tsphp.tinsphp.common.symbols.PrimitiveTypeNames;
-import ch.tsphp.tinsphp.common.translation.dtos.ParameterDto;
 import ch.tsphp.tinsphp.common.utils.Pair;
 import ch.tsphp.tinsphp.translators.tsphp.issues.IOutputIssueMessageProvider;
 
@@ -52,8 +51,7 @@ public class TSPHPRuntimeCheckProvider implements IRuntimeCheckProvider
             Deque<String> statements,
             IBindingCollection bindings,
             IVariable parameter,
-            int parameterIndex,
-            ParameterDto parameterDto) {
+            int parameterIndex) {
 
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("if (");
@@ -82,7 +80,7 @@ public class TSPHPRuntimeCheckProvider implements IRuntimeCheckProvider
             ITypeSymbol typeSymbol,
             List<String> types) {
         boolean ok = true;
-        if (typeSymbol instanceof IUnionTypeSymbol) {
+        if (typeSymbol instanceof IUnionTypeSymbol && typeSymbol != tsphpBoolTypeSymbol) {
             ok = appendParameterRuntimeCheck(stringBuilder, parameterId, (IUnionTypeSymbol) typeSymbol, types);
         } else if (typeSymbol instanceof IIntersectionTypeSymbol) {
             stringBuilder.append("(");
@@ -102,13 +100,13 @@ public class TSPHPRuntimeCheckProvider implements IRuntimeCheckProvider
         String typeCheckExpression;
         switch (typeName) {
             case PrimitiveTypeNames.FALSE_TYPE:
-                typeCheckExpression = "" + variableId + " !== false";
+                typeCheckExpression = "" + variableId + " === false";
                 break;
             case PrimitiveTypeNames.TRUE_TYPE:
-                typeCheckExpression = "" + variableId + " !== true";
+                typeCheckExpression = "" + variableId + " === true";
                 break;
             case PrimitiveTypeNames.NULL_TYPE:
-                typeCheckExpression = "" + variableId + " !== null";
+                typeCheckExpression = "" + variableId + " === null";
                 break;
             default:
                 typeCheckExpression = "" + variableId + " <: " + typeName;
@@ -143,9 +141,10 @@ public class TSPHPRuntimeCheckProvider implements IRuntimeCheckProvider
 
     private SortedMap<String, ITypeSymbol> copyTypeSymbols(Map<String, ITypeSymbol> typeSymbols) {
         SortedMap<String, ITypeSymbol> copiedTypeSymbols = new TreeMap<>(typeSymbols);
-        boolean containsFalseType = copiedTypeSymbols.remove(PrimitiveTypeNames.FALSE_TYPE) != null;
-        boolean containsTrueType = copiedTypeSymbols.remove(PrimitiveTypeNames.TRUE_TYPE) != null;
-        if (containsFalseType || containsTrueType) {
+        if (copiedTypeSymbols.containsKey(PrimitiveTypeNames.FALSE_TYPE)
+                && copiedTypeSymbols.containsKey(PrimitiveTypeNames.TRUE_TYPE)) {
+            copiedTypeSymbols.remove(PrimitiveTypeNames.FALSE_TYPE);
+            copiedTypeSymbols.remove(PrimitiveTypeNames.TRUE_TYPE);
             copiedTypeSymbols.put(tsphpBoolTypeSymbol.getAbsoluteName(), tsphpBoolTypeSymbol);
         }
         return copiedTypeSymbols;
@@ -205,7 +204,7 @@ public class TSPHPRuntimeCheckProvider implements IRuntimeCheckProvider
                 } else {
                     //convertible types are different, see TINS-602 runtime check for convertible types
                     String targetTypeName = typeName.substring(4, typeName.length() - 1);
-                    newArgument = firstExpression + " as " + targetTypeName;
+                    newArgument = getAsOperation(firstExpression, targetTypeName);
                 }
             } else {
                 stringBuilder.insert(0, '(');
@@ -220,6 +219,10 @@ public class TSPHPRuntimeCheckProvider implements IRuntimeCheckProvider
             statements.add("mixed " + tempVariable + ";");
         }
         return newArgument;
+    }
+
+    private String getAsOperation(String expression, String targetTypeName) {
+        return expression + " as " + targetTypeName;
     }
 
     private boolean appendTypeCheck(
@@ -276,7 +279,7 @@ public class TSPHPRuntimeCheckProvider implements IRuntimeCheckProvider
             targetTypeName = convertibleTypeSymbol.getTypeVariable();
         }
         String typeName = "{as " + targetTypeName + "}";
-        String typeCast = firstExpression + " as " + targetTypeName;
+        String typeCast = getAsOperation(firstExpression, targetTypeName);
         appendTypeCheck(stringBuilder, firstExpression, suffixCheck, types, typeName, typeCast);
     }
 

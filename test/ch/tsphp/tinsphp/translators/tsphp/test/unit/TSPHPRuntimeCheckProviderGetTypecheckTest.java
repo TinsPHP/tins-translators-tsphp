@@ -7,18 +7,12 @@
 package ch.tsphp.tinsphp.translators.tsphp.test.unit;
 
 import ch.tsphp.common.ITSPHPAst;
-import ch.tsphp.common.symbols.ITypeSymbol;
 import ch.tsphp.tinsphp.common.gen.TokenTypes;
 import ch.tsphp.tinsphp.common.symbols.IUnionTypeSymbol;
 import ch.tsphp.tinsphp.translators.tsphp.IRuntimeCheckProvider;
 import ch.tsphp.tinsphp.translators.tsphp.ITempVariableHelper;
-import ch.tsphp.tinsphp.translators.tsphp.ITypeTransformer;
-import ch.tsphp.tinsphp.translators.tsphp.TSPHPRuntimeCheckProvider;
-import ch.tsphp.tinsphp.translators.tsphp.issues.IOutputIssueMessageProvider;
-import ch.tsphp.tinsphp.translators.tsphp.test.unit.testutils.ATypeTest;
+import ch.tsphp.tinsphp.translators.tsphp.test.unit.testutils.ATSPHPRuntimeCheckProviderTest;
 import org.junit.Test;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 
 import java.util.ArrayDeque;
 
@@ -26,13 +20,10 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyList;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class TSPHPRuntimeCheckProviderTest extends ATypeTest
+public class TSPHPRuntimeCheckProviderGetTypeCheckTest extends ATSPHPRuntimeCheckProviderTest
 {
     @Test
     public void getTypeCheck_IntAndIsVariable_ReturnsCastToInt() {
@@ -345,71 +336,4 @@ public class TSPHPRuntimeCheckProviderTest extends ATypeTest
         assertThat(statements, contains("mixed $t;"));
     }
 
-    private ITempVariableHelper createTempVariableHelperIsVariable() {
-        ITempVariableHelper tempVariableHelper = mock(ITempVariableHelper.class);
-        when(tempVariableHelper.getTempVariableNameIfNotVariable(any(ITSPHPAst.class))).then(new Answer<Object>()
-        {
-            @Override
-            public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
-                return ((ITSPHPAst) invocationOnMock.getArguments()[0]).getText();
-            }
-        });
-        return tempVariableHelper;
-    }
-
-    private ITempVariableHelper createTempVariableHelperIsNotVariable(final String tempVariableName) {
-        ITempVariableHelper tempVariableHelper = mock(ITempVariableHelper.class);
-        when(tempVariableHelper.getTempVariableNameIfNotVariable(any(ITSPHPAst.class))).then(new Answer<Object>()
-        {
-            @Override
-            public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
-                return tempVariableName;
-            }
-        });
-        return tempVariableHelper;
-    }
-
-    private IRuntimeCheckProvider createRuntimeCheckProvider(ITempVariableHelper tempVariableHelper) {
-        ITypeTransformer typeTransformer = mock(ITypeTransformer.class);
-        when(typeTransformer.getType(any(ITypeSymbol.class))).then(new Answer<Object>()
-        {
-            @Override
-            public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
-                return invocationOnMock.getArguments()[0];
-            }
-        });
-        ITypeSymbol tsphpBoolTypeSymbol = mock(ITypeSymbol.class);
-        when(tsphpBoolTypeSymbol.getAbsoluteName()).thenReturn("bool");
-        IOutputIssueMessageProvider messageProvider = mock(IOutputIssueMessageProvider.class);
-        when(messageProvider.getValueCheckError(anyString(), anyString())).then(new Answer<Object>()
-        {
-            @Override
-            public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
-                Object[] args = invocationOnMock.getArguments();
-                return "The variable " + args[0] + " must hold the value " + args[1] + ".";
-            }
-        });
-        when(messageProvider.getTypeCheckError(anyString(), anyList())).then(new Answer<Object>()
-        {
-            @Override
-            public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
-                Object[] args = invocationOnMock.getArguments();
-                return "The variable " + args[0] + " must hold a value of type " + args[1] + ".";
-            }
-        });
-
-        return createRuntimeCheckProvider(
-                typeTransformer,
-                tempVariableHelper,
-                messageProvider,
-                tsphpBoolTypeSymbol);
-    }
-
-    protected IRuntimeCheckProvider createRuntimeCheckProvider(
-            ITypeTransformer typeTransformer,
-            ITempVariableHelper tempVariableHelper,
-            IOutputIssueMessageProvider messageProvider,
-            ITypeSymbol tsphpBoolTypeSymbol) {
-        return new TSPHPRuntimeCheckProvider(typeTransformer, tempVariableHelper, messageProvider, tsphpBoolTypeSymbol);
-    }
 }

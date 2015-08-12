@@ -10,7 +10,6 @@ import ch.tsphp.common.ITSPHPAst;
 import ch.tsphp.common.symbols.ITypeSymbol;
 import ch.tsphp.tinsphp.common.inference.constraints.IBindingCollection;
 import ch.tsphp.tinsphp.common.inference.constraints.IVariable;
-import ch.tsphp.tinsphp.common.translation.dtos.ParameterDto;
 
 import java.util.Deque;
 
@@ -23,8 +22,7 @@ public class MetaRuntimeCheckProvider implements IRuntimeCheckProvider
             Deque<String> statements,
             IBindingCollection bindings,
             IVariable parameter,
-            int parameterIndex,
-            ParameterDto parameterDto) {
+            int parameterIndex) {
         return false;
     }
 
