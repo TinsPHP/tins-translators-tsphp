@@ -39,7 +39,6 @@ public class FunctionDefinitionNeedWideningTest extends ATranslatorWithWideningT
     @Parameterized.Parameters
     public static Collection<Object[]> testStrings() {
         return Arrays.asList(new Object[][]{
-                //TODO TINS-602 runtime check for convertible types
                 {
                         "<?php function foo($x){ if(true){return $x + 1;} return $x + [1];} ?>",
                         "namespace{\n"
@@ -131,6 +130,22 @@ public class FunctionDefinitionNeedWideningTest extends ATranslatorWithWideningT
                                 + "        try {\n"
                                 + "        } catch (Exception $x3_0) {\n"
                                 + "            $x = $x3_0;\n"
+                                + "        }\n"
+                                + "        return $x;\n"
+                                + "    }\n"
+                                + "\n"
+                                + "}"
+                },
+                //see TINS-602 runtime check for convertible types
+                {
+                        "<?php function foo($x){echo $x; try{}catch(Exception \n$x){} return $x;}",
+                        "namespace{\n"
+                                + "\n"
+                                + "    function mixed foo(mixed $x) {\n"
+                                + "        echo $x as string;\n"
+                                + "        try {\n"
+                                + "        } catch (Exception $x2_0) {\n"
+                                + "            $x = $x2_0;\n"
                                 + "        }\n"
                                 + "        return $x;\n"
                                 + "    }\n"

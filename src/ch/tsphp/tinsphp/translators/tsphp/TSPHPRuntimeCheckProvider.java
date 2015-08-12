@@ -174,7 +174,6 @@ public class TSPHPRuntimeCheckProvider implements IRuntimeCheckProvider
         return ok;
     }
 
-
     @Override
     public Object getTypeCheck(
             Deque<String> statements, ITSPHPAst expressionAst, Object expressionTemplate, ITypeSymbol typeSymbol) {
@@ -201,7 +200,13 @@ public class TSPHPRuntimeCheckProvider implements IRuntimeCheckProvider
                     firstExpression = expressionTemplate.toString();
                     usesTempVariable = false;
                 }
-                newArgument = getTypeCast(typeName, firstExpression, tempVariable);
+                if (!typeName.startsWith("{as")) {
+                    newArgument = getTypeCast(typeName, firstExpression, tempVariable);
+                } else {
+                    //convertible types are different, see TINS-602 runtime check for convertible types
+                    String targetTypeName = typeName.substring(4, typeName.length() - 1);
+                    newArgument = firstExpression + " as " + targetTypeName;
+                }
             } else {
                 stringBuilder.insert(0, '(');
                 String errorMessage = messageProvider.getTypeCheckError(tempVariable, types);
@@ -242,16 +247,37 @@ public class TSPHPRuntimeCheckProvider implements IRuntimeCheckProvider
                     (IIntersectionTypeSymbol) typeSymbol,
                     suffixCheck,
                     types);
-            //TODO TINS-602 runtime check for convertible types
-//        } else if (typeSymbol instanceof IConvertibleTypeSymbol) {
-//            String typeName = typeSymbol.getAbsoluteName();
-//            appendTypeCheck(stringBuilder, firstExpression, tempVariable, suffixCheck, types, typeName);
-//        } else {
+        } else if (typeSymbol instanceof IConvertibleTypeSymbol) {
+            appendConversion(stringBuilder, firstExpression, suffixCheck, (IConvertibleTypeSymbol) typeSymbol, types);
         } else {
             String typeName = typeSymbol.getAbsoluteName();
-            appendTypeCheck(stringBuilder, firstExpression, tempVariable, suffixCheck, types, typeName);
+            String typeCast = getTypeCast(typeName, tempVariable, tempVariable);
+            appendTypeCheck(stringBuilder, firstExpression, suffixCheck, types, typeName, typeCast);
         }
         return ok;
+    }
+
+    private void appendConversion(
+            StringBuilder stringBuilder,
+            String firstExpression,
+            String suffixCheck,
+            IConvertibleTypeSymbol convertibleTypeSymbol,
+            List<String> types) {
+        String targetTypeName;
+        if (convertibleTypeSymbol.isFixed()) {
+            if (convertibleTypeSymbol.hasUpperTypeBounds()) {
+                IIntersectionTypeSymbol upperTypeBounds = convertibleTypeSymbol.getUpperTypeBounds();
+                targetTypeName = typeTransformer.getType(upperTypeBounds).first.getAbsoluteName();
+            } else {
+                IUnionTypeSymbol lowerTypeBounds = convertibleTypeSymbol.getLowerTypeBounds();
+                targetTypeName = typeTransformer.getType(lowerTypeBounds).first.getAbsoluteName();
+            }
+        } else {
+            targetTypeName = convertibleTypeSymbol.getTypeVariable();
+        }
+        String typeName = "{as " + targetTypeName + "}";
+        String typeCast = firstExpression + " as " + targetTypeName;
+        appendTypeCheck(stringBuilder, firstExpression, suffixCheck, types, typeName, typeCast);
     }
 
     private boolean appendTypeCheck(StringBuilder stringBuilder, String firstExpression, String tempVariable,
@@ -281,26 +307,10 @@ public class TSPHPRuntimeCheckProvider implements IRuntimeCheckProvider
     private void appendTypeCheck(
             StringBuilder stringBuilder,
             String firstExpression,
-            String tempVariable,
             String suffixCheck,
             List<String> types,
-            String typeName) {
-        String typeCast;
-        switch (typeName) {
-            case PrimitiveTypeNames.FALSE_TYPE:
-                typeCast = "false";
-                break;
-            case PrimitiveTypeNames.TRUE_TYPE:
-                typeCast = "true";
-                break;
-            case PrimitiveTypeNames.NULL_TYPE:
-                typeCast = "null";
-                break;
-            default:
-                typeCast = getTypeCast(typeName, tempVariable, tempVariable);
-                break;
-        }
-
+            String typeName,
+            String typeCast) {
         stringBuilder.append(getTypeCheckExpression(typeName, firstExpression)).append(suffixCheck)
                 .append(" ? ").append(typeCast).append(" : ");
         types.add(typeName);
@@ -348,8 +358,9 @@ public class TSPHPRuntimeCheckProvider implements IRuntimeCheckProvider
 
         if (hadNoContainerTypes) {
             Pair<ITypeSymbol, Boolean> pair = typeTransformer.getType(intersectionTypeSymbol);
-            appendTypeCheck(
-                    stringBuilder, firstExpression, tempVariable, suffixCheck, types, pair.first.getAbsoluteName());
+            String typeName = pair.first.getAbsoluteName();
+            String typeCast = getTypeCast(typeName, firstExpression, tempVariable);
+            appendTypeCheck(stringBuilder, firstExpression, suffixCheck, types, typeName, typeCast);
         } else {
             //TODO TINS-604 runtime check with container types
         }
