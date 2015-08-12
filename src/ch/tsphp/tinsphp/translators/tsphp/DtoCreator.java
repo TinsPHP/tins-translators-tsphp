@@ -25,7 +25,6 @@ import ch.tsphp.tinsphp.common.utils.Pair;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.HashSet;
@@ -69,8 +68,10 @@ public class DtoCreator implements IDtoCreator
             sortedOverloads.put(overload.getSignature(), overload);
         }
 
+        Set<String> additionalNames = new HashSet<>();
         for (IFunctionType overload : sortedOverloads.values()) {
-            Pair<OverloadDto, Integer> pair = createOverloadDto(name, count, overload, methodSymbol, numberOfOverloads);
+            Pair<OverloadDto, Integer> pair = createOverloadDto(
+                    name, count, overload, methodSymbol, numberOfOverloads, additionalNames);
             count = pair.second;
             methodDtos.add(pair.first);
         }
@@ -79,7 +80,14 @@ public class DtoCreator implements IDtoCreator
     }
 
     private Pair<OverloadDto, Integer> createOverloadDto(
-            String name, int count, IFunctionType overload, IMethodSymbol methodSymbol, int numberOfOverloads) {
+            String name,
+            int count,
+            IFunctionType overload,
+            IMethodSymbol methodSymbol,
+            int numberOfOverloads,
+            Set<String> additionalNames) {
+
+
         Map<String, List<ISymbol>> symbols = methodSymbol.getDefinitionScope().getSymbols();
         IBindingCollection bindings = overload.getBindingCollection();
         List<IVariable> parameters = overload.getParameters();
@@ -88,12 +96,12 @@ public class DtoCreator implements IDtoCreator
         String newName = name;
         int numbering = count;
         if (numberOfOverloads != 1) {
-            while (symbols.containsKey(name + numbering)) {
+            while (symbols.containsKey(name + numbering) || additionalNames.contains(name + numbering)) {
                 ++numbering;
             }
             newName = name + numbering;
             overload.addSuffix(TSPHPTranslator.TRANSLATOR_ID, String.valueOf(numbering));
-            symbols.put(newName, Arrays.asList((ISymbol) methodSymbol));
+            additionalNames.add(newName);
         }
 
         Set<String> typeVariablesAdded = new HashSet<>(numberOfParameters + 1);
