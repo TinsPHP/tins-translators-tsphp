@@ -294,7 +294,6 @@ public class FunctionDefinitionTest extends ATranslatorWithWideningTest
                                 + "\n"
                                 + "}"
                 },
-                //TODO TINS-413 remove falseType and trueType overloads
                 {
                         "<?php function fooC($x){echo $x; return $x && true; }",
                         "namespace{\n"
@@ -304,16 +303,7 @@ public class FunctionDefinitionTest extends ATranslatorWithWideningTest
                                 + "        return $x as bool && true;\n"
                                 + "    }\n"
                                 + "\n"
-                                + "    function bool fooC1(bool $x) {\n"
-                                + "        if (!($x === false)) {\n"
-                                + "            \\trigger_error('Argument 1 passed to fooC1() (parameter $x) must be a" +
-                                " value of type falseType.', \\E_USER_ERROR);\n"
-                                + "        }\n"
-                                + "        echo $x as string;\n"
-                                + "        return $x && true;\n"
-                                + "    }\n"
-                                + "\n"
-                                + "    function bool fooC2(string $x) {\n"
+                                + "    function bool fooC1(string $x) {\n"
                                 + "        echo $x;\n"
                                 + "        return $x as bool && true;\n"
                                 + "    }\n"
