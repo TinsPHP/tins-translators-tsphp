@@ -36,9 +36,9 @@ import ch.tsphp.tinsphp.translators.tsphp.DtoCreator;
 import ch.tsphp.tinsphp.translators.tsphp.IOperatorHelper;
 import ch.tsphp.tinsphp.translators.tsphp.IRuntimeCheckProvider;
 import ch.tsphp.tinsphp.translators.tsphp.ITypeTransformer;
-import ch.tsphp.tinsphp.translators.tsphp.MetaOperatorHelper;
-import ch.tsphp.tinsphp.translators.tsphp.MetaRuntimeCheckProvider;
-import ch.tsphp.tinsphp.translators.tsphp.MetaTypeTransformer;
+import ch.tsphp.tinsphp.translators.tsphp.PhpPlusOperatorHelper;
+import ch.tsphp.tinsphp.translators.tsphp.PhpPlusRuntimeCheckProvider;
+import ch.tsphp.tinsphp.translators.tsphp.PhpPlusTypeTransformer;
 import ch.tsphp.tinsphp.translators.tsphp.PrecedenceHelper;
 import ch.tsphp.tinsphp.translators.tsphp.TempVariableHelper;
 import ch.tsphp.tinsphp.translators.tsphp.TranslatorController;
@@ -149,11 +149,11 @@ public abstract class ATest implements IIssueLogger
 
     protected IRuntimeCheckProvider createRuntimeCheckProvider(
             ITypeTransformer typeTransformer, TempVariableHelper tempVariableHelper) {
-        return new MetaRuntimeCheckProvider();
+        return new PhpPlusRuntimeCheckProvider();
     }
 
     protected ITypeTransformer createTypeTransformer() {
-        return new MetaTypeTransformer();
+        return new PhpPlusTypeTransformer();
     }
 
     protected ICoreInitialiser createCoreInitialiser(IAstHelper astHelper, ISymbolsInitialiser symbolsInitialiser) {
@@ -162,7 +162,7 @@ public abstract class ATest implements IIssueLogger
 
     protected IOperatorHelper createOperatorHelper(
             IRuntimeCheckProvider runtimeCheckProvider, ITypeTransformer typeTransformer) {
-        return new MetaOperatorHelper();
+        return new PhpPlusOperatorHelper();
     }
 
     protected void checkNoIssuesDuringParsing() {

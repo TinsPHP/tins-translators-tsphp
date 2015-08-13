@@ -17,7 +17,7 @@ import java.util.TreeSet;
 
 import static ch.tsphp.tinsphp.common.utils.Pair.pair;
 
-public class MetaTypeTransformer implements ITypeTransformer
+public class PhpPlusTypeTransformer implements ITypeTransformer
 {
 
     @Override

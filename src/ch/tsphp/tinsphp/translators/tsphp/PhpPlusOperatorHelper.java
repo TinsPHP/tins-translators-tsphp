@@ -11,7 +11,7 @@ import ch.tsphp.tinsphp.common.inference.constraints.OverloadApplicationDto;
 import ch.tsphp.tinsphp.common.translation.dtos.FunctionApplicationDto;
 import ch.tsphp.tinsphp.common.translation.dtos.TranslationScopeDto;
 
-public class MetaOperatorHelper implements IOperatorHelper
+public class PhpPlusOperatorHelper implements IOperatorHelper
 {
 
     @Override

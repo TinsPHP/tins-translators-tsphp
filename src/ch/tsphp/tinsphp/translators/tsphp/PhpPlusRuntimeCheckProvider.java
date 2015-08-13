@@ -13,7 +13,7 @@ import ch.tsphp.tinsphp.common.inference.constraints.IVariable;
 
 import java.util.Deque;
 
-public class MetaRuntimeCheckProvider implements IRuntimeCheckProvider
+public class PhpPlusRuntimeCheckProvider implements IRuntimeCheckProvider
 {
 
     @Override
