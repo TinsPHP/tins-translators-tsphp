@@ -264,7 +264,7 @@ public class TSPHPOperatorHelper implements IOperatorHelper
             }
         } else {
             //if overload is parametric polymorphic then we need to cast to the parametric type
-            functionApplicationDto.returnRuntimeCheck = "cast(%returnRuntimeCheck%, " + lhsTypeVariable + ")";
+            functionApplicationDto.returnRuntimeCheck = "cast<" + lhsTypeVariable + ">(%returnRuntimeCheck%)";
         }
     }
 

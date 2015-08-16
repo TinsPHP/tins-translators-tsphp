@@ -40,7 +40,7 @@ public class TSPHPRuntimeCheckProviderGetTypeCheckTest extends ATSPHPRuntimeChec
         IRuntimeCheckProvider runtimeCheckProvider = createRuntimeCheckProvider(tempVariableHelper);
         Object result = runtimeCheckProvider.getTypeCheck(translationScopeDto, argumentAst, expression, intType);
 
-        assertThat(result.toString(), is("cast($x, int)"));
+        assertThat(result.toString(), is("cast<int>($x)"));
         assertThat(statements, empty());
     }
 
@@ -57,7 +57,7 @@ public class TSPHPRuntimeCheckProviderGetTypeCheckTest extends ATSPHPRuntimeChec
         IRuntimeCheckProvider runtimeCheckProvider = createRuntimeCheckProvider(tempVariableHelper);
         Object result = runtimeCheckProvider.getTypeCheck(translationScopeDto, argumentAst, expression, intType);
 
-        assertThat(result.toString(), is("cast(" + expression + ", int)"));
+        assertThat(result.toString(), is("cast<int>(" + expression + ")"));
         assertThat(statements, empty());
     }
 
@@ -74,7 +74,7 @@ public class TSPHPRuntimeCheckProviderGetTypeCheckTest extends ATSPHPRuntimeChec
         IRuntimeCheckProvider runtimeCheckProvider = createRuntimeCheckProvider(tempVariableHelper);
         Object result = runtimeCheckProvider.getTypeCheck(translationScopeDto, argumentAst, expression, floatType);
 
-        assertThat(result.toString(), is("cast($x, float)"));
+        assertThat(result.toString(), is("cast<float>($x)"));
         assertThat(statements, empty());
     }
 
@@ -91,7 +91,7 @@ public class TSPHPRuntimeCheckProviderGetTypeCheckTest extends ATSPHPRuntimeChec
         IRuntimeCheckProvider runtimeCheckProvider = createRuntimeCheckProvider(tempVariableHelper);
         Object result = runtimeCheckProvider.getTypeCheck(translationScopeDto, argumentAst, expression, floatType);
 
-        assertThat(result.toString(), is("cast(" + expression + ", float)"));
+        assertThat(result.toString(), is("cast<float>(" + expression + ")"));
         assertThat(statements, empty());
     }
 
@@ -109,7 +109,7 @@ public class TSPHPRuntimeCheckProviderGetTypeCheckTest extends ATSPHPRuntimeChec
         Object result = runtimeCheckProvider.getTypeCheck(translationScopeDto, argumentAst, expression,
                 stringType);
 
-        assertThat(result.toString(), is("cast($x, string)"));
+        assertThat(result.toString(), is("cast<string>($x)"));
         assertThat(statements, empty());
     }
 
@@ -127,7 +127,7 @@ public class TSPHPRuntimeCheckProviderGetTypeCheckTest extends ATSPHPRuntimeChec
         Object result = runtimeCheckProvider.getTypeCheck(translationScopeDto, argumentAst, expression,
                 stringType);
 
-        assertThat(result.toString(), is("cast(" + expression + ", string)"));
+        assertThat(result.toString(), is("cast<string>(" + expression + ")"));
         assertThat(statements, empty());
     }
 
@@ -252,7 +252,7 @@ public class TSPHPRuntimeCheckProviderGetTypeCheckTest extends ATSPHPRuntimeChec
         IRuntimeCheckProvider runtimeCheckProvider = createRuntimeCheckProvider(tempVariableHelper);
         Object result = runtimeCheckProvider.getTypeCheck(translationScopeDto, argumentAst, expression, boolType);
 
-        assertThat(result.toString(), is("cast($x, bool)"));
+        assertThat(result.toString(), is("cast<bool>($x)"));
         assertThat(statements, empty());
     }
 
@@ -269,7 +269,7 @@ public class TSPHPRuntimeCheckProviderGetTypeCheckTest extends ATSPHPRuntimeChec
         IRuntimeCheckProvider runtimeCheckProvider = createRuntimeCheckProvider(tempVariableHelper);
         Object result = runtimeCheckProvider.getTypeCheck(translationScopeDto, argumentAst, expression, boolType);
 
-        assertThat(result.toString(), is("cast(" + expression + ", bool)"));
+        assertThat(result.toString(), is("cast<bool>(" + expression + ")"));
         assertThat(statements, empty());
     }
 
@@ -286,7 +286,7 @@ public class TSPHPRuntimeCheckProviderGetTypeCheckTest extends ATSPHPRuntimeChec
         IRuntimeCheckProvider runtimeCheckProvider = createRuntimeCheckProvider(tempVariableHelper);
         Object result = runtimeCheckProvider.getTypeCheck(translationScopeDto, argumentAst, expression, numType);
 
-        assertThat(result.toString(), is("($x <: float ? cast($x, float) : $x <: int ? cast($x, int) : "
+        assertThat(result.toString(), is("($x <: float ? cast<float>($x) : $x <: int ? cast<int>($x) : "
                 + "\\trigger_error('The variable $x must hold a value of type [float, int].', \\E_USER_ERROR))"));
         assertThat(statements, empty());
     }
@@ -304,7 +304,7 @@ public class TSPHPRuntimeCheckProviderGetTypeCheckTest extends ATSPHPRuntimeChec
         IRuntimeCheckProvider runtimeCheckProvider = createRuntimeCheckProvider(tempVariableHelper);
         Object result = runtimeCheckProvider.getTypeCheck(translationScopeDto, argumentAst, expression, numType);
 
-        assertThat(result.toString(), is("(($t = ($x + 1)) <: float ? cast($t, float) : $t <: int ? cast($t, int) : "
+        assertThat(result.toString(), is("(($t = ($x + 1)) <: float ? cast<float>($t) : $t <: int ? cast<int>($t) : "
                 + "\\trigger_error('The variable $t must hold a value of type [float, int].', \\E_USER_ERROR))"));
         assertThat(statements, contains("mixed $t;"));
     }
@@ -326,8 +326,8 @@ public class TSPHPRuntimeCheckProviderGetTypeCheckTest extends ATSPHPRuntimeChec
         Object result = runtimeCheckProvider.getTypeCheck(translationScopeDto, argumentAst, expression,
                 numOrArray);
 
-        assertThat(result.toString(), is("($x <: array ? cast($x, array) : $x <: float ? cast($x, float) : "
-                + "$x <: int ? cast($x, int) : \\trigger_error('The variable $x must hold a value of type "
+        assertThat(result.toString(), is("($x <: array ? cast<array>($x) : $x <: float ? cast<float>($x) : "
+                + "$x <: int ? cast<int>($x) : \\trigger_error('The variable $x must hold a value of type "
                 + "[array, float, int].', \\E_USER_ERROR))"));
         assertThat(statements, empty());
     }
@@ -349,8 +349,8 @@ public class TSPHPRuntimeCheckProviderGetTypeCheckTest extends ATSPHPRuntimeChec
         Object result = runtimeCheckProvider.getTypeCheck(translationScopeDto, argumentAst, expression,
                 numOrArray);
 
-        assertThat(result.toString(), is("(($t = ($x + 1)) <: array ? cast($t, array) : "
-                + "$t <: float ? cast($t, float) : $t <: int ? cast($t, int) : "
+        assertThat(result.toString(), is("(($t = ($x + 1)) <: array ? cast<array>($t) : "
+                + "$t <: float ? cast<float>($t) : $t <: int ? cast<int>($t) : "
                 + "\\trigger_error('The variable $t must hold a value of type [array, float, int].', " +
                 "\\E_USER_ERROR))"));
         assertThat(statements, contains("mixed $t;"));

@@ -190,11 +190,11 @@ public class MigrationFunctionTest extends ATranslatorTest
         return Arrays.asList(new String[][]{
                 {
                         "<?php $a = 'a' " + op + " 1.2;",
-                        "namespace{\n    float $a;\n    $a = cast(" + oldSchool + "('a', 1.2), float);\n}"
+                        "namespace{\n    float $a;\n    $a = cast<float>(" + oldSchool + "('a', 1.2));\n}"
                 },
                 {
                         "<?php $a = 1.2 " + op + " true;",
-                        "namespace{\n    float $a;\n    $a = cast(" + oldSchool + "(1.2, true), float);\n}"
+                        "namespace{\n    float $a;\n    $a = cast<float>(" + oldSchool + "(1.2, true));\n}"
                 },
                 {
                         "<?php $a = 'a' " + op + " 1;",
@@ -210,7 +210,7 @@ public class MigrationFunctionTest extends ATranslatorTest
                 },
                 {
                         "<?php $a = true " + op + " false;",
-                        "namespace{\n    int $a;\n    $a = cast(" + oldSchool + "(true, false), int);\n}"
+                        "namespace{\n    int $a;\n    $a = cast<int>(" + oldSchool + "(true, false));\n}"
                 },
                 //will use the overload float x {as num} but since arguments are float x int it should use +
                 {"<?php $a = 1.2 " + op + " 1;", "namespace{\n    float $a;\n    $a = 1.2 " + op + " 1;\n}"},
@@ -226,7 +226,7 @@ public class MigrationFunctionTest extends ATranslatorTest
                                 + "    function int foo1(array $x_0) {\n"
                                 + "        (array | int) $x = $x_0;\n"
                                 + "        $x = 1;\n"
-                                + "        return cast(" + oldSchool + "($x, 1), int);\n"
+                                + "        return cast<int>(" + oldSchool + "($x, 1));\n"
                                 + "    }\n"
                                 + "\n"
                                 + "}"
@@ -238,7 +238,7 @@ public class MigrationFunctionTest extends ATranslatorTest
                                 + "    function float foo2(array $x_0) {\n"
                                 + "        (array | float) $x = $x_0;\n"
                                 + "        $x = 1.5;\n"
-                                + "        return cast(" + oldSchool + "(1.2, $x), float);\n"
+                                + "        return cast<float>(" + oldSchool + "(1.2, $x));\n"
                                 + "    }\n"
                                 + "\n"
                                 + "}"
@@ -250,7 +250,7 @@ public class MigrationFunctionTest extends ATranslatorTest
                                 + "    function float foo3(array $x_0) {\n"
                                 + "        (array | float) $x = $x_0;\n"
                                 + "        $x = 1.5;\n"
-                                + "        return cast(" + oldSchool + "(1.2, $x), float) " + op + " 1;\n"
+                                + "        return cast<float>(" + oldSchool + "(1.2, $x)) " + op + " 1;\n"
                                 + "    }\n"
                                 + "\n"
                                 + "}"
@@ -274,7 +274,7 @@ public class MigrationFunctionTest extends ATranslatorTest
                                 + "    function float foo5(array $x_0) {\n"
                                 + "        (array | float) $x = $x_0;\n"
                                 + "        $x = 1.2;\n"
-                                + "        return cast(" + oldSchool + "($x, '1'), float);\n"
+                                + "        return cast<float>(" + oldSchool + "($x, '1'));\n"
                                 + "    }\n"
                                 + "\n"
                                 + "}"
@@ -296,7 +296,7 @@ public class MigrationFunctionTest extends ATranslatorTest
                                 + "    }\n"
                                 + "\n"
                                 + "    function T foo63<T>({as T} $x, {as T} $y) where [T <: (float | int)] {\n"
-                                + "        return cast(oldSchoolAddition($x, $y), T);\n"
+                                + "        return cast<T>(oldSchoolAddition($x, $y));\n"
                                 + "    }\n"
                                 + "\n"
                                 + "}"

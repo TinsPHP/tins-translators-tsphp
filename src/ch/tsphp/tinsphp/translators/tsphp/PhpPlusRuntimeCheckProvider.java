@@ -25,6 +25,6 @@ public class PhpPlusRuntimeCheckProvider implements IRuntimeCheckProvider
     @Override
     public Object getTypeCheck(
             TranslationScopeDto translationScopeDto, ITSPHPAst argumentAst, Object argument, ITypeSymbol argumentType) {
-        return "cast(" + argument.toString() + ", " + argumentType.getAbsoluteName() + ")";
+        return "cast<" + argumentType.getAbsoluteName() + ">(" + argument.toString() + ")";
     }
 }

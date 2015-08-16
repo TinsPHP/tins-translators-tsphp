@@ -107,7 +107,7 @@ private StringTemplate getFunctionApplication(
     if (dto != null) {
         stringTemplate = %functionCall(identifier={dto.name}, typeParams={dto.typeParameters}, arguments={dto.arguments});
         if (dto.returnRuntimeCheck != null) {
-            stringTemplate = new StringTemplate(templateLib, dto.returnRuntimeCheck.replace("\%returnRuntimeCheck\%", stringTemplate.toString()));
+            stringTemplate = %list(statements={dto.returnRuntimeCheck.replace("\%returnRuntimeCheck\%", stringTemplate.toString())});
         }
     } else {
         stringTemplate = getErrorMessage(functionCall, identifier, errorMessageCaller);
@@ -131,8 +131,7 @@ private StringTemplate getOperatorOrFunctionApplication(
         } else {
             stringTemplate = getOperatorApplication(dto, arguments, argumentNames, operatorFunction, operator, needParentheses);
             if (dto.returnRuntimeCheck != null) {
-                stringTemplate = new StringTemplate(
-                    templateLib, dto.returnRuntimeCheck.replace("\%returnRuntimeCheck\%", stringTemplate.getTemplate()));
+                stringTemplate = %list(statements={dto.returnRuntimeCheck.replace("\%returnRuntimeCheck\%", stringTemplate.toString())});
             }
         }
     } else {

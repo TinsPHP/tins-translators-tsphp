@@ -345,7 +345,7 @@ public class TSPHPRuntimeCheckProvider implements IRuntimeCheckProvider
                 value = "null";
                 break;
             default:
-                typeCast = "cast(" + firstExpression + ", " + typeName + ")";
+                typeCast = "cast<" + typeName + ">(" + firstExpression + ")";
         }
         if (typeCast == null) {
             typeCast = "(" + firstExpression + " === " + value + " ? " + value + " : \\trigger_error('"

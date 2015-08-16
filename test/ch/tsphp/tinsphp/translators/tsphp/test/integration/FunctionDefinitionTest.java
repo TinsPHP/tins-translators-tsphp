@@ -346,9 +346,9 @@ public class FunctionDefinitionTest extends ATranslatorTest
                                 + "\n"
                                 + "    function (array | int | string) foo((array | {as (float | int)}) $x) {\n"
                                 + "        if (true) {\n"
-                                + "            return ~cast($x, (float | int | string));\n"
+                                + "            return ~cast<(float | int | string)>($x);\n"
                                 + "        }\n"
-                                + "        return cast($x, array) + [1];\n"
+                                + "        return cast<array>($x) + [1];\n"
                                 + "    }\n"
                                 + "\n"
                                 + "}"
@@ -405,7 +405,7 @@ public class FunctionDefinitionTest extends ATranslatorTest
                                 + "    }\n"
                                 + "\n"
                                 + "    $a = fooP0(2);\n"
-                                + "    $b = ~cast($a, (int | string));\n"
+                                + "    $b = ~cast<(int | string)>($a);\n"
                                 + "}"
                 },
                 {

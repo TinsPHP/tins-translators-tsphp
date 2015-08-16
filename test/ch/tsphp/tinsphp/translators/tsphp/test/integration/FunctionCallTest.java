@@ -244,7 +244,7 @@ public class FunctionCallTest extends ATranslatorTest
                                 + "    function int barA(array $x_0) {\n"
                                 + "        (array | int) $x = $x_0;\n"
                                 + "        $x = 1;\n"
-                                + "        return fooA(cast($x, int));\n"
+                                + "        return fooA(cast<int>($x));\n"
                                 + "    }\n"
                                 + "\n"
                                 + "    $i = fooA0(1);\n"
