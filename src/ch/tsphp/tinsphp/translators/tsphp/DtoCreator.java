@@ -18,7 +18,6 @@ import ch.tsphp.tinsphp.common.translation.IDtoCreator;
 import ch.tsphp.tinsphp.common.translation.dtos.OverloadDto;
 import ch.tsphp.tinsphp.common.translation.dtos.ParameterDto;
 import ch.tsphp.tinsphp.common.translation.dtos.TranslationScopeDto;
-import ch.tsphp.tinsphp.common.translation.dtos.TypeDto;
 import ch.tsphp.tinsphp.common.translation.dtos.TypeParameterDto;
 import ch.tsphp.tinsphp.common.translation.dtos.VariableDto;
 import ch.tsphp.tinsphp.common.utils.Pair;
@@ -178,11 +177,11 @@ public class DtoCreator implements IDtoCreator
         String parameterName = parameter.getName();
         ITypeSymbol typeSymbol = parameter.getType();
         String absoluteName = parameter.getAbsoluteName();
-        Pair<TypeDto, Boolean> pair = createTypeDto(absoluteName, bindings, typeVariablesAdded, typeParameters);
-        TypeDto typeDto = pair.first;
+        Pair<String, Boolean> pair = createTypeDto(absoluteName, bindings, typeVariablesAdded, typeParameters);
+        String type = pair.first;
         if (typeSymbol == null) {
             parameterDto = new ParameterDto(
-                    typeDto,
+                    type,
                     parameterName,
                     null,
                     null,
@@ -192,10 +191,10 @@ public class DtoCreator implements IDtoCreator
             String tempVariableName
                     = tempVariableHelper.getTempNameIfAlreadyExists(parameterName + "_0", methodSymbol);
             parameterDto = new ParameterDto(
-                    new TypeDto(null, typeSymbol.getAbsoluteName(), null),
+                    typeSymbol.getAbsoluteName(),
                     tempVariableName,
                     null,
-                    typeDto,
+                    type,
                     parameterName
             );
         }
@@ -217,23 +216,23 @@ public class DtoCreator implements IDtoCreator
                 typeVariablesAdded.add(returnTypeVariable);
                 typeParameters.add(typeParamDto);
             }
-            returnVariable = new VariableDto(null, new TypeDto(null, returnTypeVariable, null), null);
+            returnVariable = new VariableDto(null, returnTypeVariable, null);
         } else {
             returnVariable = new VariableDto(typeParamDto, null, null);
         }
         return returnVariable;
     }
 
-    private Pair<TypeDto, Boolean> createTypeDto(
+    private Pair<String, Boolean> createTypeDto(
             String variableId,
             IBindingCollection bindings,
             Set<String> typeVariablesAdded,
             List<TypeParameterDto> typeParameters) {
 
         ITypeVariableReference reference = bindings.getTypeVariableReference(variableId);
-        Pair<TypeDto, Boolean> pair = createParameterTypeDto(reference, bindings);
+        Pair<String, Boolean> pair = createParameterTypeDto(reference, bindings);
         if (!reference.hasFixedType()) {
-            String typeVariable = pair.first.type;
+            String typeVariable = pair.first;
             if (!typeVariablesAdded.contains(typeVariable)) {
                 typeVariablesAdded.add(typeVariable);
                 TypeParameterDto typeParameterDto =
@@ -244,7 +243,7 @@ public class DtoCreator implements IDtoCreator
         return pair;
     }
 
-    private Pair<TypeDto, Boolean> createParameterTypeDto(
+    private Pair<String, Boolean> createParameterTypeDto(
             ITypeVariableReference reference, IBindingCollection bindings) {
         String typeVariable = reference.getTypeVariable();
         String typeName;
@@ -256,7 +255,7 @@ public class DtoCreator implements IDtoCreator
         } else {
             typeName = typeVariable;
         }
-        return pair(new TypeDto(null, typeName, null), wasWidened);
+        return pair(typeName, wasWidened);
     }
 
     @Override
@@ -271,16 +270,16 @@ public class DtoCreator implements IDtoCreator
         ITypeVariableReference reference = bindings.getTypeVariableReference(absoluteName);
         String typeVariable = reference.getTypeVariable();
         TypeParameterDto typeParameterDto = null;
-        TypeDto typeDto = null;
+        String type = null;
         if (typeVariable.startsWith("T")) {
-            typeDto = new TypeDto(null, typeVariable, null);
+            type = typeVariable;
         } else if (reference.hasFixedType()) {
             Pair<ITypeSymbol, Boolean> pair = typeTransformer.getType(bindings, typeVariable);
-            typeDto = new TypeDto(null, pair.first.getAbsoluteName(), null);
+            type = pair.first.getAbsoluteName();
         } else {
             typeParameterDto = typeVariableTransformer.createTypeParameterDto(bindings, typeVariable);
         }
-        return new VariableDto(typeParameterDto, typeDto, name);
+        return new VariableDto(typeParameterDto, type, name);
     }
 
     @Override

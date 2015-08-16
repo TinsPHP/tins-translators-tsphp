@@ -82,11 +82,7 @@ private String getMethodName(String name) {
 private StringTemplate getType(VariableDto dto) {
     StringTemplate type;
     if(dto.type!=null){
-        type = %type(
-            prefixModifiers={dto.type.prefixModifiers}, 
-            type={dto.type.type},
-            suffixModifiers={dto.type.suffixModifiers}
-        );
+        type = new StringTemplate(templateLib, dto.type);
     } else {
         type = %bound(
             bounds={dto.typeParameter.lowerBounds},
@@ -292,13 +288,8 @@ constantDefinition
     :   ^(Identifier unaryPrimitiveAtom)
         {
              VariableDto dto = controller.createVariableDtoForConstant(translationScopeDto.bindingCollection, $Identifier);
-             StringTemplate type = %type(
-                 prefixModifiers={dto.type.prefixModifiers}, 
-                 type={dto.type.type},
-                 suffixModifiers={dto.type.suffixModifiers}
-             );
         }
-        -> constant(type={type}, identifier={dto.variableId}, value={$unaryPrimitiveAtom.st})
+        -> constant(type={dto.type}, identifier={dto.variableId}, value={$unaryPrimitiveAtom.st})
     ;
     
 unaryPrimitiveAtom
@@ -568,26 +559,15 @@ functionDefinition
                     
                     List<StringTemplate> parameters = new ArrayList<>();
                     for (ParameterDto paramDto : dto.parameters) {
-                        StringTemplate type = %type(
-                            prefixModifiers={paramDto.type.prefixModifiers}, 
-                            type={paramDto.type.type},
-                            suffixModifiers={paramDto.type.suffixModifiers}
-                        );
                         parameters.add(%parameter(
-                            type={type},
+                            type={paramDto.type},
                             variableId={paramDto.parameterId}, 
                             defaultValue={paramDto.defaultValue}
                         ));
                         
                         if (paramDto.localVariableType != null) {
-                            StringTemplate localVariableType = %type(
-                                prefixModifiers={paramDto.localVariableType.prefixModifiers}, 
-                                type={paramDto.localVariableType.type},
-                                suffixModifiers={paramDto.localVariableType.suffixModifiers}
-                            );
-                        
                             StringTemplate localVariable = %variable(
-                                type={localVariableType}, 
+                                type={paramDto.localVariableType},
                                 variableId={paramDto.localVariableId}, 
                                 defaultValue={paramDto.parameterId}
                             );
