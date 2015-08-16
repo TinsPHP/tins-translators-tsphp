@@ -36,9 +36,11 @@ import ch.tsphp.tinsphp.translators.tsphp.DtoCreator;
 import ch.tsphp.tinsphp.translators.tsphp.IOperatorHelper;
 import ch.tsphp.tinsphp.translators.tsphp.IRuntimeCheckProvider;
 import ch.tsphp.tinsphp.translators.tsphp.ITypeTransformer;
+import ch.tsphp.tinsphp.translators.tsphp.ITypeVariableTransformer;
 import ch.tsphp.tinsphp.translators.tsphp.PhpPlusOperatorHelper;
 import ch.tsphp.tinsphp.translators.tsphp.PhpPlusRuntimeCheckProvider;
 import ch.tsphp.tinsphp.translators.tsphp.PhpPlusTypeTransformer;
+import ch.tsphp.tinsphp.translators.tsphp.PhpPlusTypeVariableTransformer;
 import ch.tsphp.tinsphp.translators.tsphp.PrecedenceHelper;
 import ch.tsphp.tinsphp.translators.tsphp.TempVariableHelper;
 import ch.tsphp.tinsphp.translators.tsphp.TranslatorController;
@@ -126,8 +128,10 @@ public abstract class ATest implements IIssueLogger
         ITypeTransformer typeTransformer = createTypeTransformer();
         IRuntimeCheckProvider runtimeCheckProvider = createRuntimeCheckProvider(typeTransformer, tempVariableHelper);
         IOperatorHelper operatorHelper = createOperatorHelper(runtimeCheckProvider, typeTransformer);
+        ITypeVariableTransformer typeVariableMapper = createTypeVariableMapper(typeTransformer);
 
-        IDtoCreator dtoCreator = new DtoCreator(tempVariableHelper, typeTransformer, runtimeCheckProvider);
+        IDtoCreator dtoCreator = new DtoCreator(
+                tempVariableHelper, typeTransformer, typeVariableMapper, runtimeCheckProvider);
 
         controller = new TranslatorController(
                 new PrecedenceHelper(),
@@ -145,6 +149,10 @@ public abstract class ATest implements IIssueLogger
         run();
 
         check();
+    }
+
+    protected ITypeVariableTransformer createTypeVariableMapper(ITypeTransformer typeTransformer) {
+        return new PhpPlusTypeVariableTransformer(typeTransformer);
     }
 
     protected IRuntimeCheckProvider createRuntimeCheckProvider(

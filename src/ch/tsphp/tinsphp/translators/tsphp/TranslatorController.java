@@ -133,7 +133,7 @@ public class TranslatorController implements ITranslatorController
                 int argumentIndex = entry.getKey();
                 if (dto.checkedArguments == null || !dto.checkedArguments.contains(argumentIndex)) {
                     Object argument = runtimeCheckProvider.getTypeCheck(
-                            translationScopeDto.statements,
+                            translationScopeDto,
                             argumentsAst.getChild(argumentIndex),
                             arguments.get(argumentIndex),
                             entry.getValue().first);

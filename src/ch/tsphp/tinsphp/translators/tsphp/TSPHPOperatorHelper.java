@@ -123,7 +123,7 @@ public class TSPHPOperatorHelper implements IOperatorHelper
 
     private void handleConvertibleTypes(
             TranslationScopeDto translationScopeDto,
-            FunctionApplicationDto dto,
+            FunctionApplicationDto functionApplicationDto,
             OverloadApplicationDto overloadApplicationDto,
             ITSPHPAst argumentsAst) {
 
@@ -150,7 +150,7 @@ public class TSPHPOperatorHelper implements IOperatorHelper
                     TypeHelperDto result = typeHelper.isFirstSameOrSubTypeOfSecond(argumentType, targetType);
                     //no conversion required if it is already a subtype
                     if (result.relation != ERelation.HAS_RELATION) {
-                        addExplicitConversion(dto, runtimeChecks, i, targetType);
+                        addExplicitConversion(functionApplicationDto, runtimeChecks, i, targetType);
                     }
                 }
             }
@@ -247,7 +247,7 @@ public class TSPHPOperatorHelper implements IOperatorHelper
             //if the left hand side is more specific than the return type then we need to cast
             if (result.relation == ERelation.HAS_NO_RELATION) {
                 functionApplicationDto.returnRuntimeCheck = runtimeCheckProvider.getTypeCheck(
-                        translationScopeDto.statements,
+                        translationScopeDto,
                         leftHandSide,
                         "%returnRuntimeCheck%",
                         typeSymbol).toString();

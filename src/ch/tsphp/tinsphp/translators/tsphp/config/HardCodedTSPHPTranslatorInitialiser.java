@@ -32,6 +32,7 @@ import ch.tsphp.tinsphp.translators.tsphp.IPrecedenceHelper;
 import ch.tsphp.tinsphp.translators.tsphp.IRuntimeCheckProvider;
 import ch.tsphp.tinsphp.translators.tsphp.ITempVariableHelper;
 import ch.tsphp.tinsphp.translators.tsphp.ITypeTransformer;
+import ch.tsphp.tinsphp.translators.tsphp.ITypeVariableTransformer;
 import ch.tsphp.tinsphp.translators.tsphp.PrecedenceHelper;
 import ch.tsphp.tinsphp.translators.tsphp.TSPHPOperatorHelper;
 import ch.tsphp.tinsphp.translators.tsphp.TSPHPRuntimeCheckProvider;
@@ -39,6 +40,7 @@ import ch.tsphp.tinsphp.translators.tsphp.TSPHPTranslator;
 import ch.tsphp.tinsphp.translators.tsphp.TSPHPTypeTransformer;
 import ch.tsphp.tinsphp.translators.tsphp.TempVariableHelper;
 import ch.tsphp.tinsphp.translators.tsphp.TranslatorController;
+import ch.tsphp.tinsphp.translators.tsphp.TsphpTypeVariableTransformer;
 import ch.tsphp.tinsphp.translators.tsphp.TsphpUnionTypeSymbol;
 import ch.tsphp.tinsphp.translators.tsphp.issues.HardCodedOutputIssueMessageProvider;
 import ch.tsphp.tinsphp.translators.tsphp.issues.IOutputIssueMessageProvider;
@@ -97,7 +99,13 @@ public class HardCodedTSPHPTranslatorInitialiser implements ITranslatorInitialis
                 typeTransformer, tempVariableHelper, outputIssueMessageProvider, tsphpBoolTypeSymbol);
         IOperatorHelper operatorHelper = new TSPHPOperatorHelper(
                 typeHelper, primitiveTypes, runtimeCheckProvider, typeTransformer);
-        IDtoCreator dtoCreator = new DtoCreator(tempVariableHelper, typeTransformer, runtimeCheckProvider);
+        ITypeVariableTransformer typeVariableMapper = new TsphpTypeVariableTransformer(
+                symbolFactory, typeHelper, typeTransformer);
+        IDtoCreator dtoCreator = new DtoCreator(
+                tempVariableHelper,
+                typeTransformer,
+                typeVariableMapper, runtimeCheckProvider
+        );
 
         controller = new TranslatorController(
                 precedenceHelper,

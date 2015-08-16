@@ -8,10 +8,8 @@ package ch.tsphp.tinsphp.translators.tsphp;
 
 import ch.tsphp.common.ITSPHPAst;
 import ch.tsphp.common.symbols.ITypeSymbol;
-import ch.tsphp.tinsphp.common.inference.constraints.IBindingCollection;
 import ch.tsphp.tinsphp.common.inference.constraints.IVariable;
-
-import java.util.Deque;
+import ch.tsphp.tinsphp.common.translation.dtos.TranslationScopeDto;
 
 public class PhpPlusRuntimeCheckProvider implements IRuntimeCheckProvider
 {
@@ -19,16 +17,14 @@ public class PhpPlusRuntimeCheckProvider implements IRuntimeCheckProvider
     @Override
     public boolean addParameterCheck(
             String identifier,
-            Deque<String> statements,
-            IBindingCollection bindings,
-            IVariable parameter,
+            TranslationScopeDto translationScopeDto, IVariable parameter,
             int parameterIndex) {
         return false;
     }
 
     @Override
     public Object getTypeCheck(
-            Deque<String> statements, ITSPHPAst argumentAst, Object argument, ITypeSymbol argumentType) {
+            TranslationScopeDto translationScopeDto, ITSPHPAst argumentAst, Object argument, ITypeSymbol argumentType) {
         return "cast(" + argument.toString() + ", " + argumentType.getAbsoluteName() + ")";
     }
 }

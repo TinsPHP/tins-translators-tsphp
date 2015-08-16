@@ -40,44 +40,44 @@ public class FunctionDefinitionTest extends ATranslatorTest
     public static Collection<Object[]> testStrings() {
         return Arrays.asList(new Object[][]{
                 {
-                        "<?php function foo($x){return $x;} ?>",
-                        "namespace{\n\n    function T foo<T>(T $x) {\n        return $x;\n    }\n\n}"
+                        "<?php function fooA($x){return $x;} ?>",
+                        "namespace{\n\n    function T fooA<T>(T $x) {\n        return $x;\n    }\n\n}"
                 },
                 {
-                        "<?php function foo($x, $y){return $x + $y;} ?>",
+                        "<?php function fooB($x, $y){return $x + $y;} ?>",
                         "namespace{\n"
                                 + "\n"
-                                + "    function array foo0(array $x, array $y) {\n"
+                                + "    function array fooB0(array $x, array $y) {\n"
                                 + "        return $x + $y;\n"
                                 + "    }\n"
                                 + "\n"
-                                + "    function float foo1(float $x, float $y) {\n"
+                                + "    function float fooB1(float $x, float $y) {\n"
                                 + "        return $x + $y;\n"
                                 + "    }\n"
                                 + "\n"
-                                + "    function int foo2(int $x, int $y) {\n"
+                                + "    function int fooB2(int $x, int $y) {\n"
                                 + "        return $x + $y;\n"
                                 + "    }\n"
                                 + "\n"
-                                + "    function T foo3<T>({as T} $x, {as T} $y) where [T <: (float | int)] {\n"
+                                + "    function T fooB3<T>({as T} $x, {as T} $y) where [T <: (float | int)] {\n"
                                 + "        return $x + $y;\n"
                                 + "    }\n"
                                 + "\n"
                                 + "}"
                 },
                 {
-                        "<?php function fooA($x, $y){return $x + $y + 1;} ?>",
+                        "<?php function fooC($x, $y){return $x + $y + 1;} ?>",
                         "namespace{\n"
                                 + "\n"
-                                + "    function float fooA0(float $x, float $y) {\n"
+                                + "    function float fooC0(float $x, float $y) {\n"
                                 + "        return $x + $y + 1;\n"
                                 + "    }\n"
                                 + "\n"
-                                + "    function int fooA1(int $x, int $y) {\n"
+                                + "    function int fooC1(int $x, int $y) {\n"
                                 + "        return $x + $y + 1;\n"
                                 + "    }\n"
                                 + "\n"
-                                + "    function (int | T) fooA2<T>({as T} $x, {as T} $y) where [T <: (float | int)] {\n"
+                                + "    function (int | T) fooC2<T>({as T} $x, {as T} $y) where [T <: (float | int)] {\n"
                                 + "        return $x + $y + 1;\n"
                                 + "    }\n"
                                 + "\n"
@@ -86,21 +86,21 @@ public class FunctionDefinitionTest extends ATranslatorTest
                 //return but without expression
                 // see TINS-404 return without expression and implicit null
                 {
-                        "<?php function foo(){ return;} ?>",
-                        "namespace{\n\n    function nullType foo() {\n        return null;\n    }\n\n}"
+                        "<?php function fooD(){ return;} ?>",
+                        "namespace{\n\n    function nullType fooD() {\n        return null;\n    }\n\n}"
                 },
                 {
-                        "<?php function foo($x){ if($x){ return; } return 1;} ?>",
+                        "<?php function fooE($x){ if($x){ return; } return 1;} ?>",
                         "namespace{\n"
                                 + "\n"
-                                + "    function (int | nullType) foo0((falseType | trueType) $x) {\n"
+                                + "    function (int | nullType) fooE0((falseType | trueType) $x) {\n"
                                 + "        if ($x) {\n"
                                 + "            return null;\n"
                                 + "        }\n"
                                 + "        return 1;\n"
                                 + "    }\n"
                                 + "\n"
-                                + "    function (int | nullType) foo1({as (falseType | trueType)} $x) {\n"
+                                + "    function (int | nullType) fooE1({as (falseType | trueType)} $x) {\n"
                                 + "        if ($x) {\n"
                                 + "            return null;\n"
                                 + "        }\n"
@@ -110,10 +110,10 @@ public class FunctionDefinitionTest extends ATranslatorTest
                                 + "}"
                 },
                 {
-                        "<?php function foo($x){ if($x){ return; } else { return 1;}} ?>",
+                        "<?php function fooF($x){ if($x){ return; } else { return 1;}} ?>",
                         "namespace{\n"
                                 + "\n"
-                                + "    function (int | nullType) foo0((falseType | trueType) $x) {\n"
+                                + "    function (int | nullType) fooF0((falseType | trueType) $x) {\n"
                                 + "        if ($x) {\n"
                                 + "            return null;\n"
                                 + "        } else {\n"
@@ -121,7 +121,7 @@ public class FunctionDefinitionTest extends ATranslatorTest
                                 + "        }\n"
                                 + "    }\n"
                                 + "\n"
-                                + "    function (int | nullType) foo1({as (falseType | trueType)} $x) {\n"
+                                + "    function (int | nullType) fooF1({as (falseType | trueType)} $x) {\n"
                                 + "        if ($x) {\n"
                                 + "            return null;\n"
                                 + "        } else {\n"
@@ -132,10 +132,10 @@ public class FunctionDefinitionTest extends ATranslatorTest
                                 + "}"
                 },
                 {
-                        "<?php function foo($x, $y){ $x = $y; return $x;}",
+                        "<?php function fooG($x, $y){ $x = $y; return $x;}",
                         "namespace{\n"
                                 + "\n"
-                                + "    function T1 foo<T1, T2>(T1 $x, T2 $y) where [T2 <: T1] {\n"
+                                + "    function T1 fooG<T1, T2>(T1 $x, T2 $y) where [T2 <: T1] {\n"
                                 + "        $x = $y;\n"
                                 + "        return $x;\n"
                                 + "    }\n"
@@ -143,45 +143,28 @@ public class FunctionDefinitionTest extends ATranslatorTest
                                 + "}"
                 },
                 {
-                        "<?php function foo($x, $y){ $x = 1 + $y; return $x;}",
+                        "<?php function fooH($x, $y){ $a = $x + $y; return $a;}",
                         "namespace{\n"
                                 + "\n"
-                                + "    function T foo0<T>(T $x, int $y) where [int <: T] {\n"
-                                + "        $x = 1 + $y;\n"
-                                + "        return $x;\n"
-                                + "    }\n"
-                                + "\n"
-                                + "    function T1 foo1<T1, T2>(T1 $x, {as T2} $y) "
-                                + "where [(int | T2) <: T1, int <: T2 <: (float | int)] {\n"
-                                + "        $x = 1 + $y;\n"
-                                + "        return $x;\n"
-                                + "    }\n"
-                                + "\n"
-                                + "}"
-                },
-                {
-                        "<?php function foo($x, $y){ $a = $x + $y; return $a;}",
-                        "namespace{\n"
-                                + "\n"
-                                + "    function array foo0(array $x, array $y) {\n"
+                                + "    function array fooH0(array $x, array $y) {\n"
                                 + "        array $a;\n"
                                 + "        $a = $x + $y;\n"
                                 + "        return $a;\n"
                                 + "    }\n"
                                 + "\n"
-                                + "    function float foo1(float $x, float $y) {\n"
+                                + "    function float fooH1(float $x, float $y) {\n"
                                 + "        float $a;\n"
                                 + "        $a = $x + $y;\n"
                                 + "        return $a;\n"
                                 + "    }\n"
                                 + "\n"
-                                + "    function int foo2(int $x, int $y) {\n"
+                                + "    function int fooH2(int $x, int $y) {\n"
                                 + "        int $a;\n"
                                 + "        $a = $x + $y;\n"
                                 + "        return $a;\n"
                                 + "    }\n"
                                 + "\n"
-                                + "    function T foo3<T>({as T} $x, {as T} $y) where [T <: (float | int)] {\n"
+                                + "    function T fooH3<T>({as T} $x, {as T} $y) where [T <: (float | int)] {\n"
                                 + "        T $a;\n"
                                 + "        $a = $x + $y;\n"
                                 + "        return $a;\n"
@@ -190,10 +173,10 @@ public class FunctionDefinitionTest extends ATranslatorTest
                                 + "}"
                 },
                 {
-                        "<?php function foo($x){ return $x /= false;}",
+                        "<?php function fooI($x){ return $x /= false;}",
                         "namespace{\n"
                                 + "\n"
-                                + "    function T foo<T>(T $x) "
+                                + "    function T fooI<T>(T $x) "
                                 + "where [(falseType | float | int) <: T <: {as (float | int)}] {\n"
                                 + "        return $x /= false;\n"
                                 + "    }\n"
@@ -201,19 +184,19 @@ public class FunctionDefinitionTest extends ATranslatorTest
                                 + "}"
                 },
                 {
-                        "<?php function foo($x, $y){ return $x /= $y;}",
+                        "<?php function fooJ($x, $y){ return $x /= $y;}",
                         "namespace{\n"
                                 + "\n"
-                                + "    function (falseType | float) foo0((falseType | float) $x, float $y) {\n"
+                                + "    function (falseType | float) fooJ0((falseType | float) $x, float $y) {\n"
                                 + "        return $x /= $y;\n"
                                 + "    }\n"
                                 + "\n"
-                                + "    function T foo1<T>(T $x, float $y) "
+                                + "    function T fooJ1<T>(T $x, float $y) "
                                 + "where [(falseType | float) <: T <: {as (float | int)}] {\n"
                                 + "        return $x /= $y;\n"
                                 + "    }\n"
                                 + "\n"
-                                + "    function T foo2<T>(T $x, {as (float | int)} $y) "
+                                + "    function T fooJ2<T>(T $x, {as (float | int)} $y) "
                                 + "where [(falseType | float | int) <: T <: {as (float | int)}] {\n"
                                 + "        return $x /= $y;\n"
                                 + "    }\n"
@@ -222,34 +205,34 @@ public class FunctionDefinitionTest extends ATranslatorTest
                 },
                 //TINS-479 local vars with multiple lower ref to params
                 {
-                        "<?php function foo($x, $y){ $a = $x / $y; return $a;}",
+                        "<?php function fooK($x, $y){ $a = $x / $y; return $a;}",
                         "namespace{\n"
                                 + "\n"
-                                + "    function (falseType | float) foo0(float $x, float $y) {\n"
+                                + "    function (falseType | float) fooK0(float $x, float $y) {\n"
                                 + "        (falseType | float) $a;\n"
                                 + "        $a = $x / $y;\n"
                                 + "        return $a;\n"
                                 + "    }\n"
                                 + "\n"
-                                + "    function (falseType | float) foo1(float $x, {as (float | int)} $y) {\n"
+                                + "    function (falseType | float) fooK1(float $x, {as (float | int)} $y) {\n"
                                 + "        (falseType | float) $a;\n"
                                 + "        $a = $x / $y;\n"
                                 + "        return $a;\n"
                                 + "    }\n"
                                 + "\n"
-                                + "    function (falseType | float | int) foo2(int $x, int $y) {\n"
+                                + "    function (falseType | float | int) fooK2(int $x, int $y) {\n"
                                 + "        (falseType | float | int) $a;\n"
                                 + "        $a = $x / $y;\n"
                                 + "        return $a;\n"
                                 + "    }\n"
                                 + "\n"
-                                + "    function (falseType | float) foo3({as (float | int)} $x, float $y) {\n"
+                                + "    function (falseType | float) fooK3({as (float | int)} $x, float $y) {\n"
                                 + "        (falseType | float) $a;\n"
                                 + "        $a = $x / $y;\n"
                                 + "        return $a;\n"
                                 + "    }\n"
                                 + "\n"
-                                + "    function (falseType | float | int) foo4("
+                                + "    function (falseType | float | int) fooK4("
                                 + "{as (float | int)} $x, {as (float | int)} $y) {\n"
                                 + "        (falseType | float | int) $a;\n"
                                 + "        $a = $x / $y;\n"
@@ -261,31 +244,31 @@ public class FunctionDefinitionTest extends ATranslatorTest
                 },
                 //TINS-479 local vars with multiple lower ref to params
                 {
-                        "<?php function fooK($x, $y){ $a = 1; $a = $x + $y; return $a;}",
+                        "<?php function fooM($x, $y){ $a = 1; $a = $x + $y; return $a;}",
                         "namespace{\n"
                                 + "\n"
-                                + "    function (array | int) fooK0(array $x, array $y) {\n"
+                                + "    function (array | int) fooM0(array $x, array $y) {\n"
                                 + "        (array | int) $a;\n"
                                 + "        $a = 1;\n"
                                 + "        $a = $x + $y;\n"
                                 + "        return $a;\n"
                                 + "    }\n"
                                 + "\n"
-                                + "    function (float | int) fooK1(float $x, float $y) {\n"
+                                + "    function (float | int) fooM1(float $x, float $y) {\n"
                                 + "        (float | int) $a;\n"
                                 + "        $a = 1;\n"
                                 + "        $a = $x + $y;\n"
                                 + "        return $a;\n"
                                 + "    }\n"
                                 + "\n"
-                                + "    function int fooK2(int $x, int $y) {\n"
+                                + "    function int fooM2(int $x, int $y) {\n"
                                 + "        int $a;\n"
                                 + "        $a = 1;\n"
                                 + "        $a = $x + $y;\n"
                                 + "        return $a;\n"
                                 + "    }\n"
                                 + "\n"
-                                + "    function (int | T) fooK3<T>({as T} $x, {as T} $y) where [T <: (float | int)] {\n"
+                                + "    function (int | T) fooM3<T>({as T} $x, {as T} $y) where [T <: (float | int)] {\n"
                                 + "        (int | T) $a;\n"
                                 + "        $a = 1;\n"
                                 + "        $a = $x + $y;\n"
@@ -369,7 +352,224 @@ public class FunctionDefinitionTest extends ATranslatorTest
                                 + "    }\n"
                                 + "\n"
                                 + "}"
-                }
+                },
+                {
+                        "<?php function fooN($x){echo $x; return $x && true; }",
+                        "namespace{\n"
+                                + "\n"
+                                + "    function (falseType | trueType) fooN0("
+                                + "({as (falseType | trueType)} & {as string}) $x) {\n"
+                                + "        echo $x;\n"
+                                + "        return $x && true;\n"
+                                + "    }\n"
+                                + "\n"
+                                + "    function (falseType | trueType) fooN1(string $x) {\n"
+                                + "        echo $x;\n"
+                                + "        return $x && true;\n"
+                                + "    }\n"
+                                + "\n"
+                                + "}"
+                },
+                {
+                        "<?php function fooO($x){if(true){return $x;} return 1;}",
+                        "namespace{\n"
+                                + "\n"
+                                + "    function (int | T) fooO<T>(T $x) {\n"
+                                + "        if (true) {\n"
+                                + "            return $x;\n"
+                                + "        }\n"
+                                + "        return 1;\n"
+                                + "    }\n"
+                                + "\n"
+                                + "}"
+                },
+                {
+                        "<?php function fooP($x){if(true){return $x + 1;} return 'hello';} $a = fooP(2); $b = ~$a;",
+                        "namespace{\n"
+                                + "    (int | string) $b;\n"
+                                + "    (int | string) $a;\n"
+                                + "\n"
+                                + "    function (int | string) fooP0(int $x) {\n"
+                                + "        if (true) {\n"
+                                + "            return $x + 1;\n"
+                                + "        }\n"
+                                + "        return 'hello';\n"
+                                + "    }\n"
+                                + "\n"
+                                + "    function (int | string | T) fooP1<T>({as T} $x) where [int <: T <: (float | " +
+                                "int)] {\n"
+                                + "        if (true) {\n"
+                                + "            return $x + 1;\n"
+                                + "        }\n"
+                                + "        return 'hello';\n"
+                                + "    }\n"
+                                + "\n"
+                                + "    $a = fooP0(2);\n"
+                                + "    $b = ~cast($a, (int | string));\n"
+                                + "}"
+                },
+                {
+                        "<?php function barQ($x){$x . 1; return $x;} "
+                                + "function fooQ($x, $y){return 1; return $x + '1'; return barQ($y);}",
+                        "namespace{\n"
+                                + "\n"
+                                + "    function T barQ<T>(T $x) where [T <: {as string}] {\n"
+                                + "        $x . 1;\n"
+                                + "        return $x;\n"
+                                + "    }\n"
+                                + "\n"
+                                + "    function (float | int | T) fooQ<T>({as (float | int)} $x, T $y) "
+                                + "where [T <: {as string}] {\n"
+                                + "        return 1;\n"
+                                + "        return $x + '1';\n"
+                                + "        return barQ($y);\n"
+                                + "    }\n"
+                                + "\n"
+                                + "}"
+                },
+                {
+                        "<?php function fooR($x, $y){ $x = 1 + $y; return $x;}",
+                        "namespace{\n"
+                                + "\n"
+                                + "    function T fooR0<T>(T $x, int $y) where [int <: T] {\n"
+                                + "        $x = 1 + $y;\n"
+                                + "        return $x;\n"
+                                + "    }\n"
+                                + "\n"
+                                + "    function T1 fooR1<T1, T2>(T1 $x, {as T2} $y) "
+                                + "where [(int | T2) <: T1, int <: T2 <: (float | int)] {\n"
+                                + "        $x = 1 + $y;\n"
+                                + "        return $x;\n"
+                                + "    }\n"
+                                + "\n"
+                                + "}"
+                },
+                {
+                        "<?php function fooS($x){$a = $x; $a = 'hello'; return $x;}",
+                        "namespace{\n"
+                                + "\n"
+                                + "    function T fooS<T>(T $x) {\n"
+                                + "        (string | T) $a;\n"
+                                + "        $a = $x;\n"
+                                + "        $a = 'hello';\n"
+                                + "        return $x;\n"
+                                + "    }\n"
+                                + "\n"
+                                + "}"
+                },
+                {
+                        "<?php function fooU($x, $y, $z){$x = $y; $x = $z; return $x;}",
+                        "namespace{\n"
+                                + "\n"
+                                + "    function T1 fooU<T1, T2, T3>(T1 $x, T2 $y, T3 $z) where [(T2 | T3) <: T1] {\n"
+                                + "        $x = $y;\n"
+                                + "        $x = $z;\n"
+                                + "        return $x;\n"
+                                + "    }\n"
+                                + "\n"
+                                + "}"
+                },
+                {
+                        "<?php function fooU2($x, $y, $z, $a){$a = $x; $x = $y; $x = $z; return $a;}",
+                        "namespace{\n"
+                                + "\n"
+                                + "    function T4 fooU2<T1, T2, T3, T4>(T1 $x, T2 $y, T3 $z, T4 $a) "
+                                + "where [(T2 | T3) <: T1, T1 <: T4] {\n"
+                                + "        $a = $x;\n"
+                                + "        $x = $y;\n"
+                                + "        $x = $z;\n"
+                                + "        return $a;\n"
+                                + "    }\n"
+                                + "\n"
+                                + "}"
+                },
+                {
+                        "<?php function fooU3($x, $y, $z){$x = $y; $x = $z; $x = 1; return $x;}",
+                        "namespace{\n"
+                                + "\n"
+                                + "    function T1 fooU3<T1, T2, T3>(T1 $x, T2 $y, " +
+                                "T3 $z) where [(int | T2 | T3) <: T1] {\n"
+                                + "        $x = $y;\n"
+                                + "        $x = $z;\n"
+                                + "        $x = 1;\n"
+                                + "        return $x;\n"
+                                + "    }\n"
+                                + "\n"
+                                + "}"
+                },
+                {
+                        "<?php function fooU4($x, $y){$x = $y; $y = 1; return $x;}",
+                        "namespace{\n"
+                                + "\n"
+                                + "    function T1 fooU4<T1, T2>(T1 $x, T2 $y) where [(int | T2) <: T1, int <: T2] {\n"
+                                + "        $x = $y;\n"
+                                + "        $y = 1;\n"
+                                + "        return $x;\n"
+                                + "    }\n"
+                                + "\n"
+                                + "}"
+                },
+                {
+                        "<?php function fooU5($x, $y){$x = $y; $x = 1; $y = 'hello'; return $x;}",
+                        "namespace{\n"
+                                + "\n"
+                                + "    function T1 fooU5<T1, T2>(T1 $x, T2 $y) "
+                                + "where [(int | string | T2) <: T1, string <: T2] {\n"
+                                + "        $x = $y;\n"
+                                + "        $x = 1;\n"
+                                + "        $y = 'hello';\n"
+                                + "        return $x;\n"
+                                + "    }\n"
+                                + "\n"
+                                + "}"
+                },
+                {
+                        "<?php function fooV($x, $y){$a = $x; $a = $y; $a = 1; return $a;}",
+                        "namespace{\n"
+                                + "\n"
+                                + "    function (int | T1 | T2) fooV<T1, T2>(T1 $x, T2 $y) {\n"
+                                + "        (int | T1 | T2) $a;\n"
+                                + "        $a = $x;\n"
+                                + "        $a = $y;\n"
+                                + "        $a = 1;\n"
+                                + "        return $a;\n"
+                                + "    }\n"
+                                + "\n"
+                                + "}"
+                },
+                {
+                        "<?php function fooV2($x, $y){$a = $x; ~$x; $a = $y; $a = 1; return $a;}",
+                        "namespace{\n"
+                                + "\n"
+                                + "    function (int | T1 | T2) fooV20<T1, T2>(T1 $x, T2 $y) where [T1 <: float] {\n"
+                                + "        (int | T1 | T2) $a;\n"
+                                + "        $a = $x;\n"
+                                + "        ~$x;\n"
+                                + "        $a = $y;\n"
+                                + "        $a = 1;\n"
+                                + "        return $a;\n"
+                                + "    }\n"
+                                + "\n"
+                                + "    function (int | T1 | T2) fooV21<T1, T2>(T1 $x, T2 $y) where [T1 <: string] {\n"
+                                + "        (int | T1 | T2) $a;\n"
+                                + "        $a = $x;\n"
+                                + "        ~$x;\n"
+                                + "        $a = $y;\n"
+                                + "        $a = 1;\n"
+                                + "        return $a;\n"
+                                + "    }\n"
+                                + "\n"
+                                + "    function (int | T) fooV22<T>(int $x, T $y) {\n"
+                                + "        (int | T) $a;\n"
+                                + "        $a = $x;\n"
+                                + "        ~$x;\n"
+                                + "        $a = $y;\n"
+                                + "        $a = 1;\n"
+                                + "        return $a;\n"
+                                + "    }\n"
+                                + "\n"
+                                + "}"
+                },
         });
     }
 }

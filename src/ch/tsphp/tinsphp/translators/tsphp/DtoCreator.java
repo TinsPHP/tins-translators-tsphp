@@ -26,7 +26,6 @@ import ch.tsphp.tinsphp.common.utils.Pair;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Deque;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -40,15 +39,18 @@ public class DtoCreator implements IDtoCreator
 {
     private final ITempVariableHelper tempVariableHelper;
     private final ITypeTransformer typeTransformer;
-    private final IRuntimeCheckProvider parameterCheckProvider;
+    private final IRuntimeCheckProvider runtimeCheckProvider;
+    private final ITypeVariableTransformer typeVariableTransformer;
 
     public DtoCreator(
             ITempVariableHelper theTempVariableHelper,
             ITypeTransformer theTypeTransformer,
-            IRuntimeCheckProvider theParameterCheckProvider) {
+            ITypeVariableTransformer theTypeVariableMapper,
+            IRuntimeCheckProvider theRuntimeCheckProvider) {
         tempVariableHelper = theTempVariableHelper;
         typeTransformer = theTypeTransformer;
-        parameterCheckProvider = theParameterCheckProvider;
+        runtimeCheckProvider = theRuntimeCheckProvider;
+        typeVariableTransformer = theTypeVariableMapper;
     }
 
     @Override
@@ -82,31 +84,24 @@ public class DtoCreator implements IDtoCreator
     private Pair<OverloadDto, Integer> createOverloadDto(
             String name,
             int count,
-            IFunctionType overload,
+            IFunctionType theOverload,
             IMethodSymbol methodSymbol,
             int numberOfOverloads,
             Set<String> additionalNames) {
 
+        IFunctionType overload = typeVariableTransformer.rewriteOverload(theOverload);
 
-        Map<String, List<ISymbol>> symbols = methodSymbol.getDefinitionScope().getSymbols();
-        IBindingCollection bindings = overload.getBindingCollection();
+        Pair<String, Integer> namePair = getOverloadName(
+                name, count, overload, methodSymbol, numberOfOverloads, additionalNames);
+        String newName = namePair.first;
+        Integer newCount = namePair.second;
+
         List<IVariable> parameters = overload.getParameters();
         int numberOfParameters = parameters.size();
-
-        String newName = name;
-        int numbering = count;
-        if (numberOfOverloads != 1) {
-            while (symbols.containsKey(name + numbering) || additionalNames.contains(name + numbering)) {
-                ++numbering;
-            }
-            newName = name + numbering;
-            overload.addSuffix(TSPHPTranslator.TRANSLATOR_ID, String.valueOf(numbering));
-            additionalNames.add(newName);
-        }
-
         Set<String> typeVariablesAdded = new HashSet<>(numberOfParameters + 1);
         List<TypeParameterDto> typeParameters = new ArrayList<>(numberOfParameters + 1);
-        Deque<String> statements = new ArrayDeque<>();
+        IBindingCollection bindings = overload.getBindingCollection();
+        TranslationScopeDto translationScopeDto = new TranslationScopeDto(bindings, new ArrayDeque<String>());
 
         List<ParameterDto> parameterDtos = new ArrayList<>();
         boolean isCheckPossible = true;
@@ -120,8 +115,8 @@ public class DtoCreator implements IDtoCreator
             boolean typeHintWasUsed = parameterDto.localVariableType == null;
             Boolean wasWidened = pair.second;
             if (isCheckPossible && wasWidened && typeHintWasUsed) {
-                isCheckPossible = parameterCheckProvider.addParameterCheck(
-                        newName + "()", statements, bindings, parameter, i);
+                isCheckPossible = runtimeCheckProvider.addParameterCheck(
+                        newName + "()", translationScopeDto, parameter, i);
             }
             parameterDtos.add(parameterDto);
         }
@@ -132,7 +127,8 @@ public class DtoCreator implements IDtoCreator
 
         for (String typeParameter : nonFixedTypeParameters) {
             if (!typeVariablesAdded.contains(typeParameter)) {
-                TypeParameterDto typeParameterDto = createTypeParameterDto(bindings, typeParameter);
+                TypeParameterDto typeParameterDto
+                        = typeVariableTransformer.createTypeParameterDto(bindings, typeParameter);
                 typeParameters.add(typeParameterDto);
             }
         }
@@ -140,14 +136,36 @@ public class DtoCreator implements IDtoCreator
         if (typeParameters.isEmpty()) {
             typeParameters = null;
         }
-        OverloadDto methodDto = new OverloadDto(
+        OverloadDto overloadDto = new OverloadDto(
                 returnVariable,
                 newName,
                 typeParameters,
                 parameterDtos,
-                new TranslationScopeDto(bindings, statements));
+                translationScopeDto);
 
-        return pair(methodDto, numbering);
+        return pair(overloadDto, newCount);
+    }
+
+    private Pair<String, Integer> getOverloadName(
+            String name,
+            int count,
+            IFunctionType overload,
+            IMethodSymbol methodSymbol,
+            int numberOfOverloads,
+            Set<String> additionalNames) {
+
+        String newName = name;
+        int numbering = count;
+        if (numberOfOverloads != 1) {
+            Map<String, List<ISymbol>> symbols = methodSymbol.getDefinitionScope().getSymbols();
+            while (symbols.containsKey(name + numbering) || additionalNames.contains(name + numbering)) {
+                ++numbering;
+            }
+            newName = name + numbering;
+            overload.addSuffix(TSPHPTranslator.TRANSLATOR_ID, String.valueOf(numbering));
+            additionalNames.add(newName);
+        }
+        return pair(newName, numbering);
     }
 
     private Pair<ParameterDto, Boolean> createParameterDto(
@@ -160,7 +178,7 @@ public class DtoCreator implements IDtoCreator
         String parameterName = parameter.getName();
         ITypeSymbol typeSymbol = parameter.getType();
         String absoluteName = parameter.getAbsoluteName();
-        Pair<TypeDto, Boolean> pair = createTypeDto(absoluteName, bindings, typeParameters, typeVariablesAdded);
+        Pair<TypeDto, Boolean> pair = createTypeDto(absoluteName, bindings, typeVariablesAdded, typeParameters);
         TypeDto typeDto = pair.first;
         if (typeSymbol == null) {
             parameterDto = new ParameterDto(
@@ -193,7 +211,7 @@ public class DtoCreator implements IDtoCreator
         String returnTypeVariable = reference.getTypeVariable();
 
         VariableDto returnVariable;
-        TypeParameterDto typeParamDto = createTypeParameterDto(bindings, returnTypeVariable);
+        TypeParameterDto typeParamDto = typeVariableTransformer.createTypeParameterDto(bindings, returnTypeVariable);
         if (nonFixedTypeParameters.contains(returnTypeVariable)) {
             if (!typeVariablesAdded.contains(returnTypeVariable)) {
                 typeVariablesAdded.add(returnTypeVariable);
@@ -209,8 +227,8 @@ public class DtoCreator implements IDtoCreator
     private Pair<TypeDto, Boolean> createTypeDto(
             String variableId,
             IBindingCollection bindings,
-            List<TypeParameterDto> typeParameters,
-            Set<String> typeVariablesAdded) {
+            Set<String> typeVariablesAdded,
+            List<TypeParameterDto> typeParameters) {
 
         ITypeVariableReference reference = bindings.getTypeVariableReference(variableId);
         Pair<TypeDto, Boolean> pair = createParameterTypeDto(reference, bindings);
@@ -218,30 +236,12 @@ public class DtoCreator implements IDtoCreator
             String typeVariable = pair.first.type;
             if (!typeVariablesAdded.contains(typeVariable)) {
                 typeVariablesAdded.add(typeVariable);
-                TypeParameterDto typeParameterDto = createTypeParameterDto(bindings, typeVariable);
+                TypeParameterDto typeParameterDto =
+                        typeVariableTransformer.createTypeParameterDto(bindings, typeVariable);
                 typeParameters.add(typeParameterDto);
             }
         }
         return pair;
-    }
-
-    private TypeParameterDto createTypeParameterDto(IBindingCollection bindings, String typeVariable) {
-        List<String> lowerBounds = null;
-        if (bindings.hasLowerBounds(typeVariable)) {
-            lowerBounds = new ArrayList<>();
-            if (bindings.hasLowerTypeBounds(typeVariable)) {
-                lowerBounds.addAll(typeTransformer.getTypeBounds(bindings.getLowerTypeBounds(typeVariable)));
-            }
-            if (bindings.hasLowerRefBounds(typeVariable)) {
-                lowerBounds.addAll(typeTransformer.getLowerRefBounds(bindings, typeVariable));
-            }
-        }
-        List<String> upperBounds = null;
-        if (bindings.hasUpperTypeBounds(typeVariable)) {
-            upperBounds = new ArrayList<>();
-            upperBounds.addAll(typeTransformer.getTypeBounds(bindings.getUpperTypeBounds(typeVariable)));
-        }
-        return new TypeParameterDto(lowerBounds, typeVariable, upperBounds);
     }
 
     private Pair<TypeDto, Boolean> createParameterTypeDto(
@@ -267,8 +267,7 @@ public class DtoCreator implements IDtoCreator
         return createVariableDto(bindings, constant.getAbsoluteName(), name);
     }
 
-    private VariableDto createVariableDto(IBindingCollection bindings, String absoluteName,
-            String name) {
+    private VariableDto createVariableDto(IBindingCollection bindings, String absoluteName, String name) {
         ITypeVariableReference reference = bindings.getTypeVariableReference(absoluteName);
         String typeVariable = reference.getTypeVariable();
         TypeParameterDto typeParameterDto = null;
@@ -279,7 +278,7 @@ public class DtoCreator implements IDtoCreator
             Pair<ITypeSymbol, Boolean> pair = typeTransformer.getType(bindings, typeVariable);
             typeDto = new TypeDto(null, pair.first.getAbsoluteName(), null);
         } else {
-            typeParameterDto = createTypeParameterDto(bindings, typeVariable);
+            typeParameterDto = typeVariableTransformer.createTypeParameterDto(bindings, typeVariable);
         }
         return new VariableDto(typeParameterDto, typeDto, name);
     }

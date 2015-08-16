@@ -8,10 +8,8 @@ package ch.tsphp.tinsphp.translators.tsphp;
 
 import ch.tsphp.common.ITSPHPAst;
 import ch.tsphp.common.symbols.ITypeSymbol;
-import ch.tsphp.tinsphp.common.inference.constraints.IBindingCollection;
 import ch.tsphp.tinsphp.common.inference.constraints.IVariable;
-
-import java.util.Deque;
+import ch.tsphp.tinsphp.common.translation.dtos.TranslationScopeDto;
 
 public interface IRuntimeCheckProvider
 {
@@ -20,10 +18,13 @@ public interface IRuntimeCheckProvider
      */
     boolean addParameterCheck(
             String identifier,
-            Deque<String> statements,
-            IBindingCollection bindings,
+            TranslationScopeDto translationScopeDto,
             IVariable parameter,
             int parameterIndex);
 
-    Object getTypeCheck(Deque<String> statements, ITSPHPAst argumentAst, Object argument, ITypeSymbol argumentType);
+    Object getTypeCheck(
+            TranslationScopeDto translationScopeDto,
+            ITSPHPAst argumentAst,
+            Object argument,
+            ITypeSymbol argumentType);
 }

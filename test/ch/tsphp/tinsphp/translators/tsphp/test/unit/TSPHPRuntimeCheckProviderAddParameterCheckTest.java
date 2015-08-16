@@ -10,6 +10,7 @@ import ch.tsphp.tinsphp.common.inference.constraints.IBindingCollection;
 import ch.tsphp.tinsphp.common.inference.constraints.IVariable;
 import ch.tsphp.tinsphp.common.symbols.IIntersectionTypeSymbol;
 import ch.tsphp.tinsphp.common.symbols.IUnionTypeSymbol;
+import ch.tsphp.tinsphp.common.translation.dtos.TranslationScopeDto;
 import ch.tsphp.tinsphp.translators.tsphp.IRuntimeCheckProvider;
 import ch.tsphp.tinsphp.translators.tsphp.ITempVariableHelper;
 import ch.tsphp.tinsphp.translators.tsphp.test.unit.testutils.ATSPHPRuntimeCheckProviderTest;
@@ -28,7 +29,6 @@ public class TSPHPRuntimeCheckProviderAddParameterCheckTest extends ATSPHPRuntim
     @Test
     public void addParameterCheck_NullType_ReturnsCheckForNull() {
         ITempVariableHelper tempVariableHelper = createTempVariableHelperIsVariable();
-        Deque<String> statements = new ArrayDeque<>();
         IBindingCollection bindingCollection = mock(IBindingCollection.class);
         when(bindingCollection.getTypeVariable("$x")).thenReturn("T");
         IIntersectionTypeSymbol upperTypeBounds = createIntersectionTypeSymbol(nullType);
@@ -36,10 +36,12 @@ public class TSPHPRuntimeCheckProviderAddParameterCheckTest extends ATSPHPRuntim
         IVariable parameter = mock(IVariable.class);
         when(parameter.getName()).thenReturn("$x");
         when(parameter.getAbsoluteName()).thenReturn("$x");
+        Deque<String> statements = new ArrayDeque<>();
+        TranslationScopeDto translationScopeDto = new TranslationScopeDto(bindingCollection, statements);
 
         IRuntimeCheckProvider runtimeCheckProvider = createRuntimeCheckProvider(tempVariableHelper);
         boolean result = runtimeCheckProvider.addParameterCheck(
-                "foo()", statements, bindingCollection, parameter, 0);
+                "foo()", translationScopeDto, parameter, 0);
 
         assertThat(result, is(true));
         assertThat(statements.size(), is(1));
@@ -52,7 +54,6 @@ public class TSPHPRuntimeCheckProviderAddParameterCheckTest extends ATSPHPRuntim
     @Test
     public void addParameterCheck_FalseType_ReturnsCheckForFalse() {
         ITempVariableHelper tempVariableHelper = createTempVariableHelperIsVariable();
-        Deque<String> statements = new ArrayDeque<>();
         IBindingCollection bindingCollection = mock(IBindingCollection.class);
         when(bindingCollection.getTypeVariable("$x")).thenReturn("T");
         IIntersectionTypeSymbol upperTypeBounds = createIntersectionTypeSymbol(falseType);
@@ -60,10 +61,12 @@ public class TSPHPRuntimeCheckProviderAddParameterCheckTest extends ATSPHPRuntim
         IVariable parameter = mock(IVariable.class);
         when(parameter.getName()).thenReturn("$x");
         when(parameter.getAbsoluteName()).thenReturn("$x");
+        Deque<String> statements = new ArrayDeque<>();
+        TranslationScopeDto translationScopeDto = new TranslationScopeDto(bindingCollection, statements);
 
         IRuntimeCheckProvider runtimeCheckProvider = createRuntimeCheckProvider(tempVariableHelper);
         boolean result = runtimeCheckProvider.addParameterCheck(
-                "foo()", statements, bindingCollection, parameter, 0);
+                "foo()", translationScopeDto, parameter, 0);
 
         assertThat(result, is(true));
         assertThat(statements.size(), is(1));
@@ -76,7 +79,6 @@ public class TSPHPRuntimeCheckProviderAddParameterCheckTest extends ATSPHPRuntim
     @Test
     public void addParameterCheck_TrueType_ReturnsCheckForTrue() {
         ITempVariableHelper tempVariableHelper = createTempVariableHelperIsVariable();
-        Deque<String> statements = new ArrayDeque<>();
         IBindingCollection bindingCollection = mock(IBindingCollection.class);
         when(bindingCollection.getTypeVariable("$x")).thenReturn("T");
         IIntersectionTypeSymbol upperTypeBounds = createIntersectionTypeSymbol(trueType);
@@ -84,10 +86,12 @@ public class TSPHPRuntimeCheckProviderAddParameterCheckTest extends ATSPHPRuntim
         IVariable parameter = mock(IVariable.class);
         when(parameter.getName()).thenReturn("$x");
         when(parameter.getAbsoluteName()).thenReturn("$x");
+        Deque<String> statements = new ArrayDeque<>();
+        TranslationScopeDto translationScopeDto = new TranslationScopeDto(bindingCollection, statements);
 
         IRuntimeCheckProvider runtimeCheckProvider = createRuntimeCheckProvider(tempVariableHelper);
         boolean result = runtimeCheckProvider.addParameterCheck(
-                "foo()", statements, bindingCollection, parameter, 0);
+                "foo()", translationScopeDto, parameter, 0);
 
         assertThat(result, is(true));
         assertThat(statements.size(), is(1));
@@ -100,7 +104,6 @@ public class TSPHPRuntimeCheckProviderAddParameterCheckTest extends ATSPHPRuntim
     @Test
     public void addParameterCheck_FalseTypeOrTrueType_ReturnsCheckForBool() {
         ITempVariableHelper tempVariableHelper = createTempVariableHelperIsVariable();
-        Deque<String> statements = new ArrayDeque<>();
         IBindingCollection bindingCollection = mock(IBindingCollection.class);
         when(bindingCollection.getTypeVariable("$x")).thenReturn("T");
         IIntersectionTypeSymbol upperTypeBounds = createIntersectionTypeSymbol(boolType);
@@ -108,10 +111,12 @@ public class TSPHPRuntimeCheckProviderAddParameterCheckTest extends ATSPHPRuntim
         IVariable parameter = mock(IVariable.class);
         when(parameter.getName()).thenReturn("$x");
         when(parameter.getAbsoluteName()).thenReturn("$x");
+        Deque<String> statements = new ArrayDeque<>();
+        TranslationScopeDto translationScopeDto = new TranslationScopeDto(bindingCollection, statements);
 
         IRuntimeCheckProvider runtimeCheckProvider = createRuntimeCheckProvider(tempVariableHelper);
         boolean result = runtimeCheckProvider.addParameterCheck(
-                "foo()", statements, bindingCollection, parameter, 0);
+                "foo()", translationScopeDto, parameter, 0);
 
         assertThat(result, is(true));
         assertThat(statements.size(), is(1));
@@ -124,7 +129,6 @@ public class TSPHPRuntimeCheckProviderAddParameterCheckTest extends ATSPHPRuntim
     @Test
     public void addParameterCheck_FalseTypeOrTrueTypeOrInt_ReturnsCheckForBoolAndInt() {
         ITempVariableHelper tempVariableHelper = createTempVariableHelperIsVariable();
-        Deque<String> statements = new ArrayDeque<>();
         IBindingCollection bindingCollection = mock(IBindingCollection.class);
         when(bindingCollection.getTypeVariable("$x")).thenReturn("T");
         IUnionTypeSymbol boolOrInt = createUnionTypeSymbol(boolType, intType);
@@ -133,10 +137,12 @@ public class TSPHPRuntimeCheckProviderAddParameterCheckTest extends ATSPHPRuntim
         IVariable parameter = mock(IVariable.class);
         when(parameter.getName()).thenReturn("$x");
         when(parameter.getAbsoluteName()).thenReturn("$x");
+        Deque<String> statements = new ArrayDeque<>();
+        TranslationScopeDto translationScopeDto = new TranslationScopeDto(bindingCollection, statements);
 
         IRuntimeCheckProvider runtimeCheckProvider = createRuntimeCheckProvider(tempVariableHelper);
         boolean result = runtimeCheckProvider.addParameterCheck(
-                "foo()", statements, bindingCollection, parameter, 0);
+                "foo()", translationScopeDto, parameter, 0);
 
         assertThat(result, is(true));
         assertThat(statements.size(), is(1));
@@ -149,7 +155,6 @@ public class TSPHPRuntimeCheckProviderAddParameterCheckTest extends ATSPHPRuntim
     @Test
     public void addParameterCheck_FalseTypeOrTrueTypeOrIntOrFloat_ReturnsCheckForBoolAndIntAndFloat() {
         ITempVariableHelper tempVariableHelper = createTempVariableHelperIsVariable();
-        Deque<String> statements = new ArrayDeque<>();
         IBindingCollection bindingCollection = mock(IBindingCollection.class);
         when(bindingCollection.getTypeVariable("$x")).thenReturn("T");
         IUnionTypeSymbol boolOrInt = createUnionTypeSymbol(boolType, numType);
@@ -158,10 +163,12 @@ public class TSPHPRuntimeCheckProviderAddParameterCheckTest extends ATSPHPRuntim
         IVariable parameter = mock(IVariable.class);
         when(parameter.getName()).thenReturn("$x");
         when(parameter.getAbsoluteName()).thenReturn("$x");
+        Deque<String> statements = new ArrayDeque<>();
+        TranslationScopeDto translationScopeDto = new TranslationScopeDto(bindingCollection, statements);
 
         IRuntimeCheckProvider runtimeCheckProvider = createRuntimeCheckProvider(tempVariableHelper);
         boolean result = runtimeCheckProvider.addParameterCheck(
-                "foo()", statements, bindingCollection, parameter, 0);
+                "foo()", translationScopeDto, parameter, 0);
 
         assertThat(result, is(true));
         assertThat(statements.size(), is(1));

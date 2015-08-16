@@ -19,10 +19,12 @@ import ch.tsphp.tinsphp.symbols.config.HardCodedSymbolsInitialiser;
 import ch.tsphp.tinsphp.translators.tsphp.IOperatorHelper;
 import ch.tsphp.tinsphp.translators.tsphp.IRuntimeCheckProvider;
 import ch.tsphp.tinsphp.translators.tsphp.ITypeTransformer;
+import ch.tsphp.tinsphp.translators.tsphp.ITypeVariableTransformer;
 import ch.tsphp.tinsphp.translators.tsphp.TSPHPOperatorHelper;
 import ch.tsphp.tinsphp.translators.tsphp.TSPHPRuntimeCheckProvider;
 import ch.tsphp.tinsphp.translators.tsphp.TSPHPTypeTransformer;
 import ch.tsphp.tinsphp.translators.tsphp.TempVariableHelper;
+import ch.tsphp.tinsphp.translators.tsphp.TsphpTypeVariableTransformer;
 import ch.tsphp.tinsphp.translators.tsphp.TsphpUnionTypeSymbol;
 import ch.tsphp.tinsphp.translators.tsphp.issues.HardCodedOutputIssueMessageProvider;
 import org.junit.Ignore;
@@ -76,5 +78,11 @@ public abstract class ATranslatorWithWideningTest extends ATranslatorTest
             tempVariableHelper) {
         return new TSPHPRuntimeCheckProvider(
                 typeTransformer, tempVariableHelper, new HardCodedOutputIssueMessageProvider(), tsphpBoolTypeSymbol);
+    }
+
+    @Override
+    protected ITypeVariableTransformer createTypeVariableMapper(ITypeTransformer typeTransformer) {
+        return new TsphpTypeVariableTransformer(
+                symbolsInitialiser.getSymbolFactory(), symbolsInitialiser.getTypeHelper(), typeTransformer);
     }
 }
