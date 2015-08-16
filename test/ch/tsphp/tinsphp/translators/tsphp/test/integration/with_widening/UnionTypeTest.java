@@ -10,7 +10,7 @@
  * For more information see http://tsphp.ch/wiki/display/TSPHP/License
  */
 
-package ch.tsphp.tinsphp.translators.tsphp.test.integration.with_reduction;
+package ch.tsphp.tinsphp.translators.tsphp.test.integration.with_widening;
 
 
 import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorWithWideningTest;

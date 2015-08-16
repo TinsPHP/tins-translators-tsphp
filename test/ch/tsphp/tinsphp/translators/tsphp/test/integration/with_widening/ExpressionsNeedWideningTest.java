@@ -4,7 +4,7 @@
  * root folder or visit the project's website http://tsphp.ch/wiki/display/TINS/License
  */
 
-package ch.tsphp.tinsphp.translators.tsphp.test.integration.with_reduction;
+package ch.tsphp.tinsphp.translators.tsphp.test.integration.with_widening;
 
 import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorWithWideningTest;
 import org.antlr.runtime.RecognitionException;
