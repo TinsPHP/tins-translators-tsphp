@@ -24,6 +24,7 @@ import ch.tsphp.tinsphp.common.utils.ITypeHelper;
 import ch.tsphp.tinsphp.common.utils.Pair;
 import ch.tsphp.tinsphp.common.utils.TypeHelperDto;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -110,6 +111,12 @@ public class TSPHPOperatorHelper implements IOperatorHelper
                 String signature = overload.getSignature();
                 Pair<String, ITypeSymbol> pair = overloads.get(signature);
                 switchToMigrationFunctionIfRequired(translationScopeDto, dto, leftHandSide, argumentsAst, pair);
+            } else if (operatorType == TokenTypes.CAST) {
+                switchToMigrationFunction(
+                        translationScopeDto, dto, leftHandSide, new Pair<String, ITypeSymbol>("oldSchoolCast", null));
+                dto.typeParameters = new ArrayList<>();
+                ITSPHPAst typeAst = (ITSPHPAst) dto.arguments.remove(0);
+                dto.typeParameters.add(typeTransformer.getType(typeAst.getEvalType()).first.getAbsoluteName());
             }
 
             if (dto.name == null && overload.hasConvertibleParameterTypes()) {
@@ -243,14 +250,17 @@ public class TSPHPOperatorHelper implements IOperatorHelper
             if (typeSymbol == null) {
                 typeSymbol = bindingCollection.getUpperTypeBounds(lhsTypeVariable);
             }
-            TypeHelperDto result = typeHelper.isFirstSameOrSubTypeOfSecond(returnType, typeSymbol);
-            //if the left hand side is more specific than the return type then we need to cast
-            if (result.relation == ERelation.HAS_NO_RELATION) {
-                functionApplicationDto.returnRuntimeCheck = runtimeCheckProvider.getTypeCheck(
-                        translationScopeDto,
-                        leftHandSide,
-                        "%returnRuntimeCheck%",
-                        typeSymbol).toString();
+            //TODO TINS-394 introduce nothing as own type
+            if (returnType != null) {
+                TypeHelperDto result = typeHelper.isFirstSameOrSubTypeOfSecond(returnType, typeSymbol);
+                //if the left hand side is more specific than the return type then we need to cast
+                if (result.relation == ERelation.HAS_NO_RELATION) {
+                    functionApplicationDto.returnRuntimeCheck = runtimeCheckProvider.getTypeCheck(
+                            translationScopeDto,
+                            leftHandSide,
+                            "%returnRuntimeCheck%",
+                            typeSymbol).toString();
+                }
             }
         } else {
             //if overload is parametric polymorphic then we need to cast to the parametric type

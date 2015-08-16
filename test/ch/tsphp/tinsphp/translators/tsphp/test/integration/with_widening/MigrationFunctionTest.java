@@ -74,7 +74,13 @@ public class MigrationFunctionTest extends ATranslatorWithWideningTest
                                 + "    }\n"
                                 + "\n"
                                 + "}"
-                }
+                },
+                {"<?php $a = (bool) 1;", "namespace{\n    bool $a;\n    $a = oldSchoolCast<bool>(1);\n}"},
+                {"<?php $a = (int) 'hello';", "namespace{\n    int $a;\n    $a = oldSchoolCast<int>('hello');\n}"},
+                {"<?php $a = (int) 1;", "namespace{\n    int $a;\n    $a = oldSchoolCast<int>(1);\n}"},
+                {"<?php $a = (float) 1;", "namespace{\n    float $a;\n    $a = oldSchoolCast<float>(1);\n}"},
+                {"<?php $a = (string) 1;", "namespace{\n    string $a;\n    $a = oldSchoolCast<string>(1);\n}"},
+                {"<?php $a = (array) 1;", "namespace{\n    array $a;\n    $a = oldSchoolCast<array>(1);\n}"},
         }));
 
         return collection;

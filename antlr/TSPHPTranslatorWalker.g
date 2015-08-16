@@ -105,7 +105,7 @@ private StringTemplate getFunctionApplication(
     StringTemplate stringTemplate;
 
     if (dto != null) {
-        stringTemplate = %functionCall(identifier={dto.name}, arguments={dto.arguments});
+        stringTemplate = %functionCall(identifier={dto.name}, typeParams={dto.typeParameters}, arguments={dto.arguments});
         if (dto.returnRuntimeCheck != null) {
             stringTemplate = new StringTemplate(templateLib, dto.returnRuntimeCheck.replace("\%returnRuntimeCheck\%", stringTemplate.toString()));
         }
@@ -862,14 +862,29 @@ operator
                 controller.needParentheses($QuestionMark));        
         }
         
-    //TODO rstoll TINS-276 conversions and casts
-    /* 
-    |   castOperator
-        -> {$castOperator.st}
-    */
+    |    ^(CAST ^(TYPE tMod=. castType=.) expr=expression)
+        {
+            List<String> argumentNames = new ArrayList<>(2);
+            List<Object> arguments = new ArrayList<>(2);
+            argumentNames.add("type");
+            arguments.add($castType);
+            argumentNames.add("expression");
+            arguments.add($expr.st);
+            FunctionApplicationDto dto = controller.getOperatorApplication(
+                    translationScopeDto, $CAST, arguments);
+            $st = getOperatorOrFunctionApplication(
+                dto, 
+                arguments,
+                argumentNames,
+                $CAST,
+                "cast",
+                null,
+                controller.needParentheses($CAST));
+        }
+    
     |   ^(Instanceof expr=expression (type=TYPE_NAME|type=VariableId))
         {
-            List<String> argumentNames = new ArrayList<>(3);
+            List<String> argumentNames = new ArrayList<>(2);
             List<Object> arguments = new ArrayList<>(2);
             argumentNames.add("expression");
             arguments.add($expr.st);

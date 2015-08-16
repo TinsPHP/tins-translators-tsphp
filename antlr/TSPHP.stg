@@ -123,6 +123,10 @@ ternaryOperator(cond, ifCase, elseCase, needParentheses) ::= <<
 <if(needParentheses)>(<endif>(<cond>) ? <ifCase> : <elseCase><if(needParentheses)>)<endif>
 >>
 
+cast(type, expression, needParentheses) ::=<<
+<if(needParentheses)>(<endif>(<type>) <expression><if(needParentheses)>)<endif>
+>>
+
 instanceof(expression, type, needParentheses) ::= <<
 <if(needParentheses)>(<endif><expression> instanceof <type><if(needParentheses)>)<endif>
 >>
@@ -131,8 +135,8 @@ clone(expression) ::= <<
 clone <expression>
 >>
 
-functionCall(identifier, arguments) ::= <<
-<identifier>(<arguments; separator=", ">)
+functionCall(identifier, typeParams, arguments) ::= <<
+<identifier><if(typeParams)>\<<typeParams; separator=", ">\><endif>(<arguments; separator=", ">)
 >>
 
 runtimeCheck(expression, type, needParentheses) ::= <<
