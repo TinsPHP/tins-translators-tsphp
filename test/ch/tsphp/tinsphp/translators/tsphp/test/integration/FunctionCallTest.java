@@ -77,14 +77,14 @@ public class FunctionCallTest extends ATranslatorTest
                 {
                         "<?php function fac($n){ return $n > 0 ? $n * fac($n-1): 1;} $a = fac(6); $b = fac(5.4);",
                         "namespace{\n"
-                                + "    (float | int) $b;\n"
+                                + "    float $b;\n"
                                 + "    int $a;\n"
                                 + "\n"
                                 + "    function int fac0(int $n) {\n"
                                 + "        return ($n > 0) ? $n * fac($n - 1) : 1;\n"
                                 + "    }\n"
                                 + "\n"
-                                + "    function (int | T) fac1<T>({as T} $n) where [T <: (float | int)] {\n"
+                                + "    function T fac1<T>({as T} $n) where [int <: T <: (float | int)] {\n"
                                 + "        return ($n > 0) ? $n * fac($n - 1) : 1;\n"
                                 + "    }\n"
                                 + "\n"
@@ -137,8 +137,9 @@ public class FunctionCallTest extends ATranslatorTest
                                 + "\nfunction bar($x, $y){ return $x > 10 ? foo($x + $y, $y) : $y;}",
                         "namespace{\n"
                                 + "\n"
-                                + "    function (T1 | T2) foo0<T1, T2>(T1 $x, T2 $y) where [T1 <: {as (float | int)}," +
-                                " T2 <: {as (float | int)}] {\n"
+                                + "    function (T1 | T2 | T4) foo0<T1, T2, T3, T4>(T1 $x, T2 $y) "
+                                + "where [T1 <: {as T3}, T2 <: {as T4}, T3 <: (float | int), "
+                                + "T3 <: T4 <: (float | int)] {\n"
                                 + "        return ($x > 0) ? bar3($x + $y, $y) : $x;\n"
                                 + "    }\n"
                                 + "\n"
@@ -166,8 +167,8 @@ public class FunctionCallTest extends ATranslatorTest
                                 + "        return ($x > 10) ? foo3($x + $y, $y) : $y;\n"
                                 + "    }\n"
                                 + "\n"
-                                + "    function (T1 | T2) bar3<T1, T2>({as T2} $x, " +
-                                "T1 $y) where [T1 <: {as (float | int)}, T2 <: (float | int)] {\n"
+                                + "    function (T1 | T2 | T3) bar3<T1, T2, T3>({as T2} $x, T1 $y) "
+                                + "where [T1 <: {as T3}, T2 <: (float | int), T2 <: T3 <: (float | int)] {\n"
                                 + "        return ($x > 10) ? foo0($x + $y, $y) : $y;\n"
                                 + "    }\n"
                                 + "\n"
@@ -184,8 +185,9 @@ public class FunctionCallTest extends ATranslatorTest
                                 + "    array $j;\n"
                                 + "    int $i;\n"
                                 + "\n"
-                                + "    function (T1 | T2) rec10<T1, T2>(T1 $x, T2 $y) where [T1 <: {as (float | int)" +
-                                "}, T2 <: {as (float | int)}] {\n"
+                                + "    function (T1 | T2 | T4) rec10<T1, T2, T3, T4>(T1 $x, T2 $y) "
+                                + "where [T1 <: {as T3}, T2 <: {as T4}, T3 <: (float | int), "
+                                + "T3 <: T4 <: (float | int)] {\n"
                                 + "        return ($x > 0) ? rec23($x + $y, $y) : $x;\n"
                                 + "    }\n"
                                 + "\n"
@@ -213,14 +215,15 @@ public class FunctionCallTest extends ATranslatorTest
                                 + "        return ($x > 10) ? rec13($x + $y, $y) : $y;\n"
                                 + "    }\n"
                                 + "\n"
-                                + "    function (T1 | T2) rec23<T1, T2>({as T2} $x, " +
-                                "T1 $y) where [T1 <: {as (float | int)}, T2 <: (float | int)] {\n"
+                                + "    function (T1 | T2 | T3) rec23<T1, T2, T3>({as T2} $x, T1 $y) "
+                                + "where [T1 <: {as T3}, T2 <: (float | int), T2 <: T3 <: (float | int)] {\n"
                                 + "        return ($x > 10) ? rec10($x + $y, $y) : $y;\n"
                                 + "    }\n"
                                 + "\n"
                                 + "    $i = rec13(5, 8);\n"
                                 + "    $j = rec20([1, 2], [2]);\n"
-                                + "}"
+                                + "}" +
+                                ""
                 },
                 //soft typing and multiple overloads apply, need to fallback to dynamic version (function call in bar
                 // is fooA)

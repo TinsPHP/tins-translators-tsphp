@@ -30,7 +30,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.SortedSet;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import static ch.tsphp.tinsphp.common.utils.Pair.pair;
 
@@ -120,7 +122,7 @@ public class DtoCreator implements IDtoCreator
             parameterDtos.add(parameterDto);
         }
 
-        Set<String> nonFixedTypeParameters = overload.getNonFixedTypeParameters();
+        SortedSet<String> nonFixedTypeParameters = new TreeSet<>(overload.getNonFixedTypeParameters());
         VariableDto returnVariable = createReturnVariable(
                 bindings, typeVariablesAdded, typeParameters, nonFixedTypeParameters);
 
