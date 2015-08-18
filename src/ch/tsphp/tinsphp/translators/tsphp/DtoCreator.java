@@ -46,12 +46,12 @@ public class DtoCreator implements IDtoCreator
     public DtoCreator(
             ITempVariableHelper theTempVariableHelper,
             ITypeTransformer theTypeTransformer,
-            ITypeVariableTransformer theTypeVariableMapper,
+            ITypeVariableTransformer theTypeVariableTransformer,
             IRuntimeCheckProvider theRuntimeCheckProvider) {
         tempVariableHelper = theTempVariableHelper;
         typeTransformer = theTypeTransformer;
         runtimeCheckProvider = theRuntimeCheckProvider;
-        typeVariableTransformer = theTypeVariableMapper;
+        typeVariableTransformer = theTypeVariableTransformer;
     }
 
     @Override
