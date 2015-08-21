@@ -504,6 +504,27 @@ public class FunctionDefinitionTest extends ATranslatorWithWideningTest
                                 + "\n"
                                 + "}"
                 },
+                //TINS-553 isFinal, container types and upper type bounds
+                {
+                        "<?php function fac($x){return $x > 0 ? $x * fac($x) : $x;}",
+                        "namespace{\n"
+                                + "\n"
+                                //TODO TINS-641 type variable transformer and recursive functions
+                                //+ "    function T1 fac0<T1, T2>(T1 $x) where [T2 <: T1 <: {as T1}, T2 <: num] {\n"
+                                + "    function T fac0<T>(T $x) where [T <: num] {\n"
+                                + "        return ($x > 0) ? cast<T>(oldSchoolMultiplication($x, fac($x))) : $x;\n"
+                                + "    }\n"
+                                + "\n"
+                                + "    function float fac1(float $x) {\n"
+                                + "        return ($x > 0) ? $x * fac($x) : $x;\n"
+                                + "    }\n"
+                                + "\n"
+                                + "    function int fac2(int $x) {\n"
+                                + "        return ($x > 0) ? $x * fac($x) : $x;\n"
+                                + "    }\n"
+                                + "\n"
+                                + "}"
+                },
         });
     }
 }
