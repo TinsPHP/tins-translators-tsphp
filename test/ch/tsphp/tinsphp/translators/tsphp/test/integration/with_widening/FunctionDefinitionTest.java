@@ -509,10 +509,8 @@ public class FunctionDefinitionTest extends ATranslatorWithWideningTest
                         "<?php function fac($x){return $x > 0 ? $x * fac($x) : $x;}",
                         "namespace{\n"
                                 + "\n"
-                                //TODO TINS-641 type variable transformer and recursive functions
-                                //+ "    function T1 fac0<T1, T2>(T1 $x) where [T2 <: T1 <: {as T1}, T2 <: num] {\n"
-                                + "    function T fac0<T>(T $x) where [T <: num] {\n"
-                                + "        return ($x > 0) ? cast<T>(oldSchoolMultiplication($x, fac($x))) : $x;\n"
+                                + "    function T fac0<T>(T $x) where [num <: T <: {as num}] {\n"
+                                + "        return ($x > 0) ? oldSchoolMultiplication($x, fac($x)) : $x;\n"
                                 + "    }\n"
                                 + "\n"
                                 + "    function float fac1(float $x) {\n"
@@ -524,6 +522,49 @@ public class FunctionDefinitionTest extends ATranslatorWithWideningTest
                                 + "    }\n"
                                 + "\n"
                                 + "}"
+                },
+                //see TINS-641 type variable transformer and recursive functions
+                {
+                        "<?php function fooW($x){ return $x != '' ? $x . '1': $x;}",
+                        "namespace{\n"
+                                + "\n"
+                                + "    function T fooW0<T>(T $x) where [string <: T <: {as string}] {\n"
+                                + "        return ($x != '') ? $x . '1' : $x;\n"
+                                + "    }\n"
+                                + "\n"
+                                + "    function string fooW1(string $x) {\n"
+                                + "        return ($x != '') ? $x . '1' : $x;\n"
+                                + "    }\n"
+                                + "\n"
+                                + "}"
+                },
+                {
+                        "<?php function fooX($x, $y){$x . 1; $y & 1.2; return $x; return $y;}\n"
+                                + "$a = fooX(1, 2);\n $b = fooX(1.2, 2.3);\n "
+                                + "$c = fooX('hello', 'hi');\n $d = fooX(1, 2.5);",
+                        "namespace{\n"
+                                + "    num $d;\n"
+                                + "    string $c;\n"
+                                + "    float $b;\n"
+                                + "    int $a;\n"
+                                + "\n"
+                                + "    function mixed fooX(mixed $x, mixed $y) {\n"
+                                + "        $x as string . 1 as string;\n"
+                                + "        oldSchoolBitwiseAnd($y, 1.2);\n"
+                                + "        return $x;\n"
+                                + "        return $y;\n"
+                                + "    }\n"
+                                + "\n"
+                                //TODO TINS-643 missing cast for return values
+//                                + "    $a = cast<int>(fooW(1, 2));\n"
+//                                + "    $b = cast<float>(fooW(1.2, 2.3));\n"
+//                                + "    $c = cast<string>(fooW('hello', 'hi'));\n"
+//                                + "    $d = cast<num>(fooW(1, 2.5));"
+                                + "    $a = fooX(1, 2);\n"
+                                + "    $b = fooX(1.2, 2.3);\n"
+                                + "    $c = fooX('hello', 'hi');\n"
+                                + "    $d = fooX(1, 2.5);\n"
+                                + "}",
                 },
         });
     }

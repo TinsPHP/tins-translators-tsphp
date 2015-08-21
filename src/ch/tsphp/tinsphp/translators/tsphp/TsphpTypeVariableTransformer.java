@@ -8,6 +8,7 @@ package ch.tsphp.tinsphp.translators.tsphp;
 
 import ch.tsphp.common.symbols.ITypeSymbol;
 import ch.tsphp.tinsphp.common.TinsPHPConstants;
+import ch.tsphp.tinsphp.common.inference.constraints.EBindingCollectionMode;
 import ch.tsphp.tinsphp.common.inference.constraints.IBindingCollection;
 import ch.tsphp.tinsphp.common.inference.constraints.IFunctionType;
 import ch.tsphp.tinsphp.common.inference.constraints.ITypeVariableReference;
@@ -25,6 +26,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import static ch.tsphp.tinsphp.common.utils.Pair.pair;
 
 public class TsphpTypeVariableTransformer implements ITypeVariableTransformer
 {
@@ -83,6 +86,10 @@ public class TsphpTypeVariableTransformer implements ITypeVariableTransformer
                     wasModified = true;
                 }
             }
+            Pair<IBindingCollection, Boolean> pair
+                    = widenTypeBoundsIfNecessary(newBindings, isStillOriginal, typeParameter);
+            wasModified = wasModified || pair.second;
+            newBindings = pair.first;
         }
 
         if (wasModified) {
@@ -103,7 +110,6 @@ public class TsphpTypeVariableTransformer implements ITypeVariableTransformer
         return newOverload;
     }
 
-
     private IBindingCollection unifyWithLowerRefs(
             IBindingCollection originalBindings, String typeVariable, boolean copyBindings) {
         IBindingCollection newBindings = originalBindings;
@@ -111,22 +117,31 @@ public class TsphpTypeVariableTransformer implements ITypeVariableTransformer
             newBindings = symbolFactory.createBindingCollection(originalBindings);
         }
 
-        IUnionTypeSymbol lowerTypeBounds = newBindings.getLowerTypeBounds(typeVariable);
         Set<String> lowerRefBounds = newBindings.getLowerRefBounds(typeVariable);
         Set<String> copyLowerRefBounds = new HashSet<>(lowerRefBounds);
         for (String refTypeVariable : copyLowerRefBounds) {
-            boolean isSubtype = true;
             IIntersectionTypeSymbol refUpperTypeBounds = null;
-            if (newBindings.hasUpperTypeBounds(refTypeVariable)) {
+
+            boolean refHasUpperTypeBounds = newBindings.hasUpperTypeBounds(refTypeVariable);
+            if (refHasUpperTypeBounds) {
                 refUpperTypeBounds = newBindings.getUpperTypeBounds(refTypeVariable);
-                isSubtype = lowerTypeBounds == null;
-                if (!isSubtype) {
-                    TypeHelperDto result = typeHelper.isFirstSameOrSubTypeOfSecond(
-                            lowerTypeBounds, refUpperTypeBounds, false);
-                    isSubtype = result.relation == ERelation.HAS_RELATION;
+            }
+            boolean canMerge = !refHasUpperTypeBounds;
+            if (!canMerge) {
+                if (newBindings.hasUpperTypeBounds(typeVariable)) {
+                    canMerge = typeHelper.areSame(refUpperTypeBounds, newBindings.getUpperTypeBounds(typeVariable));
+                } else {
+                    IUnionTypeSymbol lowerTypeBounds = newBindings.getLowerTypeBounds(typeVariable);
+                    canMerge = lowerTypeBounds == null;
+                    if (!canMerge) {
+                        TypeHelperDto result = typeHelper.isFirstSameOrSubTypeOfSecond(
+                                lowerTypeBounds, refUpperTypeBounds, false);
+                        canMerge = result.relation == ERelation.HAS_RELATION;
+                    }
                 }
             }
-            if (isSubtype) {
+
+            if (canMerge) {
                 newBindings.mergeFirstIntoSecond(refTypeVariable, typeVariable);
                 lowerRefBounds.remove(typeVariable);
                 newBindings.getUpperRefBounds(typeVariable).remove(typeVariable);
@@ -138,6 +153,48 @@ public class TsphpTypeVariableTransformer implements ITypeVariableTransformer
             }
         }
         return newBindings;
+    }
+
+    private Pair<IBindingCollection, Boolean> widenTypeBoundsIfNecessary(
+            IBindingCollection newBindings, boolean isStillOriginal, String typeParameter) {
+
+        boolean wasModified = false;
+
+        boolean needToTransformUpperTypeBound = true;
+        if (newBindings.hasLowerTypeBounds(typeParameter)) {
+            Pair<ITypeSymbol, Boolean> pair
+                    = typeTransformer.getType(newBindings.getLowerTypeBounds(typeParameter));
+            if (pair.second) {
+                wasModified = true;
+                if (isStillOriginal) {
+                    newBindings = symbolFactory.createBindingCollection(newBindings);
+                }
+                if (newBindings.hasUpperTypeBounds(typeParameter)) {
+                    TypeHelperDto resultDto = typeHelper.isFirstSameOrSubTypeOfSecond(
+                            pair.first, newBindings.getUpperTypeBounds(typeParameter), false);
+                    if (resultDto.relation == ERelation.HAS_NO_RELATION) {
+                        needToTransformUpperTypeBound = false;
+                        newBindings.setMode(EBindingCollectionMode.Modification);
+                        newBindings.removeUpperTypeBounds(typeParameter);
+                        newBindings.addUpperTypeBound(typeParameter, pair.first);
+                        newBindings.setMode(EBindingCollectionMode.Normal);
+                    }
+                }
+                newBindings.addLowerTypeBound(typeParameter, pair.first);
+            }
+        }
+        if (needToTransformUpperTypeBound && newBindings.hasUpperTypeBounds(typeParameter)) {
+            Pair<ITypeSymbol, Boolean> pair
+                    = typeTransformer.getType(newBindings.getUpperTypeBounds(typeParameter));
+            if (pair.second) {
+                wasModified = true;
+                if (isStillOriginal) {
+                    newBindings = symbolFactory.createBindingCollection(newBindings);
+                }
+                newBindings.addUpperTypeBound(typeParameter, pair.first);
+            }
+        }
+        return pair(newBindings, wasModified);
     }
 
     @Override

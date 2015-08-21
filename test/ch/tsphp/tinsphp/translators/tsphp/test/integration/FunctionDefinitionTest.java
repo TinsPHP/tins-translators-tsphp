@@ -570,6 +570,39 @@ public class FunctionDefinitionTest extends ATranslatorTest
                                 + "\n"
                                 + "}"
                 },
+                {
+                        "<?php function fac($x){return $x > 0 ? $x * fac($x) : $x;}",
+                        "namespace{\n"
+                                + "\n"
+                                + "    function (T1 | T2) fac0<T1, T2>(T1 $x) "
+                                + "where [T1 <: {as T2}, T2 <: (float | int)] {\n"
+                                + "        return ($x > 0) ? $x * fac($x) : $x;\n"
+                                + "    }\n"
+                                + "\n"
+                                + "    function float fac1(float $x) {\n"
+                                + "        return ($x > 0) ? $x * fac($x) : $x;\n"
+                                + "    }\n"
+                                + "\n"
+                                + "    function int fac2(int $x) {\n"
+                                + "        return ($x > 0) ? $x * fac($x) : $x;\n"
+                                + "    }\n"
+                                + "\n"
+                                + "}"
+                },
+                {
+                        "<?php function fooW($x, $y){$x . 1; $y & 1.2; return $x; return $y;}",
+                        "namespace{\n"
+                                + "\n"
+                                + "    function (T1 | T2) fooW<T1, T2>(T1 $x, T2 $y) "
+                                + "where [T1 <: {as string}, T2 <: (array | {as int})] {\n"
+                                + "        $x . 1;\n"
+                                + "        $y & 1.2;\n"
+                                + "        return $x;\n"
+                                + "        return $y;\n"
+                                + "    }\n"
+                                + "\n"
+                                + "}"
+                }
         });
     }
 }
