@@ -28,6 +28,7 @@ import ch.tsphp.tinsphp.common.issues.EIssueSeverity;
 import ch.tsphp.tinsphp.common.issues.IIssueLogger;
 import ch.tsphp.tinsphp.common.translation.IDtoCreator;
 import ch.tsphp.tinsphp.common.translation.ITranslatorController;
+import ch.tsphp.tinsphp.common.utils.ITypeHelper;
 import ch.tsphp.tinsphp.core.config.HardCodedCoreInitialiser;
 import ch.tsphp.tinsphp.inference_engine.config.HardCodedInferenceEngineInitialiser;
 import ch.tsphp.tinsphp.parser.config.HardCodedParserInitialiser;
@@ -124,9 +125,11 @@ public abstract class ATest implements IIssueLogger
 
         commonTreeNodeStream.reset();
 
+        ITypeHelper typeHelper = symbolsInitialiser.getTypeHelper();
         TempVariableHelper tempVariableHelper = new TempVariableHelper(astAdaptor);
         ITypeTransformer typeTransformer = createTypeTransformer();
-        IRuntimeCheckProvider runtimeCheckProvider = createRuntimeCheckProvider(typeTransformer, tempVariableHelper);
+        IRuntimeCheckProvider runtimeCheckProvider = createRuntimeCheckProvider(
+                typeHelper, typeTransformer, tempVariableHelper);
         IOperatorHelper operatorHelper = createOperatorHelper(runtimeCheckProvider, typeTransformer);
         ITypeVariableTransformer typeVariableMapper = createTypeVariableMapper(typeTransformer);
 
@@ -156,8 +159,8 @@ public abstract class ATest implements IIssueLogger
     }
 
     protected IRuntimeCheckProvider createRuntimeCheckProvider(
-            ITypeTransformer typeTransformer, TempVariableHelper tempVariableHelper) {
-        return new PhpPlusRuntimeCheckProvider();
+            ITypeHelper typeHelper, ITypeTransformer typeTransformer, TempVariableHelper tempVariableHelper) {
+        return new PhpPlusRuntimeCheckProvider(typeHelper);
     }
 
     protected ITypeTransformer createTypeTransformer() {

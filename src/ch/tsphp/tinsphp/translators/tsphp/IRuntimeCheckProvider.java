@@ -9,6 +9,7 @@ package ch.tsphp.tinsphp.translators.tsphp;
 import ch.tsphp.common.ITSPHPAst;
 import ch.tsphp.common.symbols.ITypeSymbol;
 import ch.tsphp.tinsphp.common.inference.constraints.IVariable;
+import ch.tsphp.tinsphp.common.translation.dtos.FunctionApplicationDto;
 import ch.tsphp.tinsphp.common.translation.dtos.TranslationScopeDto;
 
 public interface IRuntimeCheckProvider
@@ -27,4 +28,12 @@ public interface IRuntimeCheckProvider
             ITSPHPAst argumentAst,
             Object argument,
             ITypeSymbol argumentType);
+
+    void addReturnValueCheck(
+            TranslationScopeDto translationScopeDto,
+            FunctionApplicationDto functionApplicationDto,
+            ITSPHPAst leftHandSide,
+            ITypeSymbol returnType,
+            boolean isConstantReturnType);
+
 }

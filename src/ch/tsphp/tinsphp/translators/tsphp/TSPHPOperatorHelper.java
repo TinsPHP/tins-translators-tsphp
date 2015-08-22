@@ -11,7 +11,6 @@ import ch.tsphp.common.symbols.ITypeSymbol;
 import ch.tsphp.tinsphp.common.gen.TokenTypes;
 import ch.tsphp.tinsphp.common.inference.constraints.IBindingCollection;
 import ch.tsphp.tinsphp.common.inference.constraints.IFunctionType;
-import ch.tsphp.tinsphp.common.inference.constraints.ITypeVariableReference;
 import ch.tsphp.tinsphp.common.inference.constraints.IVariable;
 import ch.tsphp.tinsphp.common.inference.constraints.OverloadApplicationDto;
 import ch.tsphp.tinsphp.common.symbols.IConvertibleTypeSymbol;
@@ -208,7 +207,8 @@ public class TSPHPOperatorHelper implements IOperatorHelper
             TranslationScopeDto translationScopeDto,
             FunctionApplicationDto functionApplicationDto,
             ITSPHPAst leftHandSide,
-            ITSPHPAst arguments, Pair<String, ITypeSymbol> pair) {
+            ITSPHPAst arguments,
+            Pair<String, ITypeSymbol> pair) {
 
         if (pair != null) {
             IBindingCollection bindingCollection = translationScopeDto.bindingCollection;
@@ -239,33 +239,14 @@ public class TSPHPOperatorHelper implements IOperatorHelper
             FunctionApplicationDto functionApplicationDto,
             ITSPHPAst leftHandSide,
             Pair<String, ITypeSymbol> pair) {
-        IBindingCollection bindingCollection = translationScopeDto.bindingCollection;
         functionApplicationDto.name = pair.first;
-        String leftHandSideId = leftHandSide.getSymbol().getAbsoluteName();
-        ITypeVariableReference reference = bindingCollection.getTypeVariableReference(leftHandSideId);
-        String lhsTypeVariable = reference.getTypeVariable();
         ITypeSymbol returnType = pair.second;
-        if (reference.hasFixedType()) {
-            ITypeSymbol typeSymbol = bindingCollection.getLowerTypeBounds(lhsTypeVariable);
-            if (typeSymbol == null) {
-                typeSymbol = bindingCollection.getUpperTypeBounds(lhsTypeVariable);
-            }
-            //TODO TINS-394 introduce nothing as own type
-            if (returnType != null) {
-                TypeHelperDto result = typeHelper.isFirstSameOrSubTypeOfSecond(returnType, typeSymbol);
-                //if the left hand side is more specific than the return type then we need to cast
-                if (result.relation == ERelation.HAS_NO_RELATION) {
-                    functionApplicationDto.returnRuntimeCheck = runtimeCheckProvider.getTypeCheck(
-                            translationScopeDto,
-                            leftHandSide,
-                            "%returnRuntimeCheck%",
-                            typeSymbol).toString();
-                }
-            }
-        } else {
-            //if overload is parametric polymorphic then we need to cast to the parametric type
-            functionApplicationDto.returnRuntimeCheck = "cast<" + lhsTypeVariable + ">(%returnRuntimeCheck%)";
-        }
+        runtimeCheckProvider.addReturnValueCheck(
+                translationScopeDto,
+                functionApplicationDto,
+                leftHandSide,
+                returnType,
+                true);
     }
 
     private ITypeSymbol getTypeSymbol(IBindingCollection currentBindings, ITSPHPAst ast) {

@@ -8,13 +8,16 @@ package ch.tsphp.tinsphp.translators.tsphp;
 
 import ch.tsphp.common.ITSPHPAst;
 import ch.tsphp.common.symbols.ITypeSymbol;
+import ch.tsphp.tinsphp.common.TinsPHPConstants;
 import ch.tsphp.tinsphp.common.inference.constraints.IBindingCollection;
 import ch.tsphp.tinsphp.common.inference.constraints.IFunctionType;
+import ch.tsphp.tinsphp.common.inference.constraints.ITypeVariableReference;
 import ch.tsphp.tinsphp.common.inference.constraints.IVariable;
 import ch.tsphp.tinsphp.common.inference.constraints.OverloadApplicationDto;
 import ch.tsphp.tinsphp.common.symbols.IExpressionVariableSymbol;
 import ch.tsphp.tinsphp.common.symbols.IMethodSymbol;
 import ch.tsphp.tinsphp.common.symbols.IMinimalMethodSymbol;
+import ch.tsphp.tinsphp.common.symbols.IUnionTypeSymbol;
 import ch.tsphp.tinsphp.common.translation.IDtoCreator;
 import ch.tsphp.tinsphp.common.translation.ITranslatorController;
 import ch.tsphp.tinsphp.common.translation.dtos.FunctionApplicationDto;
@@ -25,10 +28,10 @@ import ch.tsphp.tinsphp.common.utils.Pair;
 import ch.tsphp.tinsphp.translators.tsphp.issues.IOutputIssueMessageProvider;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
 
 public class TranslatorController implements ITranslatorController
 {
@@ -38,7 +41,7 @@ public class TranslatorController implements ITranslatorController
     private final IDtoCreator dtoCreator;
     private final IOutputIssueMessageProvider messageProvider;
     private final IRuntimeCheckProvider runtimeCheckProvider;
-    private Map<String, Collection<OverloadDto>> methodDtosMap;
+    private Map<String, SortedMap<String, OverloadDto>> methodDtosMap;
 
     public TranslatorController(
             IPrecedenceHelper thePrecedenceHelper,
@@ -79,7 +82,7 @@ public class TranslatorController implements ITranslatorController
     }
 
     @Override
-    public Collection<OverloadDto> getOverloadDtos(ITSPHPAst identifier) {
+    public SortedMap<String, OverloadDto> getOverloadDtos(ITSPHPAst identifier) {
         IMethodSymbol methodSymbol = (IMethodSymbol) identifier.getSymbol();
         return methodDtosMap.get(methodSymbol.getAbsoluteName());
     }
@@ -116,6 +119,12 @@ public class TranslatorController implements ITranslatorController
             dto = new FunctionApplicationDto(name);
             dto.arguments = arguments;
             applyRuntimeChecks(translationScopeDto, dto, functionCall.getChild(1), appliedOverloadDto);
+            String functionName = identifier.getSymbol().getAbsoluteName();
+            //TODO TINS-545 dynamic version of functions
+            //null check because soft typing might choose the dynamic version
+            if (appliedOverloadDto.overload != null && methodDtosMap.containsKey(functionName)) {
+                addReturnValueCheckIfRequired(translationScopeDto, dto, functionCall, appliedOverloadDto, functionName);
+            }
         }
 
         return dto;
@@ -126,6 +135,7 @@ public class TranslatorController implements ITranslatorController
             FunctionApplicationDto dto,
             ITSPHPAst argumentsAst,
             OverloadApplicationDto appliedOverloadDto) {
+
         List<Object> arguments = dto.arguments;
         if (appliedOverloadDto.runtimeChecks != null) {
             for (Map.Entry<Integer, Pair<ITypeSymbol, List<ITypeSymbol>>> entry
@@ -140,6 +150,28 @@ public class TranslatorController implements ITranslatorController
                     arguments.set(argumentIndex, argument);
                 }
             }
+        }
+    }
+
+    private void addReturnValueCheckIfRequired(
+            TranslationScopeDto translationScopeDto,
+            FunctionApplicationDto dto,
+            ITSPHPAst leftHandSide,
+            OverloadApplicationDto appliedOverloadDto,
+            String functionName) {
+        String signature = appliedOverloadDto.overload.getSignature();
+        SortedMap<String, OverloadDto> overloads = methodDtosMap.get(functionName);
+        // a direct recursive function will use the assign operator as overload and
+        // hence is not part of the rewritten overloads
+        if (overloads.containsKey(signature)) {
+            IBindingCollection rewrittenBindingCollection
+                    = overloads.get(signature).translationScopeDto.bindingCollection;
+            ITypeVariableReference returnReference
+                    = rewrittenBindingCollection.getTypeVariableReference(TinsPHPConstants.RETURN_VARIABLE_NAME);
+            IUnionTypeSymbol returnType
+                    = rewrittenBindingCollection.getLowerTypeBounds(returnReference.getTypeVariable());
+            runtimeCheckProvider.addReturnValueCheck(
+                    translationScopeDto, dto, leftHandSide, returnType, returnReference.hasFixedType());
         }
     }
 

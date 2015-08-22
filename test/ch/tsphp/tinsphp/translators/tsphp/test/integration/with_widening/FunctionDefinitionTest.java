@@ -540,6 +540,7 @@ public class FunctionDefinitionTest extends ATranslatorWithWideningTest
                 },
                 {
                         "<?php function fooX($x, $y){$x . 1; $y & 1.2; return $x; return $y;}\n"
+                                + "function barX($x){ return fooX($x, $x);}"
                                 + "$a = fooX(1, 2);\n $b = fooX(1.2, 2.3);\n "
                                 + "$c = fooX('hello', 'hi');\n $d = fooX(1, 2.5);",
                         "namespace{\n"
@@ -555,16 +556,20 @@ public class FunctionDefinitionTest extends ATranslatorWithWideningTest
                                 + "        return $y;\n"
                                 + "    }\n"
                                 + "\n"
-                                //TODO TINS-643 missing cast for return values
-//                                + "    $a = cast<int>(fooW(1, 2));\n"
-//                                + "    $b = cast<float>(fooW(1.2, 2.3));\n"
-//                                + "    $c = cast<string>(fooW('hello', 'hi'));\n"
-//                                + "    $d = cast<num>(fooW(1, 2.5));"
-                                + "    $a = fooX(1, 2);\n"
-                                + "    $b = fooX(1.2, 2.3);\n"
-                                + "    $c = fooX('hello', 'hi');\n"
-                                + "    $d = fooX(1, 2.5);\n"
-                                + "}",
+                                + "    function T barX<T>(T $x) where [T <: mixed] {\n"
+                                + "        return cast<T>(fooX($x, $x));\n"
+                                + "    }\n"
+                                + "\n"
+                                + "    $a = cast<int>(fooX(1, 2));\n"
+                                + "    $b = cast<float>(fooX(1.2, 2.3));\n"
+                                + "    $c = cast<string>(fooX('hello', 'hi'));\n"
+                                + "    $d = (($_t5_6 = (fooX(1, 2.5))) <: float ? cast<float>($_t5_6) : $_t5_6 <: int" +
+                                " ? cast<int>($_t5_6) : \\trigger_error('The variable $_t5_6 must hold a value of " +
+                                "type float or int.', \\E_USER_ERROR));\n"
+                                + "}\n"
+                                + "namespace{\n"
+                                + "    mixed $_t5_6;\n"
+                                + "}"
                 },
         });
     }

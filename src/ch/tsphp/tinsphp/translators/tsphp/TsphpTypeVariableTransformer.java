@@ -203,7 +203,7 @@ public class TsphpTypeVariableTransformer implements ITypeVariableTransformer
         if (!bindings.hasLowerTypeBounds(typeVariable) || !bindings.hasLowerRefBounds(typeVariable)) {
             lowerBounds = getLowerBoundsStandard(bindings, typeVariable);
         } else {
-            lowerBounds = getLowerTypeBoundsReduced(bindings, typeVariable);
+            lowerBounds = getLowerTypeBoundsWidened(bindings, typeVariable);
         }
         List<String> upperBounds = null;
         if (bindings.hasUpperTypeBounds(typeVariable)) {
@@ -227,7 +227,7 @@ public class TsphpTypeVariableTransformer implements ITypeVariableTransformer
         return lowerBounds;
     }
 
-    private List<String> getLowerTypeBoundsReduced(IBindingCollection bindings, String typeVariable) {
+    private List<String> getLowerTypeBoundsWidened(IBindingCollection bindings, String typeVariable) {
         List<String> lowerBounds;
 
         IUnionTypeSymbol lowerTypeBounds = bindings.getLowerTypeBounds(typeVariable);

@@ -96,7 +96,7 @@ public class HardCodedTSPHPTranslatorInitialiser implements ITranslatorInitialis
 
         IOutputIssueMessageProvider outputIssueMessageProvider = new HardCodedOutputIssueMessageProvider();
         IRuntimeCheckProvider runtimeCheckProvider = new TSPHPRuntimeCheckProvider(
-                typeTransformer, tempVariableHelper, outputIssueMessageProvider, tsphpBoolTypeSymbol);
+                typeHelper, typeTransformer, tempVariableHelper, outputIssueMessageProvider, tsphpBoolTypeSymbol);
         IOperatorHelper operatorHelper = new TSPHPOperatorHelper(
                 typeHelper, primitiveTypes, runtimeCheckProvider, typeTransformer);
         ITypeVariableTransformer typeVariableMapper = new TsphpTypeVariableTransformer(

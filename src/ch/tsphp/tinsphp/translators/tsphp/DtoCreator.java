@@ -55,14 +55,13 @@ public class DtoCreator implements IDtoCreator
     }
 
     @Override
-    public List<OverloadDto> createOverloadDtos(IMethodSymbol methodSymbol) {
-        List<OverloadDto> methodDtos = new ArrayList<>();
+    public SortedMap<String, OverloadDto> createOverloadDtos(IMethodSymbol methodSymbol) {
+        SortedMap<String, OverloadDto> methodDtos = new TreeMap<>();
         String name = methodSymbol.getName();
         //remove () at the end
         name = name.substring(0, name.length() - 2);
         int count = 0;
         Collection<IFunctionType> overloads = methodSymbol.getOverloads();
-
         int numberOfOverloads = overloads.size();
 
         //mainly due to testing, we want a deterministic output in order that we can test
@@ -76,7 +75,7 @@ public class DtoCreator implements IDtoCreator
             Pair<OverloadDto, Integer> pair = createOverloadDto(
                     name, count, overload, methodSymbol, numberOfOverloads, additionalNames);
             count = pair.second;
-            methodDtos.add(pair.first);
+            methodDtos.put(overload.getSignature(), pair.first);
         }
 
         return methodDtos;

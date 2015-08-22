@@ -103,6 +103,7 @@ public class ATSPHPRuntimeCheckProviderTest extends ATypeTest
             ITempVariableHelper tempVariableHelper,
             IOutputIssueMessageProvider messageProvider,
             ITypeSymbol tsphpBoolTypeSymbol) {
-        return new TSPHPRuntimeCheckProvider(typeTransformer, tempVariableHelper, messageProvider, tsphpBoolTypeSymbol);
+        return new TSPHPRuntimeCheckProvider(
+                typeHelper, typeTransformer, tempVariableHelper, messageProvider, tsphpBoolTypeSymbol);
     }
 }

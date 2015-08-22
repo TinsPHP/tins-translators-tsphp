@@ -46,6 +46,7 @@ import ch.tsphp.tinsphp.common.utils.Pair;
 
 import java.util.Map;
 import java.util.Collection;
+import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.Deque;
 import java.util.ArrayDeque;
@@ -524,8 +525,8 @@ functionDefinition
                     isNotMethodBefore = parent.getChild(childIndex - 1).getType() != Function;
                 }
 
-                Collection<OverloadDto> dtos = controller.getOverloadDtos($Identifier);
-                for (OverloadDto dto : dtos) {
+                SortedMap<String, OverloadDto> dtos = controller.getOverloadDtos($Identifier);
+                for (OverloadDto dto : dtos.values()) {
                     int index = input.mark();                
                     StringTemplate returnType = getType(dto.returnVariable);
                     

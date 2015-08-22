@@ -9,14 +9,18 @@ package ch.tsphp.tinsphp.translators.tsphp;
 import ch.tsphp.common.ITSPHPAst;
 import ch.tsphp.common.symbols.ITypeSymbol;
 import ch.tsphp.tinsphp.common.inference.constraints.IBindingCollection;
+import ch.tsphp.tinsphp.common.inference.constraints.ITypeVariableReference;
 import ch.tsphp.tinsphp.common.inference.constraints.IVariable;
-import ch.tsphp.tinsphp.common.symbols.IContainerTypeSymbol;
 import ch.tsphp.tinsphp.common.symbols.IConvertibleTypeSymbol;
 import ch.tsphp.tinsphp.common.symbols.IIntersectionTypeSymbol;
 import ch.tsphp.tinsphp.common.symbols.IUnionTypeSymbol;
 import ch.tsphp.tinsphp.common.symbols.PrimitiveTypeNames;
+import ch.tsphp.tinsphp.common.translation.dtos.FunctionApplicationDto;
 import ch.tsphp.tinsphp.common.translation.dtos.TranslationScopeDto;
+import ch.tsphp.tinsphp.common.utils.ERelation;
+import ch.tsphp.tinsphp.common.utils.ITypeHelper;
 import ch.tsphp.tinsphp.common.utils.Pair;
+import ch.tsphp.tinsphp.common.utils.TypeHelperDto;
 import ch.tsphp.tinsphp.translators.tsphp.issues.IOutputIssueMessageProvider;
 
 import java.util.ArrayList;
@@ -28,6 +32,7 @@ import java.util.TreeMap;
 
 public class TSPHPRuntimeCheckProvider implements IRuntimeCheckProvider
 {
+    private final ITypeHelper typeHelper;
     private final ITypeTransformer typeTransformer;
     private final IOutputIssueMessageProvider messageProvider;
     private final ITypeSymbol tsphpBoolTypeSymbol;
@@ -35,10 +40,12 @@ public class TSPHPRuntimeCheckProvider implements IRuntimeCheckProvider
 
 
     public TSPHPRuntimeCheckProvider(
+            ITypeHelper theTypeHelper,
             ITypeTransformer theTypeTransformer,
             ITempVariableHelper theTempVariableHelper,
             IOutputIssueMessageProvider theMessageProvider,
             ITypeSymbol theTsphpBoolTypeSymbol) {
+        typeHelper = theTypeHelper;
         typeTransformer = theTypeTransformer;
         messageProvider = theMessageProvider;
         tsphpBoolTypeSymbol = theTsphpBoolTypeSymbol;
@@ -224,6 +231,52 @@ public class TSPHPRuntimeCheckProvider implements IRuntimeCheckProvider
         return newArgument;
     }
 
+    //Warning! start code duplication - same as in PhpPlusRuntimeCheckProvider#addReturnValueCheck
+    @Override
+    public void addReturnValueCheck(
+            TranslationScopeDto translationScopeDto,
+            FunctionApplicationDto functionApplicationDto,
+            ITSPHPAst leftHandSide,
+            ITypeSymbol returnType,
+            boolean isConstantReturnType) {
+
+        IBindingCollection bindingCollection = translationScopeDto.bindingCollection;
+        String leftHandSideId = leftHandSide.getSymbol().getAbsoluteName();
+        ITypeVariableReference reference = bindingCollection.getTypeVariableReference(leftHandSideId);
+        String lhsTypeVariable = reference.getTypeVariable();
+
+        ITypeSymbol typeSymbol = bindingCollection.getUpperTypeBounds(lhsTypeVariable);
+        if (typeSymbol == null) {
+            typeSymbol = bindingCollection.getLowerTypeBounds(lhsTypeVariable);
+        }
+
+        //TODO TINS-394 introduce nothing as own type - then we do not need this check
+        if (returnType != null) {
+            //if the left hand side is more specific than the return type then we need to cast
+            if (isConstantReturnType && !reference.hasFixedType()) {
+                //if overload is parametric polymorphic then we need to cast to the parametric type
+                functionApplicationDto.returnRuntimeCheck = "cast<" + lhsTypeVariable + ">(%returnRuntimeCheck%)";
+            } else {
+                TypeHelperDto result = typeHelper.isFirstSameOrSubTypeOfSecond(returnType, typeSymbol);
+                if (result.relation == ERelation.HAS_NO_RELATION) {
+                    if (reference.hasFixedType()) {
+                        functionApplicationDto.returnRuntimeCheck = getTypeCheck(
+                                translationScopeDto,
+                                leftHandSide,
+                                "%returnRuntimeCheck%",
+                                typeSymbol).toString();
+                    } else {
+                        //if overload is parametric polymorphic then we need to cast to the parametric type
+                        functionApplicationDto.returnRuntimeCheck
+                                = "cast<" + lhsTypeVariable + ">(%returnRuntimeCheck%)";
+                    }
+                }
+            }
+        }
+    }
+    //Warning! end code duplication - same as in PhpPlusRuntimeCheckProvider#addReturnValueCheck
+
+
     private String getAsOperation(String expression, String targetTypeName) {
         return expression + " as " + targetTypeName;
     }
@@ -363,12 +416,25 @@ public class TSPHPRuntimeCheckProvider implements IRuntimeCheckProvider
             List<String> types) {
         boolean ok = true;
 
+        boolean needToHandleUnionType = true;
         boolean hadNoContainerTypes = true;
-        for (ITypeSymbol typeSymbol : intersectionTypeSymbol.getTypeSymbols().values()) {
-            if (typeSymbol instanceof IContainerTypeSymbol) {
-                hadNoContainerTypes = false;
-                break;
+        Iterator<ITypeSymbol> iterator = intersectionTypeSymbol.getTypeSymbols().values().iterator();
+        ITypeSymbol firstTypeSymbol = iterator.next();
+        if (iterator.hasNext()) {
+            hadNoContainerTypes = !(firstTypeSymbol instanceof IUnionTypeSymbol);
+            while (hadNoContainerTypes || iterator.hasNext()) {
+                hadNoContainerTypes = !(iterator.next() instanceof IUnionTypeSymbol);
             }
+        } else if (firstTypeSymbol instanceof IUnionTypeSymbol) {
+            appendTypeCheck(
+                    stringBuilder,
+                    firstExpression,
+                    tempVariable,
+                    (IUnionTypeSymbol) firstTypeSymbol,
+                    suffixCheck,
+                    types);
+            hadNoContainerTypes = false;
+            needToHandleUnionType = false;
         }
 
         if (hadNoContainerTypes) {
@@ -376,8 +442,9 @@ public class TSPHPRuntimeCheckProvider implements IRuntimeCheckProvider
             String typeName = pair.first.getAbsoluteName();
             String typeCast = getTypeCast(typeName, firstExpression, tempVariable);
             appendTypeCheck(stringBuilder, firstExpression, suffixCheck, types, typeName, typeCast);
-        } else {
+        } else if (needToHandleUnionType) {
             //TODO TINS-604 runtime check with container types
+            throw new UnsupportedOperationException("type check for intersection and combined union");
         }
         return ok;
     }

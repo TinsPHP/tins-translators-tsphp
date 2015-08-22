@@ -74,10 +74,11 @@ public abstract class ATranslatorWithWideningTest extends ATranslatorTest
     }
 
     @Override
-    public IRuntimeCheckProvider createRuntimeCheckProvider(ITypeTransformer typeTransformer, TempVariableHelper
-            tempVariableHelper) {
+    public IRuntimeCheckProvider createRuntimeCheckProvider(
+            ITypeHelper typeHelper, ITypeTransformer typeTransformer, TempVariableHelper tempVariableHelper) {
         return new TSPHPRuntimeCheckProvider(
-                typeTransformer, tempVariableHelper, new HardCodedOutputIssueMessageProvider(), tsphpBoolTypeSymbol);
+                this.typeHelper, typeTransformer, tempVariableHelper, new HardCodedOutputIssueMessageProvider(),
+                tsphpBoolTypeSymbol);
     }
 
     @Override
