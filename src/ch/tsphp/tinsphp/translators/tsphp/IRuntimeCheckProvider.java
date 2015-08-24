@@ -29,7 +29,7 @@ public interface IRuntimeCheckProvider
             Object argument,
             ITypeSymbol argumentType);
 
-    void addReturnValueCheck(
+    void addReturnValueCheckIfRequired(
             TranslationScopeDto translationScopeDto,
             FunctionApplicationDto functionApplicationDto,
             ITSPHPAst leftHandSide,

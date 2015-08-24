@@ -55,6 +55,27 @@ public class ExpressionsNeedWideningTest extends ATranslatorWithWideningTest
                                 + "namespace{\n"
                                 + "    mixed $_t2_0;\n"
                                 + "}"
+                },
+                {
+                        "<?php $a = 1; $a = 'hello'; ~($a \n/ 1); ?>",
+                        "namespace{\n"
+                                + "    scalar $a;\n"
+                                + "    $a = 1;\n"
+                                + "    $a = 'hello';\n"
+                                //TODO TINS-654 migration function for divide
+//                                + "    ~(($_t2_0 = (oldSchoolAddition($a, 1))) <: float ? cast<float>($_t2_0) :
+// $_t2_0 <: " +
+//                                "int ? cast<int>($_t2_0) : \\trigger_error('The variable $_t2_0 must hold a value
+// of " +
+//                                "type float or int.', \\E_USER_ERROR));\n"
+                                + "    ~(($_t2_0 = (($a / 1))) <: float ? "
+                                + "cast<float>($_t2_0) : $_t2_0 <: int ? cast<int>($_t2_0) : "
+                                + "\\trigger_error('The variable $_t2_0 must hold a value of type float or int.', "
+                                + "\\E_USER_ERROR));\n"
+                                + "}\n"
+                                + "namespace{\n"
+                                + "    mixed $_t2_0;\n"
+                                + "}"
                 }
         });
     }

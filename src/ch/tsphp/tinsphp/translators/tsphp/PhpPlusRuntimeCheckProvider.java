@@ -39,9 +39,9 @@ public class PhpPlusRuntimeCheckProvider implements IRuntimeCheckProvider
         return "cast<" + argumentType.getAbsoluteName() + ">(" + argument.toString() + ")";
     }
 
-    //Warning! start code duplication - same as in TSPHPRuntimeCheckProvider#addReturnValueCheck
+    //Warning! start code duplication - same as in TSPHPRuntimeCheckProvider#addReturnValueCheckIfRequired
     @Override
-    public void addReturnValueCheck(
+    public void addReturnValueCheckIfRequired(
             TranslationScopeDto translationScopeDto,
             FunctionApplicationDto functionApplicationDto,
             ITSPHPAst leftHandSide,
@@ -82,5 +82,5 @@ public class PhpPlusRuntimeCheckProvider implements IRuntimeCheckProvider
             }
         }
     }
-    //Warning! end code duplication - same as in TSPHPRuntimeCheckProvider#addReturnValueCheck
+    //Warning! end code duplication - same as in TSPHPRuntimeCheckProvider#addReturnValueCheckIfRequired
 }

@@ -118,6 +118,34 @@ public class MigrationFunctionTest extends ATranslatorTest
                 {"<?php $a = (float) 1;", "namespace{\n    float $a;\n    $a = oldSchoolCast<float>(1);\n}"},
                 {"<?php $a = (string) 1;", "namespace{\n    string $a;\n    $a = oldSchoolCast<string>(1);\n}"},
                 {"<?php $a = (array) 1;", "namespace{\n    array $a;\n    $a = oldSchoolCast<array>(1);\n}"},
+                {
+                        "<?php function typeHintAndDataPolymorphism(array $x, $key){$x = $x[$key]; return $x + 1;}",
+                        "namespace{\n"
+                                + "\n"
+                                + "    function (float | int) typeHintAndDataPolymorphism(array $x_0, " +
+                                "{as int} $key) {\n"
+                                + "        mixed $x = $x_0;\n"
+                                //TODO TINS-653 migration function for array access
+                                //+ "        $x = oldSchoolArrayAccess($x, $key);\n"
+                                + "        $x = cast<array>($x)[$key];\n"
+                                + "        return oldSchoolAddition($x, 1);\n"
+                                + "    }\n"
+                                + "\n"
+                                + "}"
+                },
+                {
+                        "<?php function typeHintAndDataPolymorphism2(array $x, $key){$x = $key & 1.2; return $x + 1;}",
+                        "namespace{\n"
+                                + "\n"
+                                + "    function (float | int) typeHintAndDataPolymorphism2("
+                                + "array $x_0, (array | {as int}) $key) {\n"
+                                + "        (array | int | string) $x = $x_0;\n"
+                                + "        $x = oldSchoolBitwiseAnd($key, 1.2);\n"
+                                + "        return oldSchoolAddition($x, 1);\n"
+                                + "    }\n"
+                                + "\n"
+                                + "}"
+                }
         }));
 
         return collection;

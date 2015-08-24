@@ -170,7 +170,7 @@ public class TranslatorController implements ITranslatorController
                     = rewrittenBindingCollection.getTypeVariableReference(TinsPHPConstants.RETURN_VARIABLE_NAME);
             IUnionTypeSymbol returnType
                     = rewrittenBindingCollection.getLowerTypeBounds(returnReference.getTypeVariable());
-            runtimeCheckProvider.addReturnValueCheck(
+            runtimeCheckProvider.addReturnValueCheckIfRequired(
                     translationScopeDto, dto, leftHandSide, returnType, returnReference.hasFixedType());
         }
     }

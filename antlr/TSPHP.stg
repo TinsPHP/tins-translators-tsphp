@@ -147,8 +147,8 @@ conversion(expression, targetType, ifTypes, needParentheses) ::= <<
 <if(needParentheses)>(<endif><expression> as <targetType><if(ifTypes)> if <ifTypes; separator=", "><endif><if(needParentheses)>)<endif>
 >>
 
-arrayAccess(expression, identifier) ::= <<
-<expression>[<index>]
+arrayAccess(expression, key) ::= <<
+<expression>[<key>]
 >>
 
 exit(expression) ::= <<

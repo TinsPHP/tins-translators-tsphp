@@ -231,9 +231,9 @@ public class TSPHPRuntimeCheckProvider implements IRuntimeCheckProvider
         return newArgument;
     }
 
-    //Warning! start code duplication - same as in PhpPlusRuntimeCheckProvider#addReturnValueCheck
+    //Warning! start code duplication - same as in PhpPlusRuntimeCheckProvider#addReturnValueCheckIfRequired
     @Override
-    public void addReturnValueCheck(
+    public void addReturnValueCheckIfRequired(
             TranslationScopeDto translationScopeDto,
             FunctionApplicationDto functionApplicationDto,
             ITSPHPAst leftHandSide,
@@ -274,7 +274,7 @@ public class TSPHPRuntimeCheckProvider implements IRuntimeCheckProvider
             }
         }
     }
-    //Warning! end code duplication - same as in PhpPlusRuntimeCheckProvider#addReturnValueCheck
+    //Warning! end code duplication - same as in PhpPlusRuntimeCheckProvider#addReturnValueCheckIfRequired
 
 
     private String getAsOperation(String expression, String targetTypeName) {

@@ -1057,8 +1057,25 @@ postFixExpression
         //^(FIELD_ACCESS expression Identifier)
         //-> fieldAccess(expression={$expression.st}, identifier={$Identifier.text})
 
-       ^(ARRAY_ACCESS expr=expression index=expression)
-        -> arrayAccess(expression={$expr.st}, index={$index.st})
+       ^(ARRAY_ACCESS expr=expression key=expression)
+       {
+            List<String> argumentNames = new ArrayList<>(2);
+            List<Object> arguments = new ArrayList<>(2);
+            argumentNames.add("expression");
+            argumentNames.add("key");
+            arguments.add($expr.st);
+            arguments.add($key.st);
+            FunctionApplicationDto dto = controller.getOperatorApplication(
+                    translationScopeDto, $ARRAY_ACCESS, arguments);
+            $st = getOperatorOrFunctionApplication(
+                dto, 
+                arguments,
+                argumentNames,
+                $ARRAY_ACCESS, 
+                "arrayAccess",
+                null,//not required for template arrayAccess
+                false);
+        }
 
     //TODO rstoll TINS-271 - translator OOP - expressions 
     //|   ^(METHOD_CALL_POSTFIX expression Identifier actualParameters)

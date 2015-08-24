@@ -276,7 +276,7 @@ public class TSPHPOperatorHelper implements IOperatorHelper
             Pair<String, ITypeSymbol> pair) {
         functionApplicationDto.name = pair.first;
         ITypeSymbol returnType = pair.second;
-        runtimeCheckProvider.addReturnValueCheck(
+        runtimeCheckProvider.addReturnValueCheckIfRequired(
                 translationScopeDto,
                 functionApplicationDto,
                 leftHandSide,
