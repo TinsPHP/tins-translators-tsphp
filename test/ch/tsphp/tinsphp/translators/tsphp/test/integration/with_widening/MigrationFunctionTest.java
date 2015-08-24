@@ -58,6 +58,8 @@ public class MigrationFunctionTest extends ATranslatorWithWideningTest
         collection.addAll(getIntVariations("<<", "oldSchoolShiftLeft"));
         collection.addAll(getIntVariations(">>", "oldSchoolShiftRight"));
 
+        collection.addAll(getArrayAccessVariants());
+
         collection.addAll(Arrays.asList(new String[][]{
                 {"<?php echo 1;", "namespace{\n    echo 1 as string;\n}"},
                 {"<?php echo true;", "namespace{\n    echo true as string;\n}"},
@@ -81,20 +83,6 @@ public class MigrationFunctionTest extends ATranslatorWithWideningTest
                 {"<?php $a = (float) 1;", "namespace{\n    float $a;\n    $a = oldSchoolCast<float>(1);\n}"},
                 {"<?php $a = (string) 1;", "namespace{\n    string $a;\n    $a = oldSchoolCast<string>(1);\n}"},
                 {"<?php $a = (array) 1;", "namespace{\n    array $a;\n    $a = oldSchoolCast<array>(1);\n}"},
-                {
-                        "<?php function typeHintAndDataPolymorphism(array $x, $key){$x = $x[$key]; return $x + 1;}",
-                        "namespace{\n"
-                                + "\n"
-                                + "    function num typeHintAndDataPolymorphism(array $x_0, {as int} $key) {\n"
-                                + "        mixed $x = $x_0;\n"
-                                //TODO TINS-653 migration function for array access
-                                //+ "        $x = oldSchoolArrayAccess($x, $key);\n"
-                                + "        $x = cast<array>($x)[$key];\n"
-                                + "        return oldSchoolAddition($x, 1);\n"
-                                + "    }\n"
-                                + "\n"
-                                + "}"
-                },
                 {
                         "<?php function typeHintAndDataPolymorphism2(array $x, $key){$x = $key & 1.2; return $x + 1;}",
                         "namespace{\n"
@@ -285,6 +273,31 @@ public class MigrationFunctionTest extends ATranslatorWithWideningTest
                                 + "\n"
                                 + "    function T foo63<T>({as T} $x, {as T} $y) where [T <: num] {\n"
                                 + "        return cast<T>(oldSchoolAddition($x, $y));\n"
+                                + "    }\n"
+                                + "\n"
+                                + "}"
+                },
+        });
+    }
+
+    private static Collection<? extends Object[]> getArrayAccessVariants() {
+        return Arrays.asList(new String[][]{
+                {"<?php $a = [1]; $a[0];", "namespace{\n    array $a;\n    $a = [1];\n    $a[0];\n}"},
+                {"<?php $a = [1]; $a['hello'];", "namespace{\n    array $a;\n    $a = [1];\n    $a['hello'];\n}"},
+                //see TINS-653 migration function for array access
+                {
+                        "<?php $a = [1]; $a[1.2];",
+                        "namespace{\n    array $a;\n    $a = [1];\n    oldSchoolArrayAccess($a, 1.2);\n}"
+                },
+                //see TINS-653 migration function for array access
+                {
+                        "<?php function typeHintAndDataPolymorphism(array $x, $key){$x = $x[$key]; return $x + 1;}",
+                        "namespace{\n"
+                                + "\n"
+                                + "    function num typeHintAndDataPolymorphism(array $x_0, {as int} $key) {\n"
+                                + "        mixed $x = $x_0;\n"
+                                + "        $x = oldSchoolArrayAccess($x, $key);\n"
+                                + "        return oldSchoolAddition($x, 1);\n"
                                 + "    }\n"
                                 + "\n"
                                 + "}"
