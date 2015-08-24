@@ -51,6 +51,7 @@ public class MigrationFunctionTest extends ATranslatorWithWideningTest
         collection.addAll(getArithmeticVariations("+", "oldSchoolAddition"));
         collection.addAll(getArithmeticVariations("-", "oldSchoolSubtraction"));
         collection.addAll(getArithmeticVariations("*", "oldSchoolMultiplication"));
+        collection.addAll(getDivideVariations());
 
         collection.addAll(getIntVariations("|", "oldSchoolBitwiseOr"));
         collection.addAll(getIntVariations("^", "oldSchoolBitwiseXor"));
@@ -279,6 +280,49 @@ public class MigrationFunctionTest extends ATranslatorWithWideningTest
                 },
         });
     }
+
+    private static Collection<? extends Object[]> getDivideVariations() {
+        return Arrays.asList(new String[][]{
+                //int / int is not a int division in PHP
+                {
+                        "<?php $a = 1 / 1;",
+                        "namespace{\n    num! $a;\n    $a = oldSchoolIntDivide(1, 1);\n}"
+                },
+                // int x float and float x int will choose {as num} x float, float x {as num} respectively but do not
+                // require a migration function in TSPHP due to an implicit conversion from int to float
+                {"<?php $a = 1 / 2.2;", "namespace{\n    float! $a;\n    $a = 1 / 2.2;\n}"},
+                {"<?php $a = 1.3 / 2;", "namespace{\n    float! $a;\n    $a = 1.3 / 2;\n}"},
+                {"<?php $a = 1.3 / '2';", "namespace{\n    float! $a;\n    $a = oldSchoolFloatDivide(1.3, '2');\n}"},
+                {"<?php $a = 1.3 / true;", "namespace{\n    float! $a;\n    $a = oldSchoolFloatDivide(1.3, true);\n}"},
+                {
+                        "<?php $x = false; $x = true; $a = 1.3 / $x;",
+                        "namespace{"
+                                + "\n    float! $a;"
+                                + "\n    bool $x;"
+                                + "\n    $x = false;"
+                                + "\n    $x = true;"
+                                + "\n    $a = oldSchoolFloatDivide(1.3, $x);"
+                                + "\n}"
+                },
+                {"<?php $a = '2' / 1.3;", "namespace{\n    float! $a;\n    $a = oldSchoolFloatDivide('2', 1.3);\n}"},
+                {"<?php $a = true / 1.3;", "namespace{\n    float! $a;\n    $a = oldSchoolFloatDivide(true, 1.3);\n}"},
+                {
+                        "<?php $x = false; $x = true; $a = $x / 1.3;",
+                        "namespace{"
+                                + "\n    float! $a;"
+                                + "\n    bool $x;"
+                                + "\n    $x = false;"
+                                + "\n    $x = true;"
+                                + "\n    $a = oldSchoolFloatDivide($x, 1.3);"
+                                + "\n}"
+                },
+                {"<?php $a = 2 / true;", "namespace{\n    num! $a;\n    $a = oldSchoolDivide(2, true);\n}"},
+                {"<?php $a = '2' / true;", "namespace{\n    num! $a;\n    $a = oldSchoolDivide('2', true);\n}"},
+                {"<?php $a = false / '2';", "namespace{\n    num! $a;\n    $a = oldSchoolDivide(false, '2');\n}"},
+                {"<?php $a = false / 2;", "namespace{\n    num! $a;\n    $a = oldSchoolDivide(false, 2);\n}"},
+        });
+    }
+
 
     private static Collection<? extends Object[]> getArrayAccessVariants() {
         return Arrays.asList(new String[][]{
