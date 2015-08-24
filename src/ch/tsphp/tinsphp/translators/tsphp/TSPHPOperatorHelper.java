@@ -92,6 +92,13 @@ public class TSPHPOperatorHelper implements IOperatorHelper
             migrationFunctions.put(token, map);
             dynamicFunctions.put(token, pair);
         }
+
+        Map<String, Pair<String, ITypeSymbol>> map = new HashMap<>();
+        Pair<String, ITypeSymbol> pair =
+                pair("oldSchoolArrayAccess", primitiveTypes.get(PrimitiveTypeNames.MIXED));
+        map.put("array x {as int} -> mixed", pair);
+        migrationFunctions.put(TokenTypes.ARRAY_ACCESS, map);
+        dynamicFunctions.put(TokenTypes.ARRAY_ACCESS, pair);
     }
 
     @Override

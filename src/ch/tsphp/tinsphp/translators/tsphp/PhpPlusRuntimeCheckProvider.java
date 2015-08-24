@@ -27,9 +27,7 @@ public class PhpPlusRuntimeCheckProvider implements IRuntimeCheckProvider
 
     @Override
     public boolean addParameterCheck(
-            String identifier,
-            TranslationScopeDto translationScopeDto, IVariable parameter,
-            int parameterIndex) {
+            String identifier, TranslationScopeDto translationScopeDto, IVariable parameter, int parameterIndex) {
         return false;
     }
 
