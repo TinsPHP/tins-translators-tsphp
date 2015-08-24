@@ -153,6 +153,18 @@ public class FunctionDefinitionNeedWideningTest extends ATranslatorWithWideningT
                                 + "\n"
                                 + "}"
                 },
+                {
+                        "<?php function addOne($x){ if(is_array($x)){return $x + [1];} return $x + 1;}",
+                        "namespace{\n"
+                                + "\n    function mixed addOne(mixed $x) {"
+                                + "\n        if (is_array($x)) {"
+                                + "\n            return cast<array>($x) + [1];"
+                                + "\n        }"
+                                + "\n        return oldSchoolAddition($x, 1);"
+                                + "\n    }"
+                                + "\n"
+                                + "\n}"
+                }
         });
     }
 }
