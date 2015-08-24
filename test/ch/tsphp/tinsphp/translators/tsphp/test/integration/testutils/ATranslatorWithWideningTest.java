@@ -11,6 +11,7 @@ import ch.tsphp.common.TSPHPAstAdaptor;
 import ch.tsphp.common.symbols.ITypeSymbol;
 import ch.tsphp.tinsphp.common.config.ICoreInitialiser;
 import ch.tsphp.tinsphp.common.config.ISymbolsInitialiser;
+import ch.tsphp.tinsphp.common.symbols.ISymbolFactory;
 import ch.tsphp.tinsphp.common.symbols.IUnionTypeSymbol;
 import ch.tsphp.tinsphp.common.symbols.PrimitiveTypeNames;
 import ch.tsphp.tinsphp.common.utils.ITypeHelper;
@@ -34,18 +35,19 @@ import java.util.Map;
 @Ignore
 public abstract class ATranslatorWithWideningTest extends ATranslatorTest
 {
+    private final ISymbolFactory symbolFactory;
     private final ITypeHelper typeHelper;
     private final Map<String, ITypeSymbol> primitiveTypes;
     private final ITypeSymbol tsphpBoolTypeSymbol;
     private final ITypeSymbol tsphpNumTypeSymbol;
     private final ITypeSymbol tsphpScalarTypeSymbol;
 
-
     public ATranslatorWithWideningTest(String theTestString, String theExpectedResult) {
         super(theTestString, theExpectedResult);
         ISymbolsInitialiser symbolsInitialiser = new HardCodedSymbolsInitialiser();
         ICoreInitialiser coreInitialiser = new HardCodedCoreInitialiser(
                 new AstHelper(new TSPHPAstAdaptor()), symbolsInitialiser);
+        symbolFactory = symbolsInitialiser.getSymbolFactory();
         typeHelper = symbolsInitialiser.getTypeHelper();
         primitiveTypes = coreInitialiser.getCore().getPrimitiveTypes();
         IUnionTypeSymbol unionTypeSymbol = (IUnionTypeSymbol) primitiveTypes.get(PrimitiveTypeNames.BOOL);
@@ -59,13 +61,18 @@ public abstract class ATranslatorWithWideningTest extends ATranslatorTest
     @Override
     public IOperatorHelper createOperatorHelper(
             IRuntimeCheckProvider runtimeCheckProvider, ITypeTransformer typeTransformer) {
-        return new TSPHPOperatorHelper(typeHelper, primitiveTypes, runtimeCheckProvider, typeTransformer);
+        return new TSPHPOperatorHelper(
+                symbolFactory,
+                typeHelper,
+                primitiveTypes,
+                runtimeCheckProvider,
+                typeTransformer);
     }
 
     @Override
     public ITypeTransformer createTypeTransformer() {
         return new TSPHPTypeTransformer(
-                symbolsInitialiser.getSymbolFactory(),
+                symbolFactory,
                 typeHelper,
                 primitiveTypes,
                 tsphpBoolTypeSymbol,
@@ -75,15 +82,17 @@ public abstract class ATranslatorWithWideningTest extends ATranslatorTest
 
     @Override
     public IRuntimeCheckProvider createRuntimeCheckProvider(
-            ITypeHelper typeHelper, ITypeTransformer typeTransformer, TempVariableHelper tempVariableHelper) {
+            ITypeHelper theTypeHelper, ITypeTransformer typeTransformer, TempVariableHelper tempVariableHelper) {
         return new TSPHPRuntimeCheckProvider(
-                this.typeHelper, typeTransformer, tempVariableHelper, new HardCodedOutputIssueMessageProvider(),
+                theTypeHelper,
+                typeTransformer,
+                tempVariableHelper,
+                new HardCodedOutputIssueMessageProvider(),
                 tsphpBoolTypeSymbol);
     }
 
     @Override
     protected ITypeVariableTransformer createTypeVariableMapper(ITypeTransformer typeTransformer) {
-        return new TsphpTypeVariableTransformer(
-                symbolsInitialiser.getSymbolFactory(), symbolsInitialiser.getTypeHelper(), typeTransformer);
+        return new TsphpTypeVariableTransformer(symbolFactory, typeHelper, typeTransformer);
     }
 }

@@ -98,7 +98,7 @@ public class HardCodedTSPHPTranslatorInitialiser implements ITranslatorInitialis
         IRuntimeCheckProvider runtimeCheckProvider = new TSPHPRuntimeCheckProvider(
                 typeHelper, typeTransformer, tempVariableHelper, outputIssueMessageProvider, tsphpBoolTypeSymbol);
         IOperatorHelper operatorHelper = new TSPHPOperatorHelper(
-                typeHelper, primitiveTypes, runtimeCheckProvider, typeTransformer);
+                symbolFactory, typeHelper, primitiveTypes, runtimeCheckProvider, typeTransformer);
         ITypeVariableTransformer typeVariableMapper = new TsphpTypeVariableTransformer(
                 symbolFactory, typeHelper, typeTransformer);
         IDtoCreator dtoCreator = new DtoCreator(

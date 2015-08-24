@@ -15,6 +15,7 @@ import ch.tsphp.tinsphp.common.inference.constraints.IVariable;
 import ch.tsphp.tinsphp.common.inference.constraints.OverloadApplicationDto;
 import ch.tsphp.tinsphp.common.symbols.IConvertibleTypeSymbol;
 import ch.tsphp.tinsphp.common.symbols.IIntersectionTypeSymbol;
+import ch.tsphp.tinsphp.common.symbols.ISymbolFactory;
 import ch.tsphp.tinsphp.common.symbols.IUnionTypeSymbol;
 import ch.tsphp.tinsphp.common.symbols.PrimitiveTypeNames;
 import ch.tsphp.tinsphp.common.translation.dtos.FunctionApplicationDto;
@@ -37,6 +38,7 @@ import static ch.tsphp.tinsphp.common.utils.Pair.pair;
 
 public class TSPHPOperatorHelper implements IOperatorHelper
 {
+    private final ISymbolFactory symbolFactory;
     private final ITypeHelper typeHelper;
     private final Map<String, ITypeSymbol> primitiveTypes;
     private final ITypeTransformer typeTransformer;
@@ -46,10 +48,12 @@ public class TSPHPOperatorHelper implements IOperatorHelper
     private final Map<Integer, Pair<String, ITypeSymbol>> dynamicFunctions = new HashMap<>();
 
     public TSPHPOperatorHelper(
+            ISymbolFactory theSymbolFactory,
             ITypeHelper theTypeHelper,
             Map<String, ITypeSymbol> thePrimitiveTypes,
             IRuntimeCheckProvider theRuntimeCheckProvider,
             ITypeTransformer theTypeTransformer) {
+        symbolFactory = theSymbolFactory;
         typeHelper = theTypeHelper;
         primitiveTypes = thePrimitiveTypes;
         runtimeCheckProvider = theRuntimeCheckProvider;
@@ -58,6 +62,8 @@ public class TSPHPOperatorHelper implements IOperatorHelper
     }
 
     private void init() {
+        Map<String, Pair<String, ITypeSymbol>> map;
+        Pair<String, ITypeSymbol> pair;
 
         int[] tokens = new int[]{TokenTypes.Plus, TokenTypes.Minus, TokenTypes.Multiply};
         String[] migrationFunctionNames = new String[]{
@@ -66,13 +72,32 @@ public class TSPHPOperatorHelper implements IOperatorHelper
 
         for (int i = 0; i < tokens.length; ++i) {
             int token = tokens[i];
-            Map<String, Pair<String, ITypeSymbol>> map = new HashMap<>();
-            Pair<String, ITypeSymbol> pair =
-                    pair(migrationFunctionNames[i], primitiveTypes.get(PrimitiveTypeNames.NUM));
+            map = new HashMap<>();
+            pair = pair(migrationFunctionNames[i], primitiveTypes.get(PrimitiveTypeNames.NUM));
             map.put("{as T} x {as T} -> T \\ T <: (float | int)", pair);
             migrationFunctions.put(token, map);
             dynamicFunctions.put(token, pair);
         }
+
+        map = new HashMap<>();
+        IUnionTypeSymbol intOrFalse = symbolFactory.createUnionTypeSymbol();
+        intOrFalse.addTypeSymbol(primitiveTypes.get(PrimitiveTypeNames.FLOAT));
+        intOrFalse.addTypeSymbol(primitiveTypes.get(PrimitiveTypeNames.FALSE_TYPE));
+        pair = new Pair<String, ITypeSymbol>("oldSchoolIntDivide", intOrFalse);
+        map.put("int x int -> (falseType | float | int)", pair);
+        IUnionTypeSymbol floatOrFalse = symbolFactory.createUnionTypeSymbol();
+        floatOrFalse.addTypeSymbol(primitiveTypes.get(PrimitiveTypeNames.FLOAT));
+        floatOrFalse.addTypeSymbol(primitiveTypes.get(PrimitiveTypeNames.FALSE_TYPE));
+        pair = new Pair<String, ITypeSymbol>("oldSchoolFloatDivide", floatOrFalse);
+        map.put("float x {as (float | int)} -> (falseType | float)", pair);
+        map.put("{as (float | int)} x float -> (falseType | float)", pair);
+        IUnionTypeSymbol numOrFalse = symbolFactory.createUnionTypeSymbol();
+        numOrFalse.addTypeSymbol(primitiveTypes.get(PrimitiveTypeNames.NUM));
+        numOrFalse.addTypeSymbol(primitiveTypes.get(PrimitiveTypeNames.FALSE_TYPE));
+        pair = new Pair<String, ITypeSymbol>("oldSchoolDivide", numOrFalse);
+        map.put("{as (float | int)} x {as (float | int)} -> (falseType | float | int)", pair);
+        migrationFunctions.put(TokenTypes.Divide, map);
+        dynamicFunctions.put(TokenTypes.Divide, pair);
 
         tokens = new int[]{
                 TokenTypes.BitwiseOr, TokenTypes.BitwiseXor, TokenTypes.BitwiseAnd,
@@ -85,17 +110,15 @@ public class TSPHPOperatorHelper implements IOperatorHelper
 
         for (int i = 0; i < tokens.length; ++i) {
             int token = tokens[i];
-            Map<String, Pair<String, ITypeSymbol>> map = new HashMap<>();
-            Pair<String, ITypeSymbol> pair =
-                    pair(migrationFunctionNames[i], primitiveTypes.get(PrimitiveTypeNames.INT));
+            map = new HashMap<>();
+            pair = pair(migrationFunctionNames[i], primitiveTypes.get(PrimitiveTypeNames.INT));
             map.put("(array | {as int}) x (array | {as int}) -> int", pair);
             migrationFunctions.put(token, map);
             dynamicFunctions.put(token, pair);
         }
 
-        Map<String, Pair<String, ITypeSymbol>> map = new HashMap<>();
-        Pair<String, ITypeSymbol> pair =
-                pair("oldSchoolArrayAccess", primitiveTypes.get(PrimitiveTypeNames.MIXED));
+        map = new HashMap<>();
+        pair = pair("oldSchoolArrayAccess", primitiveTypes.get(PrimitiveTypeNames.MIXED));
         map.put("array x {as int} -> mixed", pair);
         migrationFunctions.put(TokenTypes.ARRAY_ACCESS, map);
         dynamicFunctions.put(TokenTypes.ARRAY_ACCESS, pair);
@@ -254,26 +277,31 @@ public class TSPHPOperatorHelper implements IOperatorHelper
 
         if (pair != null) {
             IBindingCollection bindingCollection = translationScopeDto.bindingCollection;
-            boolean needMigrationFunction = true;
-
-            int operatorType = leftHandSide.getType();
-            if (operatorType == TokenTypes.Plus
-                    || operatorType == TokenTypes.Minus
-                    || operatorType == TokenTypes.Multiply) {
-                ITypeSymbol lhs = getTypeSymbol(bindingCollection, arguments.getChild(0));
-                ITypeSymbol rhs = getTypeSymbol(bindingCollection, arguments.getChild(1));
-                ITypeSymbol intTypeSymbol = primitiveTypes.get(PrimitiveTypeNames.INT);
-                ITypeSymbol floatTypeSymbol = primitiveTypes.get(PrimitiveTypeNames.FLOAT);
-                if ((typeHelper.areSame(lhs, intTypeSymbol) || typeHelper.areSame(lhs, floatTypeSymbol))
-                        && (typeHelper.areSame(rhs, intTypeSymbol) || typeHelper.areSame(rhs, floatTypeSymbol))) {
-                    needMigrationFunction = false;
-                }
-            }
-
-            if (needMigrationFunction) {
+            if (isNotExceptionalCase(leftHandSide, arguments, bindingCollection)) {
                 switchToMigrationFunction(translationScopeDto, functionApplicationDto, leftHandSide, pair);
             }
         }
+    }
+
+    private boolean isNotExceptionalCase(ITSPHPAst leftHandSide, ITSPHPAst arguments, IBindingCollection
+            bindingCollection) {
+        boolean needMigrationFunction = true;
+
+        int operatorType = leftHandSide.getType();
+        if (operatorType == TokenTypes.Plus
+                || operatorType == TokenTypes.Minus
+                || operatorType == TokenTypes.Multiply
+                || operatorType == TokenTypes.Divide) {
+            ITypeSymbol lhs = getTypeSymbol(bindingCollection, arguments.getChild(0));
+            ITypeSymbol rhs = getTypeSymbol(bindingCollection, arguments.getChild(1));
+            ITypeSymbol intTypeSymbol = primitiveTypes.get(PrimitiveTypeNames.INT);
+            ITypeSymbol floatTypeSymbol = primitiveTypes.get(PrimitiveTypeNames.FLOAT);
+            if (typeHelper.areSame(lhs, intTypeSymbol) && typeHelper.areSame(rhs, floatTypeSymbol)
+                    || typeHelper.areSame(lhs, floatTypeSymbol) && typeHelper.areSame(rhs, intTypeSymbol)) {
+                needMigrationFunction = false;
+            }
+        }
+        return needMigrationFunction;
     }
 
     private void switchToMigrationFunction(
