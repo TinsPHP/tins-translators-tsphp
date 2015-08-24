@@ -62,13 +62,7 @@ public class ExpressionsNeedWideningTest extends ATranslatorWithWideningTest
                                 + "    scalar $a;\n"
                                 + "    $a = 1;\n"
                                 + "    $a = 'hello';\n"
-                                //TODO TINS-654 migration function for divide
-//                                + "    ~(($_t2_0 = (oldSchoolAddition($a, 1))) <: float ? cast<float>($_t2_0) :
-// $_t2_0 <: " +
-//                                "int ? cast<int>($_t2_0) : \\trigger_error('The variable $_t2_0 must hold a value
-// of " +
-//                                "type float or int.', \\E_USER_ERROR));\n"
-                                + "    ~(($_t2_0 = (($a / 1))) <: float ? "
+                                + "    ~(($_t2_0 = (oldSchoolDivide($a, 1))) <: float ? "
                                 + "cast<float>($_t2_0) : $_t2_0 <: int ? cast<int>($_t2_0) : "
                                 + "\\trigger_error('The variable $_t2_0 must hold a value of type float or int.', "
                                 + "\\E_USER_ERROR));\n"
