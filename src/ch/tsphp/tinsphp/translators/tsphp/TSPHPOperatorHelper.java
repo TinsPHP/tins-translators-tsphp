@@ -15,6 +15,7 @@ import ch.tsphp.tinsphp.common.inference.constraints.IVariable;
 import ch.tsphp.tinsphp.common.inference.constraints.OverloadApplicationDto;
 import ch.tsphp.tinsphp.common.symbols.IConvertibleTypeSymbol;
 import ch.tsphp.tinsphp.common.symbols.IIntersectionTypeSymbol;
+import ch.tsphp.tinsphp.common.symbols.IUnionTypeSymbol;
 import ch.tsphp.tinsphp.common.symbols.PrimitiveTypeNames;
 import ch.tsphp.tinsphp.common.translation.dtos.FunctionApplicationDto;
 import ch.tsphp.tinsphp.common.translation.dtos.TranslationScopeDto;
@@ -138,9 +139,6 @@ public class TSPHPOperatorHelper implements IOperatorHelper
         int numberOfParameters = parameters.size();
 
         Map<Integer, Pair<ITypeSymbol, List<ITypeSymbol>>> runtimeChecks = overloadApplicationDto.runtimeChecks;
-        if (runtimeChecks == null) {
-            runtimeChecks = new HashMap<>(0);
-        }
 
         for (int i = 0; i < numberOfParameters; ++i) {
             IVariable variable = parameters.get(i);
@@ -153,14 +151,51 @@ public class TSPHPOperatorHelper implements IOperatorHelper
                     IIntersectionTypeSymbol targetType = convertibleTypeSymbol.getUpperTypeBounds();
                     ITypeSymbol argumentType = getTypeSymbol(
                             translationScopeDto.bindingCollection, argumentsAst.getChild(i));
-                    TypeHelperDto result = typeHelper.isFirstSameOrSubTypeOfSecond(argumentType, targetType);
+                    TypeHelperDto result = typeHelper.isFirstSameOrSubTypeOfSecond(argumentType, targetType, false);
                     //no conversion required if it is already a subtype
                     if (result.relation != ERelation.HAS_RELATION) {
+                        if (runtimeChecks == null) {
+                            runtimeChecks = getRuntimeChecksForConversion(
+                                    i, argumentType, convertibleTypeSymbol, targetType);
+                        }
                         addExplicitConversion(functionApplicationDto, runtimeChecks, i, targetType);
                     }
                 }
             }
         }
+    }
+
+    private Map<Integer, Pair<ITypeSymbol, List<ITypeSymbol>>> getRuntimeChecksForConversion(
+            int argumentIndex,
+            ITypeSymbol argumentType,
+            IConvertibleTypeSymbol convertibleTypeSymbol,
+            IIntersectionTypeSymbol targetType) {
+
+        Map<Integer, Pair<ITypeSymbol, List<ITypeSymbol>>> runtimeChecks;
+        runtimeChecks = new HashMap<>(0);
+        Pair<ITypeSymbol, Boolean> pair = typeTransformer.getType(argumentType);
+        if (pair.second) {
+            //must be a union type - otherwise we would have had a relation
+            IUnionTypeSymbol unionTypeSymbol = (IUnionTypeSymbol) argumentType;
+            Map<String, ITypeSymbol> typeSymbols = unionTypeSymbol.getTypeSymbols();
+            int size = typeSymbols.size();
+            if (size > 1) {
+                List<ITypeSymbol> ifTypes = new ArrayList<>(size);
+                for (ITypeSymbol typeSymbol : typeSymbols.values()) {
+                    TypeHelperDto result = typeHelper.isFirstSameOrSubTypeOfSecond(typeSymbol, targetType, false);
+                    if (result.relation == ERelation.HAS_NO_RELATION) {
+                        result = typeHelper.isFirstSameOrSubTypeOfSecond(typeSymbol, convertibleTypeSymbol, false);
+                        if (result.relation == ERelation.HAS_RELATION) {
+                            ifTypes.add(typeSymbol);
+                        }
+                    }
+                }
+                if (!ifTypes.isEmpty()) {
+                    runtimeChecks.put(argumentIndex, new Pair<ITypeSymbol, List<ITypeSymbol>>(null, ifTypes));
+                }
+            }
+        }
+        return runtimeChecks;
     }
 
     private void addExplicitConversion(

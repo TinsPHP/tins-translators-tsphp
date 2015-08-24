@@ -571,6 +571,64 @@ public class FunctionDefinitionTest extends ATranslatorWithWideningTest
                                 + "    mixed $_t5_6;\n"
                                 + "}"
                 },
+                //see TINS-648 conversions in TSPHP miss post condition
+                {
+                        "<?php function foo($x){ $a = 1; $a ='hello'; if ($x){ $a = 1.2;} echo $a; return $a;}",
+                        "namespace{\n"
+                                + "\n"
+                                + "    function scalar foo0(bool $x) {\n"
+                                + "        scalar $a;\n"
+                                + "        $a = 1;\n"
+                                + "        $a = 'hello';\n"
+                                + "        if ($x) {\n"
+                                + "            $a = 1.2;\n"
+                                + "        }\n"
+                                + "        echo $a as string if float, int;\n"
+                                + "        return $a;\n"
+                                + "    }\n"
+                                + "\n"
+                                + "    function scalar foo1({as bool} $x) {\n"
+                                + "        scalar $a;\n"
+                                + "        $a = 1;\n"
+                                + "        $a = 'hello';\n"
+                                + "        if ($x) {\n"
+                                + "            $a = 1.2;\n"
+                                + "        }\n"
+                                + "        echo $a as string if float, int;\n"
+                                + "        return $a;\n"
+                                + "    }\n"
+                                + "\n"
+                                + "}"
+                },
+                //see TINS-648 conversions in TSPHP miss post condition
+                {
+                        "<?php function foo($x){ $a = 1; $a ='hello'; if ($x){ $a = [1.2];} echo $a; return $a;}",
+                        "namespace{\n"
+                                + "\n"
+                                + "    function mixed foo0(bool $x) {\n"
+                                + "        mixed $a;\n"
+                                + "        $a = 1;\n"
+                                + "        $a = 'hello';\n"
+                                + "        if ($x) {\n"
+                                + "            $a = [1.2];\n"
+                                + "        }\n"
+                                + "        echo $a as string if array, int;\n"
+                                + "        return $a;\n"
+                                + "    }\n"
+                                + "\n"
+                                + "    function mixed foo1({as bool} $x) {\n"
+                                + "        mixed $a;\n"
+                                + "        $a = 1;\n"
+                                + "        $a = 'hello';\n"
+                                + "        if ($x) {\n"
+                                + "            $a = [1.2];\n"
+                                + "        }\n"
+                                + "        echo $a as string if array, int;\n"
+                                + "        return $a;\n"
+                                + "    }\n"
+                                + "\n"
+                                + "}"
+                }
         });
     }
 }
