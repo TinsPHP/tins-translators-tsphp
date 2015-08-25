@@ -47,6 +47,7 @@ public class TSPHPOperatorHelper implements IOperatorHelper
     private final Map<Integer, Map<String, Pair<String, ITypeSymbol>>> migrationFunctions = new HashMap<>();
     private final Map<Integer, Pair<String, ITypeSymbol>> dynamicFunctions = new HashMap<>();
 
+    @SuppressWarnings("checkstyle:parameternumber")
     public TSPHPOperatorHelper(
             ISymbolFactory theSymbolFactory,
             ITypeHelper theTypeHelper,

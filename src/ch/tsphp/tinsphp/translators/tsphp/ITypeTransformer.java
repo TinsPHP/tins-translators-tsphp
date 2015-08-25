@@ -15,7 +15,7 @@ import ch.tsphp.tinsphp.common.utils.Pair;
 import java.util.Collection;
 
 /**
- * Transforms type names and type variable names according to rules of the translation target.
+ * Transforms type according to rules of the translation target, e.g., widens union types to a least upper type bound.
  */
 public interface ITypeTransformer
 {

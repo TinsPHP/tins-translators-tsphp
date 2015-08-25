@@ -12,6 +12,9 @@ import ch.tsphp.tinsphp.common.inference.constraints.IVariable;
 import ch.tsphp.tinsphp.common.translation.dtos.FunctionApplicationDto;
 import ch.tsphp.tinsphp.common.translation.dtos.TranslationScopeDto;
 
+/**
+ * Is responsible to provide the output code for runtime checks.
+ */
 public interface IRuntimeCheckProvider
 {
     /**

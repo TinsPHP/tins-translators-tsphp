@@ -38,7 +38,7 @@ public class TSPHPRuntimeCheckProvider implements IRuntimeCheckProvider
     private final ITypeSymbol tsphpBoolTypeSymbol;
     private final ITempVariableHelper tempVariableHelper;
 
-
+    @SuppressWarnings("checkstyle:parameternumber")
     public TSPHPRuntimeCheckProvider(
             ITypeHelper theTypeHelper,
             ITypeTransformer theTypeTransformer,
@@ -213,7 +213,7 @@ public class TSPHPRuntimeCheckProvider implements IRuntimeCheckProvider
                     newArgument = getTypeCast(typeName, firstExpression, tempVariable);
                 } else {
                     //convertible types are different, see TINS-602 runtime check for convertible types
-                    String targetTypeName = typeName.substring(4, typeName.length() - 1);
+                    String targetTypeName = typeName.substring("{as ".length(), typeName.length() - 1);
                     newArgument = getAsOperation(firstExpression, targetTypeName);
                 }
             } else {

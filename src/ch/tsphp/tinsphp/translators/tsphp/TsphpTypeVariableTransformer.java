@@ -156,8 +156,9 @@ public class TsphpTypeVariableTransformer implements ITypeVariableTransformer
     }
 
     private Pair<IBindingCollection, Boolean> widenTypeBoundsIfNecessary(
-            IBindingCollection newBindings, boolean isStillOriginal, String typeParameter) {
+            IBindingCollection bindingCollection, boolean isStillOriginal, String typeParameter) {
 
+        IBindingCollection newBindings = bindingCollection;
         boolean wasModified = false;
 
         boolean needToTransformUpperTypeBound = true;

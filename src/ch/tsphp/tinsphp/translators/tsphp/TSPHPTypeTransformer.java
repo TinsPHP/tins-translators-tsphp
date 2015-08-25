@@ -44,6 +44,7 @@ public class TSPHPTypeTransformer implements ITypeTransformer
     private final ITypeSymbol tsphpNumTypeSymbol;
     private final ITypeSymbol tsphpScalarTypeSymbol;
 
+    @SuppressWarnings("checkstyle:parameternumber")
     public TSPHPTypeTransformer(
             ISymbolFactory theSymbolFactory,
             ITypeHelper theTypeHelper,

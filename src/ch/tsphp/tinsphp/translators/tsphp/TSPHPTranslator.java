@@ -43,6 +43,7 @@ public class TSPHPTranslator implements ITranslator, IIssueLogger
     private EnumSet<EIssueSeverity> foundIssues = EnumSet.noneOf(EIssueSeverity.class);
     private Exception loadingTemplateException;
 
+    @SuppressWarnings("checkstyle:parameternumber")
     public TSPHPTranslator(
             StringTemplateGroup theTemplateGroup,
             ITranslatorController theController,

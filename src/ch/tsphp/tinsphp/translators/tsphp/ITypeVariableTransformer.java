@@ -10,6 +10,10 @@ import ch.tsphp.tinsphp.common.inference.constraints.IBindingCollection;
 import ch.tsphp.tinsphp.common.inference.constraints.IFunctionType;
 import ch.tsphp.tinsphp.common.translation.dtos.TypeParameterDto;
 
+/**
+ * Transforms overloads, its type parameters and type variables respectively, according to the rules of the target
+ * language, e.g., reducing multiple lower ref bounds to one type variable.
+ */
 public interface ITypeVariableTransformer
 {
     IFunctionType rewriteOverload(IFunctionType overload);

@@ -11,6 +11,9 @@ import ch.tsphp.tinsphp.common.inference.constraints.OverloadApplicationDto;
 import ch.tsphp.tinsphp.common.translation.dtos.FunctionApplicationDto;
 import ch.tsphp.tinsphp.common.translation.dtos.TranslationScopeDto;
 
+/**
+ * Is responsible to turn operator applications into migration functions if required or adds explicit conversions.
+ */
 public interface IOperatorHelper
 {
     void turnIntoMigrationFunctionIfRequired(

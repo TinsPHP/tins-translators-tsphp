@@ -43,6 +43,7 @@ public class TranslatorController implements ITranslatorController
     private final IRuntimeCheckProvider runtimeCheckProvider;
     private Map<String, SortedMap<String, OverloadDto>> methodDtosMap;
 
+    @SuppressWarnings("checkstyle:parameternumber")
     public TranslatorController(
             IPrecedenceHelper thePrecedenceHelper,
             ITempVariableHelper theTempVariableHelper,
