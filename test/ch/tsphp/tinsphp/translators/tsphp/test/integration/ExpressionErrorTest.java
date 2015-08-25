@@ -82,7 +82,18 @@ public class ExpressionErrorTest extends ATranslatorTest
                                 + "    }\n"
                                 + "\n"
                                 + "}"
-                }
+                },
+                {
+                        "<?php $a = 2; foreach($a as $v){}",
+                        "namespace{\n"
+                                + "    mixed $v;\n"
+                                + "    int $a;\n"
+                                + "    $a = 2;\n"
+                                + "    \\trigger_error('No applicable overload found for the operator foreach'" +
+                                ".PHP_EOL.'Given argument types: int x mixed x int'.PHP_EOL.'Existing overloads:'" +
+                                ".PHP_EOL.'array x mixed x (int | string) -> mixed', \\E_USER_ERROR)\n"
+                                + "}"
+                },
         });
     }
 

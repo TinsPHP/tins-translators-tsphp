@@ -137,12 +137,15 @@ public abstract class ATest implements IIssueLogger
                 tempVariableHelper, typeTransformer, typeVariableMapper, runtimeCheckProvider);
 
         controller = new TranslatorController(
+                astAdaptor,
+                symbolsInitialiser.getSymbolFactory(),
                 new PrecedenceHelper(),
                 tempVariableHelper,
                 operatorHelper,
                 dtoCreator,
                 runtimeCheckProvider,
-                new HardCodedOutputIssueMessageProvider());
+                new HardCodedOutputIssueMessageProvider(),
+                typeTransformer);
         controller.setMethodSymbols(inferenceEngineInitialiser.getMethodSymbols());
         translator = new ErrorReportingTSPHPTranslatorWalker(
                 commonTreeNodeStream, controller, inferenceEngineInitialiser.getGlobalDefaultNamespace());

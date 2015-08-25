@@ -11,6 +11,8 @@ import ch.tsphp.tinsphp.common.inference.constraints.OverloadApplicationDto;
 import ch.tsphp.tinsphp.common.translation.dtos.FunctionApplicationDto;
 import ch.tsphp.tinsphp.common.translation.dtos.TranslationScopeDto;
 
+import java.util.List;
+
 public class PhpPlusOperatorHelper implements IOperatorHelper
 {
 
@@ -20,7 +22,7 @@ public class PhpPlusOperatorHelper implements IOperatorHelper
             FunctionApplicationDto functionApplicationDto,
             OverloadApplicationDto overloadApplicationDto,
             ITSPHPAst leftHandSide,
-            ITSPHPAst argumentsAst) {
+            List<ITSPHPAst> arguments) {
         //does not do anything
     }
 }

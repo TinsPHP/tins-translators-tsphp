@@ -10,9 +10,9 @@
  * For more information see http://tsphp.ch/wiki/display/TSPHP/License
  */
 
-package ch.tsphp.tinsphp.translators.tsphp.test.integration;
+package ch.tsphp.tinsphp.translators.tsphp.test.integration.with_widening;
 
-import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorTest;
+import ch.tsphp.tinsphp.translators.tsphp.test.integration.testutils.ATranslatorWithWideningTest;
 import org.antlr.runtime.RecognitionException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,7 +23,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 @RunWith(Parameterized.class)
-public class ForeachTest extends ATranslatorTest
+public class ForeachTest extends ATranslatorWithWideningTest
 {
 
     public ForeachTest(String testString, String expectedResult) {
@@ -42,9 +42,9 @@ public class ForeachTest extends ATranslatorTest
                         "<?php foreach([1,2] as \n$k => \n$v)$a=1;",
                         "namespace{"
                                 + "\n    int $a;"
-                                + "\n    (int | string) $k;"
+                                + "\n    scalar $k;"
                                 + "\n    mixed $v;"
-                                + "\n    foreach ([1, 2] as (int | string) $k2_0 => mixed $v3_0) {"
+                                + "\n    foreach ([1, 2] as scalar $k2_0 => mixed $v3_0) {"
                                 + "\n        $k = $k2_0;"
                                 + "\n        $v = $v3_0;"
                                 + "\n        $a = 1;"
@@ -66,9 +66,9 @@ public class ForeachTest extends ATranslatorTest
                         "<?php foreach([1, 2] as \n$k => \n$v){$a=1;}",
                         "namespace{"
                                 + "\n    int $a;"
-                                + "\n    (int | string) $k;"
+                                + "\n    scalar $k;"
                                 + "\n    mixed $v;"
-                                + "\n    foreach ([1, 2] as (int | string) $k2_0 => mixed $v3_0) {"
+                                + "\n    foreach ([1, 2] as scalar $k2_0 => mixed $v3_0) {"
                                 + "\n        $k = $k2_0;"
                                 + "\n        $v = $v3_0;"
                                 + "\n        $a = 1;"
@@ -91,9 +91,9 @@ public class ForeachTest extends ATranslatorTest
                         "namespace{"
                                 + "\n    int $b;"
                                 + "\n    int $a;"
-                                + "\n    (int | string) $k;"
+                                + "\n    scalar $k;"
                                 + "\n    mixed $v;"
-                                + "\n    foreach ([1, 2] as (int | string) $k2_0 => mixed $v3_0) {"
+                                + "\n    foreach ([1, 2] as scalar $k2_0 => mixed $v3_0) {"
                                 + "\n        $k = $k2_0;"
                                 + "\n        $v = $v3_0;"
                                 + "\n        $a = 1;"
@@ -138,18 +138,47 @@ public class ForeachTest extends ATranslatorTest
                                 + "\n }"
                         ,
                         "namespace{"
-                                + "\n    (int | string) $k;"
+                                + "\n    scalar $k;"
                                 + "\n    mixed $v;"
                                 + "\n    $v = null;"
-                                + "\n    foreach ([1, 2] as (int | string) $k3_0 => mixed $v4_0) {"
+                                + "\n    foreach ([1, 2] as scalar $k3_0 => mixed $v4_0) {"
                                 + "\n        $k = $k3_0;"
                                 + "\n        $v = $v4_0;"
                                 + "\n    }"
                                 + "\n    if ($v != null) {"
-                                + "\n        echo cast<{as string}>($v);"
+                                + "\n        echo $v as string;"
                                 + "\n    }"
                                 + "\n}"
-                }
+                },
+                {
+                        "<?php function foo($x){foreach($x as $k => $v){} return $x;}",
+                        "namespace{\n"
+                                + "\n"
+                                + "    function array foo(array $x) {\n"
+                                + "        scalar $k;\n"
+                                + "        mixed $v;\n"
+                                + "        foreach ($x as scalar $k1_37 => mixed $v1_43) {\n"
+                                + "            $k = $k1_37;\n"
+                                + "            $v = $v1_43;\n"
+                                + "        }\n"
+                                + "        return $x;\n"
+                                + "    }\n"
+                                + "\n"
+                                + "}"
+                },
+                //see TINS-649 translation of flow-of-control should not be one-to-one
+                {
+                        "<?php $a = [1]; $a = 2; foreach($a as $v){}",
+                        "namespace{\n"
+                                + "    mixed $v;\n"
+                                + "    mixed $a;\n"
+                                + "    $a = [1];\n"
+                                + "    $a = 2;\n"
+                                + "    foreach (cast<array>($a) as mixed $v1_38) {\n"
+                                + "        $v = $v1_38;\n"
+                                + "    }\n"
+                                + "}"
+                },
         });
     }
 }

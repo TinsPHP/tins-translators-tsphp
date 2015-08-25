@@ -115,18 +115,18 @@ public class FunctionDefinitionImplicitReturnTest extends ATranslatorWithWidenin
                 },
                 //partial return with param
                 {
-                        "<?php function foo($x){if($x){return 1;}} ?>",
+                        "<?php function fooD($x){if($x){return 1;}} ?>",
                         "namespace{"
                                 + "\n"
-                                + "\n    function int? foo0(bool $x) {"
+                                + "\n    function int? fooD0(bool $x) {"
                                 + "\n        if ($x) {"
                                 + "\n            return 1;"
                                 + "\n        }"
                                 + "\n        return null;"
                                 + "\n    }"
                                 + "\n"
-                                + "\n    function int? foo1({as bool} $x) {"
-                                + "\n        if ($x) {"
+                                + "\n    function int? fooD1({as bool} $x) {"
+                                + "\n        if ($x as bool) {"
                                 + "\n            return 1;"
                                 + "\n        }"
                                 + "\n        return null;"

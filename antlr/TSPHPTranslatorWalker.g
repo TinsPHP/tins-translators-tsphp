@@ -29,9 +29,12 @@ options {
 package ch.tsphp.tinsphp.translators.tsphp.antlr;
 
 import ch.tsphp.common.ITSPHPAst;
+import ch.tsphp.common.symbols.ISymbol;
+import ch.tsphp.common.symbols.ITypeSymbol;
 import ch.tsphp.tinsphp.common.inference.constraints.IBindingCollection;
 import ch.tsphp.tinsphp.common.scopes.IGlobalNamespaceScope;
 import ch.tsphp.tinsphp.common.symbols.IArrayTypeSymbol;
+import ch.tsphp.tinsphp.common.symbols.IContainerTypeSymbol;
 import ch.tsphp.tinsphp.common.translation.ITranslatorController;
 import ch.tsphp.tinsphp.common.translation.dtos.FunctionApplicationDto;
 import ch.tsphp.tinsphp.common.translation.dtos.OverloadDto;
@@ -42,13 +45,8 @@ import ch.tsphp.tinsphp.common.translation.dtos.VariableDto;
 import ch.tsphp.tinsphp.translators.tsphp.antlrmod.IErrorMessageCaller;
 import ch.tsphp.tinsphp.translators.tsphp.antlrmod.FunctionErrorMessageCaller;
 import ch.tsphp.tinsphp.translators.tsphp.antlrmod.OperatorErrorMessageCaller;
-import ch.tsphp.tinsphp.common.utils.Pair;
 
-import java.util.Map;
-import java.util.Collection;
 import java.util.SortedMap;
-import java.util.SortedSet;
-import java.util.Deque;
 import java.util.ArrayDeque;
 
 }
@@ -98,7 +96,6 @@ private StringTemplate getType(VariableDto dto) {
 
 private StringTemplate getFunctionApplication(
         FunctionApplicationDto dto,
-        List<Object> arguments,
         ITSPHPAst functionCall,
         ITSPHPAst identifier,
         IErrorMessageCaller errorMessageCaller){
@@ -118,7 +115,6 @@ private StringTemplate getFunctionApplication(
 
 private StringTemplate getOperatorOrFunctionApplication(
         FunctionApplicationDto dto,
-        List<Object> arguments,
         List<String> argumentNames,
         ITSPHPAst operatorAst,
         String operatorFunction,
@@ -128,9 +124,9 @@ private StringTemplate getOperatorOrFunctionApplication(
     StringTemplate stringTemplate;
     if (dto != null) {
         if (dto.name != null) {
-            stringTemplate = getFunctionApplication(dto, arguments, operatorAst, operatorAst, operatorErrorMessageCaller);
+            stringTemplate = getFunctionApplication(dto, operatorAst, operatorAst, operatorErrorMessageCaller);
         } else {
-            stringTemplate = getOperatorApplication(dto, arguments, argumentNames, operatorFunction, operator, needParentheses);
+            stringTemplate = getOperatorApplication(dto, argumentNames, operatorFunction, operator, needParentheses);
             if (dto.returnRuntimeCheck != null) {
                 stringTemplate = %list(statements={dto.returnRuntimeCheck.replace("\%returnRuntimeCheck\%", stringTemplate.toString())});
             }
@@ -144,17 +140,16 @@ private StringTemplate getOperatorOrFunctionApplication(
 
 private StringTemplate getOperatorApplication(
         FunctionApplicationDto dto,
-        List<Object> arguments,
         List<String> argumentNames,
         String operatorFunction,
         StringTemplate operator,
         boolean needParentheses) {
 
-    int numberOfArguments = arguments.size();
+    int numberOfArguments = dto.arguments.size();
     STAttrMap map = new STAttrMap().put("operator", operator).put("needParentheses", needParentheses);
     for(int i = 0; i < numberOfArguments; ++i){
         String argumentName = argumentNames.get(i);
-        Object argument = arguments.get(i);
+        Object argument = dto.arguments.get(i);
         map.put(argumentName, argument);
     }
     return templateLib.getInstanceOf(operatorFunction, map);
@@ -626,7 +621,6 @@ instruction
             FunctionApplicationDto dto = controller.getOperatorApplication(translationScopeDto, $Echo, arguments);
             $st = getOperatorOrFunctionApplication(
                 dto, 
-                arguments,
                 argumentNames,
                 $Echo,
                 "echo",
@@ -644,7 +638,24 @@ ifCondition
             ifBlock=blockConditional
             elseBlock=blockConditional?
         )
-        -> if(condition={$expression.st}, ifBlock={$ifBlock.instructions}, elseBlock={$elseBlock.instructions})
+        {
+            List<String> argumentNames = new ArrayList<>(3);
+            List<Object> arguments = new ArrayList<>(3);
+            argumentNames.add("condition");
+            arguments.add($expression.st);
+            argumentNames.add("ifBlock");
+            arguments.add($ifBlock.instructions);
+            argumentNames.add("elseBlock");
+            arguments.add($elseBlock.instructions);
+            FunctionApplicationDto dto = controller.getOperatorApplication(translationScopeDto, $If, arguments);
+            $st = getOperatorOrFunctionApplication(
+                dto,
+                argumentNames,
+                $If,
+                "if",
+                null,
+                false);
+        }
     ;
 
 blockConditional returns[List<Object> instructions]
@@ -652,7 +663,7 @@ blockConditional returns[List<Object> instructions]
     ;
     
 switchCondition
-    :   ^(Switch expression content+=switchContent*) 
+    :   ^(Switch expression content+=switchContent*)
         -> switch(condition={$expression.st}, content={$content})
     ;
 
@@ -667,13 +678,45 @@ caseLabel
     ;
     
 forLoop
-    :   ^('for'
+    :   ^(For
             (init=expressionList[true])
-            condition=expressionList[true]
+            ^(EXPRESSION_LIST condition+=expression*)
             update=expressionList[false]
             blockConditional
         )
-        -> for(init={$init.st}, condition={$condition.st}, update={$update.st}, block={$blockConditional.instructions})
+        {
+            if($condition != null){
+                int lastElement = $condition.size() - 1;
+            	Object expression = $condition.get(lastElement);
+                List<Object> operatorArguments = new ArrayList<>(1);
+                operatorArguments.add(expression);
+                FunctionApplicationDto dto = controller.getOperatorApplication(translationScopeDto, $For, operatorArguments);
+                
+                List<String> argumentNames = new ArrayList<>(4);
+                List<Object> arguments = new ArrayList<>(4);
+                argumentNames.add("init");
+                arguments.add($init.st);
+                argumentNames.add("condition");
+                $condition.set(lastElement, dto.arguments.get(0));
+                StringTemplate conditionTemplate = %expressionList(expressions={$condition}, semicolonAtTheEnd={true});
+                arguments.add(conditionTemplate);
+                argumentNames.add("update");
+                arguments.add($update.st);
+                argumentNames.add("block");
+                arguments.add($blockConditional.instructions);
+                dto.arguments = arguments;
+                $st = getOperatorOrFunctionApplication(
+                    dto,
+                    argumentNames,
+                    $For,
+                    "for",
+                    null,
+                    false);
+            } else {
+                StringTemplate conditionTemplate = %expressionList(expressions={$condition}, semicolonAtTheEnd={true});
+                $st = %for(init={$init.st}, condition={conditionTemplate}, update={$update.st}, block={$blockConditional.instructions});
+            }
+        }
     ;
 
 expressionList[boolean semicolonAtTheEnd]
@@ -682,28 +725,69 @@ expressionList[boolean semicolonAtTheEnd]
     ;
     
 foreachLoop
-    :   ^('foreach'
+    :   ^(Foreach
             expression
             valueVariableId=VariableId
             keyVariableId=VariableId?
             blockConditional
         )
         {
-            IArrayTypeSymbol arrayTypeSymbol = (IArrayTypeSymbol) $expression.start.getEvalType();            
-            String keyVariableIdType = arrayTypeSymbol.getKeyTypeSymbol().getAbsoluteName();
-            String keyVariableIdTemp = $keyVariableId != null ? controller.getTempVariableName($keyVariableId) : null;
-            String valueVariableIdType = arrayTypeSymbol.getValueTypeSymbol().getAbsoluteName();
-            String valueVariableIdTemp = controller.getTempVariableName($valueVariableId);
+            ISymbol symbol = $expression.start.getSymbol();
+            String typeVariable =  translationScopeDto.bindingCollection.getTypeVariable(symbol.getAbsoluteName());
+            IContainerTypeSymbol containerTypeSymbol = translationScopeDto.bindingCollection.getLowerTypeBounds(typeVariable);
+            if(containerTypeSymbol == null){
+               containerTypeSymbol = translationScopeDto.bindingCollection.getUpperTypeBounds(typeVariable);
+            }
+            IArrayTypeSymbol arrayTypeSymbol = null;
+            for (ITypeSymbol typeSymbol : containerTypeSymbol.getTypeSymbols().values()){
+                 if(typeSymbol instanceof IArrayTypeSymbol){
+                     arrayTypeSymbol = (IArrayTypeSymbol) typeSymbol;
+                 }
+            }
+            String keyVariableIdType = null;
+            String keyVariableIdTemp = null;
+            String valueVariableIdType = null;
+            String valueVariableIdTemp = null;
+            if(arrayTypeSymbol != null) {
+                valueVariableIdType = controller.getTransformedTypeName(arrayTypeSymbol.getValueTypeSymbol());
+                valueVariableIdTemp = controller.getTempVariableName(valueVariableId);        
+                keyVariableIdType = controller.getTransformedTypeName(arrayTypeSymbol.getKeyTypeSymbol());
+                keyVariableIdTemp = keyVariableId != null ? controller.getTempVariableName(keyVariableId) : null;
+                
+            }
+            
+            List<String> argumentNames = new ArrayList<>(8);
+            List<Object> arguments = new ArrayList<>(8);
+            argumentNames.add("array");
+            arguments.add($expression.st);
+            argumentNames.add("keyVariableIdType");
+            arguments.add(keyVariableIdType);
+            argumentNames.add("keyVariableId");
+            arguments.add($keyVariableId != null ? $keyVariableId.getText() : null);
+            argumentNames.add("keyVariableIdTemp");
+            arguments.add(keyVariableIdTemp);
+            argumentNames.add("valueVariableIdType");
+            arguments.add(valueVariableIdType);
+            argumentNames.add("valueVariableId");
+            arguments.add($valueVariableId.getText());
+            argumentNames.add("valueVariableIdTemp");
+            arguments.add(valueVariableIdTemp);
+            argumentNames.add("block");
+            arguments.add($blockConditional.instructions);
+            FunctionApplicationDto dto = controller.getOperatorApplication(translationScopeDto, $Foreach, arguments);
+            if (keyVariableIdTemp != null) {
+                // we might calculate a runtime check for the variable but since we use a temp variable anyway, 
+                // it is unnecessary, would result in (k <: int ? cast<int>(k) ...) = k_0;
+                dto.arguments.set(2, $keyVariableId);
+            }
+            $st = getOperatorOrFunctionApplication(
+                dto,
+                argumentNames,
+                $Foreach,
+                "foreach",
+                null,
+                false);
         }
-        -> foreach(
-            array={$expression.st}, 
-            keyVariableIdType={keyVariableIdType},
-            keyVariableId={$keyVariableId != null ? $keyVariableId.getText() : null}, 
-            keyVariableIdTemp={keyVariableIdTemp}, 
-            valueVariableIdType={valueVariableIdType},            
-            valueVariableId={$valueVariableId.getText()},
-            valueVariableIdTemp={valueVariableIdTemp},
-            block={$blockConditional.instructions})
     ;
 
 whileLoop
@@ -794,7 +878,6 @@ operator
                     translationScopeDto, $unaryPreOperator.start, arguments);
             $st = getOperatorOrFunctionApplication(
                 dto, 
-                arguments,
                 argumentNames,
                 $unaryPreOperator.start, 
                 "unaryPreOperator",
@@ -812,7 +895,6 @@ operator
                     translationScopeDto, $unaryPostOperator.start, arguments);
             $st = getOperatorOrFunctionApplication(
                 dto, 
-                arguments,
                 argumentNames,
                 $unaryPostOperator.start, 
                 "unaryPostOperator",
@@ -832,7 +914,6 @@ operator
                     translationScopeDto, $binaryOperator.start, arguments);
            $st = getOperatorOrFunctionApplication(
                 dto, 
-                arguments,
                 argumentNames,
                 $binaryOperator.start, 
                 "binaryOperator",
@@ -854,7 +935,6 @@ operator
                     translationScopeDto, $QuestionMark, arguments);
             $st = getOperatorOrFunctionApplication(
                 dto, 
-                arguments,
                 argumentNames,
                 $QuestionMark, 
                 "ternaryOperator",
@@ -874,7 +954,6 @@ operator
                     translationScopeDto, $CAST, arguments);
             $st = getOperatorOrFunctionApplication(
                 dto, 
-                arguments,
                 argumentNames,
                 $CAST,
                 "cast",
@@ -894,7 +973,6 @@ operator
                     translationScopeDto, $Instanceof, arguments);
             $st = getOperatorOrFunctionApplication(
                 dto, 
-                arguments,
                 argumentNames,
                 $Instanceof,
                 "instanceof",
@@ -1006,7 +1084,6 @@ functionCall
                 translationScopeDto, $FUNCTION_CALL, $actualParameters.parameters);
             $st = getFunctionApplication(
                 dto, 
-                $actualParameters.parameters,
                 $FUNCTION_CALL, 
                 $identifier, 
                 functionErrorMessageCaller);
@@ -1069,8 +1146,7 @@ postFixExpression
                     translationScopeDto, $ARRAY_ACCESS, arguments);
             $st = getOperatorOrFunctionApplication(
                 dto, 
-                arguments,
-                argumentNames,
+                                argumentNames,
                 $ARRAY_ACCESS, 
                 "arrayAccess",
                 null,//not required for template arrayAccess

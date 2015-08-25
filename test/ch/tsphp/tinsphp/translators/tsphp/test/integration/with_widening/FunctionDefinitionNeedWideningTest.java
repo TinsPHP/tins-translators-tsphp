@@ -109,7 +109,7 @@ public class FunctionDefinitionNeedWideningTest extends ATranslatorWithWideningT
                                 + "$x <: int ? cast<int>($x) : "
                                 + "$x <: string ? cast<string>($x) : \\trigger_error('The variable $x must hold a "
                                 + "value of type float, int or string.', \\E_USER_ERROR));\n"
-                                + "        foreach ([1] as (int | string) $x1_43 => mixed $v1_49) {\n"
+                                + "        foreach ([1] as scalar $x1_43 => mixed $v1_49) {\n"
                                 + "            $x = $x1_43;\n"
                                 + "            $v = $v1_49;\n"
                                 + "        }\n"

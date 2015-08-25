@@ -131,7 +131,7 @@ public class TSPHPOperatorHelper implements IOperatorHelper
             FunctionApplicationDto dto,
             OverloadApplicationDto overloadApplicationDto,
             ITSPHPAst leftHandSide,
-            ITSPHPAst argumentsAst) {
+            List<ITSPHPAst> arguments) {
 
         int operatorType = leftHandSide.getType();
 
@@ -141,7 +141,7 @@ public class TSPHPOperatorHelper implements IOperatorHelper
                 Map<String, Pair<String, ITypeSymbol>> overloads = migrationFunctions.get(operatorType);
                 String signature = overload.getSignature();
                 Pair<String, ITypeSymbol> pair = overloads.get(signature);
-                switchToMigrationFunctionIfRequired(translationScopeDto, dto, leftHandSide, argumentsAst, pair);
+                switchToMigrationFunctionIfRequired(translationScopeDto, dto, leftHandSide, arguments, pair);
             } else if (operatorType == TokenTypes.CAST) {
                 switchToMigrationFunction(
                         translationScopeDto, dto, leftHandSide, new Pair<String, ITypeSymbol>("oldSchoolCast", null));
@@ -151,11 +151,11 @@ public class TSPHPOperatorHelper implements IOperatorHelper
             }
 
             if (dto.name == null && overload.hasConvertibleParameterTypes()) {
-                handleConvertibleTypes(translationScopeDto, dto, overloadApplicationDto, argumentsAst);
+                handleConvertibleTypes(translationScopeDto, dto, overloadApplicationDto, arguments);
             }
         } else {
             Pair<String, ITypeSymbol> pair = dynamicFunctions.get(operatorType);
-            switchToMigrationFunctionIfRequired(translationScopeDto, dto, leftHandSide, argumentsAst, pair);
+            switchToMigrationFunctionIfRequired(translationScopeDto, dto, leftHandSide, arguments, pair);
         }
     }
 
@@ -163,7 +163,7 @@ public class TSPHPOperatorHelper implements IOperatorHelper
             TranslationScopeDto translationScopeDto,
             FunctionApplicationDto functionApplicationDto,
             OverloadApplicationDto overloadApplicationDto,
-            ITSPHPAst argumentsAst) {
+            List<ITSPHPAst> argumentsAst) {
 
         IBindingCollection rightBindings = overloadApplicationDto.overload.getBindingCollection();
         List<IVariable> parameters = overloadApplicationDto.overload.getParameters();
@@ -181,7 +181,7 @@ public class TSPHPOperatorHelper implements IOperatorHelper
                     IConvertibleTypeSymbol convertibleTypeSymbol = (IConvertibleTypeSymbol) next;
                     IIntersectionTypeSymbol targetType = convertibleTypeSymbol.getUpperTypeBounds();
                     ITypeSymbol argumentType = getTypeSymbol(
-                            translationScopeDto.bindingCollection, argumentsAst.getChild(i));
+                            translationScopeDto.bindingCollection, argumentsAst.get(i));
                     TypeHelperDto result = typeHelper.isFirstSameOrSubTypeOfSecond(argumentType, targetType, false);
                     //no conversion required if it is already a subtype
                     if (result.relation != ERelation.HAS_RELATION) {
@@ -273,7 +273,7 @@ public class TSPHPOperatorHelper implements IOperatorHelper
             TranslationScopeDto translationScopeDto,
             FunctionApplicationDto functionApplicationDto,
             ITSPHPAst leftHandSide,
-            ITSPHPAst arguments,
+            List<ITSPHPAst> arguments,
             Pair<String, ITypeSymbol> pair) {
 
         if (pair != null) {
@@ -284,7 +284,7 @@ public class TSPHPOperatorHelper implements IOperatorHelper
         }
     }
 
-    private boolean isNotExceptionalCase(ITSPHPAst leftHandSide, ITSPHPAst arguments, IBindingCollection
+    private boolean isNotExceptionalCase(ITSPHPAst leftHandSide, List<ITSPHPAst> arguments, IBindingCollection
             bindingCollection) {
         boolean needMigrationFunction = true;
 
@@ -293,8 +293,8 @@ public class TSPHPOperatorHelper implements IOperatorHelper
                 || operatorType == TokenTypes.Minus
                 || operatorType == TokenTypes.Multiply
                 || operatorType == TokenTypes.Divide) {
-            ITypeSymbol lhs = getTypeSymbol(bindingCollection, arguments.getChild(0));
-            ITypeSymbol rhs = getTypeSymbol(bindingCollection, arguments.getChild(1));
+            ITypeSymbol lhs = getTypeSymbol(bindingCollection, arguments.get(0));
+            ITypeSymbol rhs = getTypeSymbol(bindingCollection, arguments.get(1));
             ITypeSymbol intTypeSymbol = primitiveTypes.get(PrimitiveTypeNames.INT);
             ITypeSymbol floatTypeSymbol = primitiveTypes.get(PrimitiveTypeNames.FLOAT);
             if (typeHelper.areSame(lhs, intTypeSymbol) && typeHelper.areSame(rhs, floatTypeSymbol)

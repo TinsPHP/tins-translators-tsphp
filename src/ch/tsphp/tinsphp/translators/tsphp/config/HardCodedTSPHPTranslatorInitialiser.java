@@ -66,14 +66,14 @@ public class HardCodedTSPHPTranslatorInitialiser implements ITranslatorInitialis
     private Exception loadingTemplateException;
 
     public HardCodedTSPHPTranslatorInitialiser(
-            ITSPHPAstAdaptor anAstAdaptor,
+            ITSPHPAstAdaptor astAdaptor,
             ISymbolsInitialiser theSymbolsInitialiser,
             ICoreInitialiser theCoreInitialiser,
             IInferenceEngineInitialiser theInferenceEngineInitialiser) {
         inferenceEngineInitialiser = theInferenceEngineInitialiser;
 
         IPrecedenceHelper precedenceHelper = new PrecedenceHelper();
-        ITempVariableHelper tempVariableHelper = new TempVariableHelper(anAstAdaptor);
+        ITempVariableHelper tempVariableHelper = new TempVariableHelper(astAdaptor);
 
         Map<String, ITypeSymbol> primitiveTypes = theCoreInitialiser.getCore().getPrimitiveTypes();
         ITypeHelper typeHelper = theSymbolsInitialiser.getTypeHelper();
@@ -108,12 +108,15 @@ public class HardCodedTSPHPTranslatorInitialiser implements ITranslatorInitialis
         );
 
         controller = new TranslatorController(
+                astAdaptor,
+                symbolFactory,
                 precedenceHelper,
                 tempVariableHelper,
                 operatorHelper,
                 dtoCreator,
                 runtimeCheckProvider,
-                outputIssueMessageProvider);
+                outputIssueMessageProvider,
+                typeTransformer);
 
         loadStringTemplate();
     }

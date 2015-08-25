@@ -11,6 +11,8 @@ import ch.tsphp.tinsphp.common.inference.constraints.OverloadApplicationDto;
 import ch.tsphp.tinsphp.common.translation.dtos.FunctionApplicationDto;
 import ch.tsphp.tinsphp.common.translation.dtos.TranslationScopeDto;
 
+import java.util.List;
+
 /**
  * Is responsible to turn operator applications into migration functions if required or adds explicit conversions.
  */
@@ -21,5 +23,5 @@ public interface IOperatorHelper
             FunctionApplicationDto functionApplicationDto,
             OverloadApplicationDto overloadApplicationDto,
             ITSPHPAst leftHandSide,
-            ITSPHPAst argumentsAst);
+            List<ITSPHPAst> arguments);
 }

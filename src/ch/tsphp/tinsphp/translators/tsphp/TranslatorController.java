@@ -7,8 +7,10 @@
 package ch.tsphp.tinsphp.translators.tsphp;
 
 import ch.tsphp.common.ITSPHPAst;
+import ch.tsphp.common.ITSPHPAstAdaptor;
 import ch.tsphp.common.symbols.ITypeSymbol;
 import ch.tsphp.tinsphp.common.TinsPHPConstants;
+import ch.tsphp.tinsphp.common.gen.TokenTypes;
 import ch.tsphp.tinsphp.common.inference.constraints.IBindingCollection;
 import ch.tsphp.tinsphp.common.inference.constraints.IFunctionType;
 import ch.tsphp.tinsphp.common.inference.constraints.ITypeVariableReference;
@@ -17,6 +19,7 @@ import ch.tsphp.tinsphp.common.inference.constraints.OverloadApplicationDto;
 import ch.tsphp.tinsphp.common.symbols.IExpressionVariableSymbol;
 import ch.tsphp.tinsphp.common.symbols.IMethodSymbol;
 import ch.tsphp.tinsphp.common.symbols.IMinimalMethodSymbol;
+import ch.tsphp.tinsphp.common.symbols.ISymbolFactory;
 import ch.tsphp.tinsphp.common.symbols.IUnionTypeSymbol;
 import ch.tsphp.tinsphp.common.translation.IDtoCreator;
 import ch.tsphp.tinsphp.common.translation.ITranslatorController;
@@ -35,28 +38,37 @@ import java.util.SortedMap;
 
 public class TranslatorController implements ITranslatorController
 {
+    private final ITSPHPAstAdaptor astAdaptor;
+    private final ISymbolFactory symbolFactory;
     private final IPrecedenceHelper precedenceHelper;
     private final ITempVariableHelper tempVariableHelper;
     private final IOperatorHelper operatorHelper;
     private final IDtoCreator dtoCreator;
-    private final IOutputIssueMessageProvider messageProvider;
     private final IRuntimeCheckProvider runtimeCheckProvider;
+    private final IOutputIssueMessageProvider messageProvider;
+    private final ITypeTransformer typeTransformer;
     private Map<String, SortedMap<String, OverloadDto>> methodDtosMap;
 
     @SuppressWarnings("checkstyle:parameternumber")
     public TranslatorController(
+            ITSPHPAstAdaptor theAstAdaptor,
+            ISymbolFactory theSymbolFactory,
             IPrecedenceHelper thePrecedenceHelper,
             ITempVariableHelper theTempVariableHelper,
             IOperatorHelper theOperatorHelper,
             IDtoCreator theDtoCreator,
             IRuntimeCheckProvider theRuntimeCheckProvider,
-            IOutputIssueMessageProvider theMessageProvider) {
+            IOutputIssueMessageProvider theMessageProvider,
+            ITypeTransformer theTypeTransformer) {
+        astAdaptor = theAstAdaptor;
+        symbolFactory = theSymbolFactory;
         precedenceHelper = thePrecedenceHelper;
         tempVariableHelper = theTempVariableHelper;
         operatorHelper = theOperatorHelper;
         dtoCreator = theDtoCreator;
         runtimeCheckProvider = theRuntimeCheckProvider;
         messageProvider = theMessageProvider;
+        typeTransformer = theTypeTransformer;
     }
 
     @Override
@@ -179,8 +191,23 @@ public class TranslatorController implements ITranslatorController
     @Override
     public FunctionApplicationDto getOperatorApplication(
             TranslationScopeDto translationScopeDto, ITSPHPAst operator, List<Object> arguments) {
-        FunctionApplicationDto dto = null;
+        if (operator.getType() != TokenTypes.For) {
+            return getOperatorApplication(translationScopeDto, operator, operator.getChildren(), arguments);
+        }
+        List<ITSPHPAst> astArguments = new ArrayList<>(1);
+        ITSPHPAst conditionList = operator.getChild(1);
+        ITSPHPAst condition = conditionList.getChild(conditionList.getChildCount() - 1);
+        astArguments.add(condition);
+        return getOperatorApplication(translationScopeDto, operator, astArguments, arguments);
+    }
 
+    private FunctionApplicationDto getOperatorApplication(
+            TranslationScopeDto translationScopeDto,
+            ITSPHPAst operator,
+            List<ITSPHPAst> astArguments,
+            List<Object> arguments) {
+
+        FunctionApplicationDto dto = null;
         String absoluteName = operator.getSymbol().getAbsoluteName();
         OverloadApplicationDto appliedOverloadDto
                 = translationScopeDto.bindingCollection.getAppliedOverload(absoluteName);
@@ -188,7 +215,7 @@ public class TranslatorController implements ITranslatorController
             dto = new FunctionApplicationDto();
             dto.arguments = arguments;
             operatorHelper.turnIntoMigrationFunctionIfRequired(
-                    translationScopeDto, dto, appliedOverloadDto, operator, operator);
+                    translationScopeDto, dto, appliedOverloadDto, operator, astArguments);
             //runtime checks are not required if a migration function is used.
             if (dto.name == null) {
                 applyRuntimeChecks(translationScopeDto, dto, operator, appliedOverloadDto);
@@ -201,7 +228,7 @@ public class TranslatorController implements ITranslatorController
     @Override
     public String getErrMessageFunctionApplication(
             IBindingCollection bindings, ITSPHPAst functionCall, ITSPHPAst identifier) {
-        List<String> arguments = getArguments(bindings, functionCall.getChild(1));
+        List<String> arguments = getArguments(bindings, functionCall.getChild(1).getChildren());
         List<String> overloads = getOverloads(functionCall);
         return messageProvider.getWrongApplication("wrongFunctionUsage", identifier.getText(), arguments, overloads);
     }
@@ -215,16 +242,16 @@ public class TranslatorController implements ITranslatorController
         return overloads;
     }
 
-    private List<String> getArguments(IBindingCollection bindings, ITSPHPAst argumentsAst) {
+    private List<String> getArguments(IBindingCollection bindings, List<ITSPHPAst> argumentsAst) {
         List<String> arguments = new ArrayList<>();
-        int numberOfArguments = argumentsAst.getChildCount();
+        int numberOfArguments = argumentsAst.size();
         if (numberOfArguments == 0) {
             arguments.add("void");
         } else {
-            String typeVariable = bindings.getTypeVariable(argumentsAst.getChild(0).getSymbol().getAbsoluteName());
+            String typeVariable = bindings.getTypeVariable(argumentsAst.get(0).getSymbol().getAbsoluteName());
             arguments.add(bindings.getLowerTypeBounds(typeVariable).getAbsoluteName());
             for (int i = 1; i < numberOfArguments; ++i) {
-                typeVariable = bindings.getTypeVariable(argumentsAst.getChild(i).getSymbol().getAbsoluteName());
+                typeVariable = bindings.getTypeVariable(argumentsAst.get(i).getSymbol().getAbsoluteName());
                 arguments.add(bindings.getLowerTypeBounds(typeVariable).getAbsoluteName());
             }
         }
@@ -233,8 +260,25 @@ public class TranslatorController implements ITranslatorController
 
     @Override
     public String getErrMessageOperatorApplication(IBindingCollection bindings, ITSPHPAst operator) {
-        List<String> arguments = getArguments(bindings, operator);
+        List<ITSPHPAst> children = operator.getChildren();
+        if (operator.getType() == TokenTypes.Foreach) {
+            children = new ArrayList<>(children);
+            //TODO TINS-392 introduce optional parameters
+            if (children.size() == 4) {
+                children.remove(3);
+            } else {
+                ITSPHPAst one = (ITSPHPAst) astAdaptor.create(TokenTypes.Int, children.get(1).getToken(), "1");
+                one.setSymbol(symbolFactory.createExpressionVariableSymbol(one));
+                children.set(2, one);
+            }
+        }
+        List<String> arguments = getArguments(bindings, children);
         List<String> overloads = getOverloads(operator);
         return messageProvider.getWrongApplication("wrongOperatorUsage", operator.getText(), arguments, overloads);
+    }
+
+    @Override
+    public String getTransformedTypeName(ITypeSymbol typeSymbol) {
+        return typeTransformer.getType(typeSymbol).first.getAbsoluteName();
     }
 }
