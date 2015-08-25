@@ -154,7 +154,7 @@ public class ForeachTest extends ATranslatorWithWideningTest
                         "<?php function foo($x){foreach($x as $k => $v){} return $x;}",
                         "namespace{\n"
                                 + "\n"
-                                + "    function array foo(array $x) {\n"
+                                + "    function T foo<T>(T $x) where [T <: array] {\n"
                                 + "        scalar $k;\n"
                                 + "        mixed $v;\n"
                                 + "        foreach ($x as scalar $k1_37 => mixed $v1_43) {\n"
