@@ -687,7 +687,7 @@ forLoop
         {
             if($condition != null){
                 int lastElement = $condition.size() - 1;
-            	Object expression = $condition.get(lastElement);
+                Object expression = $condition.get(lastElement);
                 List<Object> operatorArguments = new ArrayList<>(1);
                 operatorArguments.add(expression);
                 FunctionApplicationDto dto = controller.getOperatorApplication(translationScopeDto, $For, operatorArguments);
@@ -708,7 +708,7 @@ forLoop
                 $st = getOperatorOrFunctionApplication(
                     dto,
                     argumentNames,
-                    $For,
+                        $For,
                     "for",
                     null,
                     false);
