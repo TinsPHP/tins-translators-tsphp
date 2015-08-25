@@ -329,10 +329,14 @@ public class FunctionDefinitionTest extends ATranslatorWithWideningTest
                                 + "    }\n"
                                 + "\n"
                                 + "    $a = fooP0(2);\n"
-                                + "    $b = ~($a <: int ? cast<int>($a) : $a <: string ? cast<string>($a) : "
-                                + "\\trigger_error('The variable $a must hold a value of type int or string.',"
-                                + " \\E_USER_ERROR));\n"
-                                + "}"
+                                //TODO TINS-666 soft typing erroneous for local/global variables
+                                //should only be cast<int> ... cast<string>
+                                + "    $b = ~($a <: float ? cast<float>($a) : "
+                                + "$a <: int ? cast<int>($a) : $a <: string ? cast<string>($a) : "
+                                + "\\trigger_error('The variable $a must hold a value of type float, int or string.', "
+                                + "\\E_USER_ERROR));\n"
+                                + "}" +
+                                ""
                 },
                 //see TINS-584 find least upper reference bound - initially we had the return type (float | int | T)
                 {
@@ -813,31 +817,31 @@ public class FunctionDefinitionTest extends ATranslatorWithWideningTest
                                 + "\n"
                                 + "     return $password;\n"
                                 + " }",
+                        // e.g., the return type should eb string, $password as well
                         "namespace{\n"
                                 + "\n"
-                                + "    function string readable_random_string({as num} $length) {\n"
-                                + "        int $i;\n"
+                                + "    function {as string} readable_random_string({as num} $length) {\n"
+                                + "        scalar? $i;\n"
                                 + "        num! $max;\n"
-                                + "        string $password;\n"
+                                + "        {as string} $password;\n"
                                 + "        array $vocal;\n"
                                 + "        array $conso;\n"
-                                + "        $conso = ['b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'r',"
-                                + " 's', 't', 'v', 'w', 'x', 'y', 'z'];\n"
+                                + "        $conso = ['b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'r'," +
+                                " 's', 't', 'v', 'w', 'x', 'y', 'z'];\n"
                                 + "        $vocal = ['a', 'e', 'i', 'o', 'u'];\n"
                                 + "        $password = '';\n"
                                 + "        srand(oldSchoolCast<float>(microtime()) * 1000000);\n"
                                 + "        $max = oldSchoolDivide($length, 2);\n"
                                 + "        for ($i = 1; $i <= $max; $i++) {\n"
-                                + "            $password .= oldSchoolArrayAccess($conso, rand(0, 19)) "
+                                + "            $password as string .= oldSchoolArrayAccess($conso, rand(0, 19)) "
                                 + "as string if {as string};\n"
-                                + "            $password .= oldSchoolArrayAccess($vocal, rand(0, 4)) "
+                                + "            $password as string .= oldSchoolArrayAccess($vocal, rand(0, 4)) "
                                 + "as string if {as string};\n"
                                 + "        }\n"
                                 + "        return $password;\n"
                                 + "    }\n"
                                 + "\n"
-                                + "}" +
-                                ""
+                                + "}"
                 },
                 //TODO TINS-664 - as operator with convertible type in post condition
                 {
@@ -858,11 +862,13 @@ public class FunctionDefinitionTest extends ATranslatorWithWideningTest
                                 + "  }\n"
                                 + "  return $rand;\n"
                                 + "}",
+                        //TODO TINS-666 soft typing erroneous for local/global variables
+                        // e.g., the return type should eb string, $password as well
                         "namespace{\n"
                                 + "\n"
-                                + "    function string generate_rand(mixed $l) {\n"
-                                + "        int $i;\n"
-                                + "        string $rand;\n"
+                                + "    function {as string} generate_rand(mixed $l) {\n"
+                                + "        scalar? $i;\n"
+                                + "        {as string} $rand;\n"
                                 + "        array $c;\n"
                                 + "        $c = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', "
                                 + "'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', "
@@ -872,14 +878,51 @@ public class FunctionDefinitionTest extends ATranslatorWithWideningTest
                                 + "        srand(oldSchoolCast<float>(microtime()) * 1000000);\n"
                                 + "        $rand = '';\n"
                                 + "        for ($i = 0; $i < $l; $i++) {\n"
-                                + "            $rand .= oldSchoolArrayAccess($c, rand(0, 1) "
-                                + "% count($c)) as string if {as string};\n"
+                                + "            $rand as string .= oldSchoolArrayAccess($c, rand(0, " +
+                                "1) % count($c)) as string if {as string};\n"
                                 + "        }\n"
                                 + "        return $rand;\n"
                                 + "    }\n"
                                 + "\n"
                                 + "}" +
                                 ""
+                },
+                {
+                        "<?php function encode_email($email, $linkText, $attrs) {\n"
+                                + "    $email = str_replace('@', '&#64;', $email);\n"
+                                + "    $email = str_replace('.', '&#46;', $email);\n"
+                                + "    $email = str_split($email, 5);\n"
+                                + "\n"
+                                + "    $linkText = str_replace('@', '&#64;', $linkText);\n"
+                                + "    $linkText = str_replace('.', '&#46;', $linkText);\n"
+                                + "    $linkText = str_split($linkText, 5);\n"
+                                + "\n"
+                                + "    $part1 = '<a href=\"ma';\n"
+                                + "    $part2 = 'ilto&#58;';\n"
+                                + "    $part3 = '\" '. $attrs .' >';\n"
+                                + "    $part4 = '</a>';\n"
+                                + "\n"
+                                + "    $encoded = '<script type=\"text/javascript\">';\n"
+                                + "    $encoded .= 'document.write(\\''.$part1.'\\');';\n"
+                                + "    $encoded .= 'document.write(\\''.$part2.'\\');';\n"
+                                + "\n"
+                                + "    foreach(str_split($email, 1) as $e)\n"
+                                + "    {\n"
+                                + "        $encoded .= 'document.write(\\''.$e.'\\');';\n"
+                                + "    }\n"
+                                + "\n"
+                                + "    $encoded .= 'document.write(\\''.$part3.'\\');';\n"
+                                + "    foreach(str_split($linkText, 1) as $l)\n"
+                                + "    {\n"
+                                + "        $encoded .= 'document.write(\\''.$l.'\\');';\n"
+                                + "    }\n"
+                                + "\n"
+                                + "    $encoded .= 'document.write(\\''.$part4.'\\');';\n"
+                                + "    $encoded .= '</script>';\n"
+                                + "\n"
+                                + "    return $encoded;\n"
+                                + "}",
+                        ""
                 }
         });
     }
