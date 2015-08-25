@@ -105,7 +105,7 @@ private StringTemplate getFunctionApplication(
     if (dto != null) {
         stringTemplate = %functionCall(identifier={dto.name}, typeParams={dto.typeParameters}, arguments={dto.arguments});
         if (dto.returnRuntimeCheck != null) {
-            stringTemplate = %list(statements={dto.returnRuntimeCheck.replace("\%returnRuntimeCheck\%", stringTemplate.toString())});
+            stringTemplate = %out(o={dto.returnRuntimeCheck.replace("\%returnRuntimeCheck\%", stringTemplate.toString())});
         }
     } else {
         stringTemplate = getErrorMessage(functionCall, identifier, errorMessageCaller);
@@ -128,7 +128,7 @@ private StringTemplate getOperatorOrFunctionApplication(
         } else {
             stringTemplate = getOperatorApplication(dto, argumentNames, operatorFunction, operator, needParentheses);
             if (dto.returnRuntimeCheck != null) {
-                stringTemplate = %list(statements={dto.returnRuntimeCheck.replace("\%returnRuntimeCheck\%", stringTemplate.toString())});
+                stringTemplate = %out(o={dto.returnRuntimeCheck.replace("\%returnRuntimeCheck\%", stringTemplate.toString())});
             }
         }
     } else {
@@ -243,7 +243,7 @@ classModifier
     ;
 
 classModifierNames
-@after {$st = %{$text};}
+@after {$st = %out(o={$text});
     :   Final
     |   Abstract
     ;
@@ -316,7 +316,7 @@ variableDeclarationList
     
 variableDeclaration
     :   ^(VariableId expression)    -> assign(id={$VariableId},value={$expression.st})
-    |   VariableId                  -> {%{$VariableId.text}}
+    |   VariableId                  -> out(o={$VariableId.text})
     ;
 */
     
@@ -358,7 +358,7 @@ abstractMethodModifier
     ;
 
 abstractToken
-    :   Abstract -> {%{$Abstract.text}}
+    :   Abstract -> out(o={$Abstract.text})
     ;
     
 constructDeclaration
@@ -436,7 +436,7 @@ methodModifier
     ;
     
 finalToken
-    :   Final -> {%{$Final.text}}
+    :   Final -> out(o={$Final.text})
     ;
 */    
 
@@ -674,7 +674,7 @@ switchContent
     
 caseLabel
     :   expression  -> caseLabel(label={$expression.st})
-    |   Default     -> {%{$Default.text+":"}}
+    |   Default     -> out(o={$Default.text+":"})
     ;
     
 forLoop
@@ -830,9 +830,9 @@ expression
   
 atom
     :   primitiveAtomWithConstant   -> {$primitiveAtomWithConstant.st}
-    |   VariableId                  -> {%{$VariableId.text}}
+    |   VariableId                  -> out(o={$VariableId.text})
     //TODO rstoll TINS-271 - translator OOP - expressions 
-    //|   This                        -> {%{$This.text}}
+    //|   This                        -> out(o={$This.text})
     ;
            
 primitiveAtomWithConstant
@@ -842,9 +842,9 @@ primitiveAtomWithConstant
         |   v=Int   
         |   v=Float
         |   v=String
-        ) -> {%{$v.text}}
+        ) -> out(o={$v.text})
     |   ^(TypeArray keyValuePairs+=arrayKeyValue*)  -> array(content ={$keyValuePairs})
-    |   CONSTANT                                    -> {%{$CONSTANT.text.substring(0,$CONSTANT.text.length()-1)}}
+    |   CONSTANT                                    -> out(o={$CONSTANT.text.substring(0,$CONSTANT.text.length()-1)})
     //TODO rstoll TINS-271 - translator OOP - expressions 
     //|   ^(CLASS_STATIC_ACCESS staticAccess CONSTANT)
     //    -> fieldAccessStatic(
@@ -861,9 +861,9 @@ arrayKeyValue
 //TODO rstoll TINS-271 - translator OOP - expressions    
 /*
 staticAccess
-    :   TYPE_NAME   -> {%{$TYPE_NAME.text}}
-    |   Self        -> {%{$Self.text}}
-    |   Parent      -> {%{$Parent.text}}
+    :   TYPE_NAME   -> out(o={$TYPE_NAME.text})
+    |   Self        -> out(o={$Self.text})
+    |   Parent      -> out(o={$Parent.text})
     ;
 */
  
@@ -992,18 +992,18 @@ operator
     ;     
 
 unaryPreOperator 
-    :   PRE_INCREMENT   -> {%{"++"}}
-    |   PRE_DECREMENT   -> {%{"--"}}
-    |   '@'             -> {%{"@"}}
-    |   '~'             -> {%{"~"}}
-    |   '!'             -> {%{"!"}}
-    |   UNARY_MINUS     -> {%{"-"}}
-    |   UNARY_PLUS      -> {%{"+"}}
+    :   PRE_INCREMENT   -> out(o={"++"})
+    |   PRE_DECREMENT   -> out(o={"--"})
+    |   '@'             -> out(o={"@"})
+    |   '~'             -> out(o={"~"})
+    |   '!'             -> out(o={"!"})
+    |   UNARY_MINUS     -> out(o={"-"})
+    |   UNARY_PLUS      -> out(o={"+"})
     ;
 
 unaryPostOperator  
-    :   POST_INCREMENT -> {%{"++"}}
-    |   POST_DECREMENT -> {%{"--"}}
+    :   POST_INCREMENT -> out(o={"++"})
+    |   POST_DECREMENT -> out(o={"--"})
     ;
 
 binaryOperator returns[boolean needParentheses]

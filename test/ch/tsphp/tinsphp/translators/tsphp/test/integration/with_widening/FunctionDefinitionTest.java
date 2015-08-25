@@ -817,7 +817,7 @@ public class FunctionDefinitionTest extends ATranslatorWithWideningTest
                                 + "\n"
                                 + "     return $password;\n"
                                 + " }",
-                        // e.g., the return type should eb string, $password as well
+                        // e.g., the return type should be string, $password as well
                         "namespace{\n"
                                 + "\n"
                                 + "    function {as string} readable_random_string({as num} $length) {\n"
@@ -863,7 +863,7 @@ public class FunctionDefinitionTest extends ATranslatorWithWideningTest
                                 + "  return $rand;\n"
                                 + "}",
                         //TODO TINS-666 soft typing erroneous for local/global variables
-                        // e.g., the return type should eb string, $password as well
+                        // e.g., the return type should be string, $password as well
                         "namespace{\n"
                                 + "\n"
                                 + "    function {as string} generate_rand(mixed $l) {\n"
@@ -887,6 +887,7 @@ public class FunctionDefinitionTest extends ATranslatorWithWideningTest
                                 + "}" +
                                 ""
                 },
+                //see TINS-667 anonymous template is evaluated
                 {
                         "<?php function encode_email($email, $linkText, $attrs) {\n"
                                 + "    $email = str_replace('@', '&#64;', $email);\n"
@@ -922,7 +923,56 @@ public class FunctionDefinitionTest extends ATranslatorWithWideningTest
                                 + "\n"
                                 + "    return $encoded;\n"
                                 + "}",
-                        ""
+                        //TODO TINS-666 soft typing erroneous for local/global variables
+                        // e.g., the return type should be string, $password as well
+                        "namespace{\n"
+                                + "\n"
+                                + "    function {as string} encode_email({as string} $email, {as string} $linkText, " +
+                                "{as string} $attrs) {\n"
+                                + "        mixed $l;\n"
+                                + "        mixed $e;\n"
+                                + "        {as string} $encoded;\n"
+                                + "        {as string} $part4;\n"
+                                + "        {as string} $part3;\n"
+                                + "        {as string} $part2;\n"
+                                + "        {as string} $part1;\n"
+                                + "        $email = str_replace('@', '&#64;', ($email <: array ? cast<array>($email) " +
+                                ": $email <: string ? cast<string>($email) : \\trigger_error('The variable $email " +
+                                "must hold a value of type array or string.', \\E_USER_ERROR)));\n"
+                                + "        $email = str_replace('.', '&#46;', ($email <: array ? cast<array>($email) " +
+                                ": $email <: string ? cast<string>($email) : \\trigger_error('The variable $email " +
+                                "must hold a value of type array or string.', \\E_USER_ERROR)));\n"
+                                + "        $email = str_split($email, 5);\n"
+                                + "        $linkText = str_replace('@', '&#64;', ($linkText <: array ? cast<array>" +
+                                "($linkText) : $linkText <: string ? cast<string>($linkText) : \\trigger_error('The " +
+                                "variable $linkText must hold a value of type array or string.', \\E_USER_ERROR)));\n"
+                                + "        $linkText = str_replace('.', '&#46;', ($linkText <: array ? cast<array>" +
+                                "($linkText) : $linkText <: string ? cast<string>($linkText) : \\trigger_error('The " +
+                                "variable $linkText must hold a value of type array or string.', \\E_USER_ERROR)));\n"
+                                + "        $linkText = str_split($linkText, 5);\n"
+                                + "        $part1 = '<a href=\"ma';\n"
+                                + "        $part2 = 'ilto&#58;';\n"
+                                + "        $part3 = '\" ' . $attrs . ' >';\n"
+                                + "        $part4 = '</a>';\n"
+                                + "        $encoded = '<script type=\"text/javascript\">';\n"
+                                + "        $encoded .= 'document.write(\\'' . $part1 . '\\');';\n"
+                                + "        $encoded .= 'document.write(\\'' . $part2 . '\\');';\n"
+                                + "        foreach (cast<array>(str_split($email, 1)) as mixed $e19_36) {\n"
+                                + "            $e = $e19_36;\n"
+                                + "            $encoded .= 'document.write(\\'' . $e as string . '\\');';\n"
+                                + "        }\n"
+                                + "        $encoded .= 'document.write(\\'' . $part3 . '\\');';\n"
+                                + "        foreach (cast<array>(str_split($linkText, 1)) as mixed $l25_39) {\n"
+                                + "            $l = $l25_39;\n"
+                                + "            $encoded .= 'document.write(\\'' . $l as string . '\\');';\n"
+                                + "        }\n"
+                                + "        $encoded .= 'document.write(\\'' . $part4 . '\\');';\n"
+                                + "        $encoded .= '</script>';\n"
+                                + "        return $encoded;\n"
+                                + "    }\n"
+                                + "\n"
+                                + "}" +
+                                ""
                 }
         });
     }

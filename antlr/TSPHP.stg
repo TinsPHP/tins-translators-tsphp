@@ -12,6 +12,8 @@
 
 group TSPHP;
 
+out(o)::= "<o>"
+
 file(namespaces) ::= <<
 <namespaces; separator="\n">
 >>
