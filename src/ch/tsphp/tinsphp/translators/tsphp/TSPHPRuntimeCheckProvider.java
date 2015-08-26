@@ -444,7 +444,9 @@ public class TSPHPRuntimeCheckProvider implements IRuntimeCheckProvider
             appendTypeCheck(stringBuilder, firstExpression, suffixCheck, types, typeName, typeCast);
         } else if (needToHandleUnionType) {
             //TODO TINS-604 runtime check with container types
-            throw new UnsupportedOperationException("type check for intersection and combined union");
+            String typeName = intersectionTypeSymbol.getAbsoluteName();
+            String typeCast = getTypeCast(typeName, firstExpression, tempVariable);
+            appendTypeCheck(stringBuilder, firstExpression, suffixCheck, types, typeName, typeCast);
         }
         return ok;
     }

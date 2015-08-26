@@ -13,6 +13,7 @@ import ch.tsphp.tinsphp.common.symbols.IContainerTypeSymbol;
 import ch.tsphp.tinsphp.common.symbols.IConvertibleTypeSymbol;
 import ch.tsphp.tinsphp.common.symbols.IIntersectionTypeSymbol;
 import ch.tsphp.tinsphp.common.symbols.IParametricTypeSymbol;
+import ch.tsphp.tinsphp.common.symbols.IPolymorphicTypeSymbol;
 import ch.tsphp.tinsphp.common.symbols.ISymbolFactory;
 import ch.tsphp.tinsphp.common.symbols.IUnionTypeSymbol;
 import ch.tsphp.tinsphp.common.symbols.PrimitiveTypeNames;
@@ -354,7 +355,7 @@ public class TSPHPTypeTransformer implements ITypeTransformer
         List<ITypeSymbol> parentTypeSymbols = new ArrayList<>();
         typeSymbols:
         for (ITypeSymbol typeSymbol : typeSymbols) {
-            if (!(typeSymbol instanceof IConvertibleTypeSymbol)) {
+            if (!(typeSymbol instanceof IPolymorphicTypeSymbol)) {
                 for (ITypeSymbol parentTypeSymbol : typeSymbol.getParentTypeSymbols()) {
                     if (typeHelper.areSame(parentTypeSymbol, mixedTypeSymbol) || areAllSubtypes(typeSymbols,
                             parentTypeSymbol)) {
@@ -364,7 +365,7 @@ public class TSPHPTypeTransformer implements ITypeTransformer
                     parentTypeSymbols.add(parentTypeSymbol);
                 }
             } else {
-                //a convertible type has only mixed as parent type
+                //a polymorphic type has only mixed as parent type
                 leastUpperBound = mixedTypeSymbol;
             }
         }
