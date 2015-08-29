@@ -248,15 +248,22 @@ public class TranslatorController implements ITranslatorController
         if (numberOfArguments == 0) {
             arguments.add("void");
         } else {
-            String typeVariable = bindings.getTypeVariable(argumentsAst.get(0).getSymbol().getAbsoluteName());
-            arguments.add(bindings.getLowerTypeBounds(typeVariable).getAbsoluteName());
-            for (int i = 1; i < numberOfArguments; ++i) {
-                typeVariable = bindings.getTypeVariable(argumentsAst.get(i).getSymbol().getAbsoluteName());
-                arguments.add(bindings.getLowerTypeBounds(typeVariable).getAbsoluteName());
+            for (int i = 0; i < numberOfArguments; ++i) {
+                String typeVariable = bindings.getTypeVariable(argumentsAst.get(i).getSymbol().getAbsoluteName());
+                String type;
+                if (bindings.hasLowerTypeBounds(typeVariable)) {
+                    type = bindings.getLowerTypeBounds(typeVariable).getAbsoluteName();
+                } else if (bindings.hasUpperTypeBounds(typeVariable)) {
+                    type = bindings.getUpperTypeBounds(typeVariable).getAbsoluteName();
+                } else {
+                    type = "_";
+                }
+                arguments.add(type);
             }
         }
         return arguments;
     }
+
 
     @Override
     public String getErrMessageOperatorApplication(IBindingCollection bindings, ITSPHPAst operator) {
