@@ -1645,8 +1645,22 @@ public class FunctionDefinitionTest extends ATranslatorWithWideningTest
                                 + "    }\n"
                                 + "\n"
                                 + "}"
+                },
+                {
+                        "<?php function foo($x){ $x . 1; return str_replace('hello', 'a', $x); }",
+                        "namespace{\n"
+                                + "\n"
+                                + "    function mixed foo(mixed $x) {\n"
+                                + "        if (!($x <: array) && !($x <: string)) {\n"
+                                + "            \\trigger_error('Argument 1 passed to foo() (parameter $x) must be a " +
+                                "value of type array or string.', \\E_USER_ERROR);\n"
+                                + "        }\n"
+                                + "        $x as string . 1 as string;\n"
+                                + "        return str_replace('hello', 'a', $x);\n"
+                                + "    }\n"
+                                + "\n"
+                                + "}"
                 }
         });
     }
 }
-

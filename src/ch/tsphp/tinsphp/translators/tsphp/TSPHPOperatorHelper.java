@@ -13,6 +13,7 @@ import ch.tsphp.tinsphp.common.inference.constraints.IBindingCollection;
 import ch.tsphp.tinsphp.common.inference.constraints.IFunctionType;
 import ch.tsphp.tinsphp.common.inference.constraints.IVariable;
 import ch.tsphp.tinsphp.common.inference.constraints.OverloadApplicationDto;
+import ch.tsphp.tinsphp.common.symbols.IContainerTypeSymbol;
 import ch.tsphp.tinsphp.common.symbols.IConvertibleTypeSymbol;
 import ch.tsphp.tinsphp.common.symbols.IIntersectionTypeSymbol;
 import ch.tsphp.tinsphp.common.symbols.ISymbolFactory;
@@ -206,9 +207,8 @@ public class TSPHPOperatorHelper implements IOperatorHelper
         runtimeChecks = new HashMap<>(0);
         Pair<ITypeSymbol, Boolean> pair = typeTransformer.getType(argumentType);
         if (pair.second) {
-            //must be a union type - otherwise we would have had a relation
-            IUnionTypeSymbol unionTypeSymbol = (IUnionTypeSymbol) argumentType;
-            Map<String, ITypeSymbol> typeSymbols = unionTypeSymbol.getTypeSymbols();
+            IContainerTypeSymbol containerTypeSymbol = (IContainerTypeSymbol) argumentType;
+            Map<String, ITypeSymbol> typeSymbols = containerTypeSymbol.getTypeSymbols();
             int size = typeSymbols.size();
             if (size > 1) {
                 List<ITypeSymbol> ifTypes = new ArrayList<>(size);

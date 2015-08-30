@@ -1529,6 +1529,17 @@ public class FunctionDefinitionTest extends ATranslatorTest
                                 + "\n"
                                 + "}" +
                                 ""
+                },
+                {
+                        "<?php function foo($x){ $x . 1; return str_replace('hello', 'a', $x); }",
+                        "namespace{\n"
+                                + "\n"
+                                + "    function (array | string) foo((array | string) $x) {\n"
+                                + "        $x . 1;\n"
+                                + "        return str_replace('hello', 'a', $x);\n"
+                                + "    }\n"
+                                + "\n"
+                                + "}"
                 }
         });
     }
