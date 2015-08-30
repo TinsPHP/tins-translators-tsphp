@@ -40,6 +40,7 @@ import java.util.Set;
 
 import static ch.tsphp.tinsphp.common.utils.Pair.pair;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -98,14 +99,15 @@ public abstract class ATypeTest
                 return new ConvertibleTypeSymbol(new BindingCollection(symbolFactory, typeHelper));
             }
         });
-        when(symbolFactory.createPseudoTypeSymbol(anyString(), any(ITypeSymbol.class))).then(new Answer<Object>()
-        {
-            @Override
-            public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
-                Object[] args = invocationOnMock.getArguments();
-                return new PseudoTypeSymbol((String) args[0], (ITypeSymbol) args[1]);
-            }
-        });
+        when(symbolFactory.createPseudoTypeSymbol(anyString(), any(ITypeSymbol.class), anyBoolean()))
+                .then(new Answer<Object>()
+                {
+                    @Override
+                    public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
+                        Object[] args = invocationOnMock.getArguments();
+                        return new PseudoTypeSymbol((String) args[0], (ITypeSymbol) args[1], (boolean) args[2]);
+                    }
+                });
 
         nullType = mock(ITypeSymbol.class);
         when(nullType.getParentTypeSymbols()).thenReturn(set(mixedType));
