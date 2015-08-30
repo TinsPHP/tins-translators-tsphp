@@ -60,6 +60,7 @@ public class ErroneousFunctionDefinitionTest extends ATranslatorTest
     @Parameterized.Parameters
     public static Collection<Object[]> testStrings() {
         return Arrays.asList(new Object[][]{
+                //see TINS-678 NullPointer getErrMessage TranslatorController
                 {
                         "<?php function foo($x){ return bar($x+1);}\nfunction bar(array $x){$x + [1];return [0];}\n",
                         "namespace{\n"
@@ -78,6 +79,7 @@ public class ErroneousFunctionDefinitionTest extends ATranslatorTest
                                 + "\n"
                                 + "}"
                 },
+                //see TINS-678 NullPointer getErrMessage TranslatorController
                 {
                         "<?php function foo($x){ return ~bar($x);}\nfunction bar(array $x){$x + [1];return [0];}\n",
                         "namespace{\n"

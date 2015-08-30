@@ -1530,6 +1530,7 @@ public class FunctionDefinitionTest extends ATranslatorTest
                                 + "}" +
                                 ""
                 },
+                //see TINS-679 ClassCastException explicit conversion
                 {
                         "<?php function foo($x){ $x . 1; return str_replace('hello', 'a', $x); }",
                         "namespace{\n"
