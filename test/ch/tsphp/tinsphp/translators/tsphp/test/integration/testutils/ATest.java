@@ -58,12 +58,16 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
 import java.util.EnumSet;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static org.junit.Assert.assertFalse;
 
 @Ignore
 public abstract class ATest implements IIssueLogger
 {
+
+    public static int numberOfThreads = 1;
 
     protected String testString;
     protected String expectedResult;
@@ -113,7 +117,8 @@ public abstract class ATest implements IIssueLogger
         symbolsInitialiser = createSymbolsInitialiser();
         coreInitialiser = createCoreInitialiser(astHelper, symbolsInitialiser);
         inferenceEngineInitialiser = createInferenceInitialiser(
-                astAdaptor, astHelper, symbolsInitialiser, coreInitialiser);
+                astAdaptor, astHelper, symbolsInitialiser, coreInitialiser,
+                Executors.newFixedThreadPool(numberOfThreads));
 
         inferTypes();
 
@@ -195,10 +200,11 @@ public abstract class ATest implements IIssueLogger
             ITSPHPAstAdaptor astAdaptor,
             IAstHelper astHelper,
             ISymbolsInitialiser theSymbolsInitialiser,
-            ICoreInitialiser theCoreInitialiser) {
+            ICoreInitialiser theCoreInitialiser,
+            ExecutorService theExecutorService) {
 
         return new HardCodedInferenceEngineInitialiser(
-                astAdaptor, astHelper, theSymbolsInitialiser, theCoreInitialiser);
+                astAdaptor, astHelper, theSymbolsInitialiser, theCoreInitialiser, theExecutorService);
     }
 
     protected ISymbolsInitialiser createSymbolsInitialiser() {

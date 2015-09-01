@@ -1470,7 +1470,7 @@ public class FunctionDefinitionTest extends ATranslatorWithWideningTest
                                 + "}"
                 },
                 {
-                        "<?php function myCount(array $x) {\n"
+                        "<?php function myCount($x) {\n"
                                 + "    return 1;\n"
                                 + "}\n"
                                 + "function myLog($arg){\n"
@@ -1509,8 +1509,7 @@ public class FunctionDefinitionTest extends ATranslatorWithWideningTest
                                 + "}\n",
                         "namespace{\n"
                                 + "\n"
-                                + "    function int myCount(array $x_0) {\n"
-                                + "        mixed $x = $x_0;\n"
+                                + "    function int myCount(mixed $x) {\n"
                                 + "        return 1;\n"
                                 + "    }\n"
                                 + "\n"
@@ -1535,7 +1534,7 @@ public class FunctionDefinitionTest extends ATranslatorWithWideningTest
                                 + "    }\n"
                                 + "\n"
                                 + "    function array myArrayReverse(array $array_0) {\n"
-                                + "        mixed $array = $array_0;\n"
+                                + "        array $array = $array_0;\n"
                                 + "        return [1];\n"
                                 + "    }\n"
                                 + "\n"

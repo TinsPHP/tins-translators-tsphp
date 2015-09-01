@@ -29,6 +29,7 @@ import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.junit.Test;
 
 import java.util.EnumSet;
+import java.util.concurrent.Executors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -80,7 +81,8 @@ public class HardCodedTSPHPTranslatorInitialiserTest
             ITSPHPAstAdaptor astAdaptor, IAstHelper astHelper, ISymbolsInitialiser symbolsInitialiser) {
         HardCodedCoreInitialiser coreInitialiser = new HardCodedCoreInitialiser(astHelper, symbolsInitialiser);
 
-        return new HardCodedInferenceEngineInitialiser(astAdaptor, astHelper, symbolsInitialiser, coreInitialiser);
+        return new HardCodedInferenceEngineInitialiser(
+                astAdaptor, astHelper, symbolsInitialiser, coreInitialiser, Executors.newSingleThreadExecutor());
     }
 
     protected ITranslatorInitialiser createTranslatorInitialiser(
