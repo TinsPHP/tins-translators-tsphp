@@ -2206,6 +2206,34 @@ public class FunctionDefinitionTest extends ATranslatorWithWideningTest
                                 + "\n"
                                 + "}"
                 },
+                //see TINS-676 parallelise constraint solving
+                {
+                        "<?php function mySprintf($format, $arg){\n"
+                                + "   return $format.$arg;\n"
+                                + "}\n"
+                                + "function zeroise( $number, $threshold ) {\n"
+                                + "    return mySprintf( '%0' . $threshold . 's', $number );\n"
+                                + "}\n",
+                        "namespace{\n"
+                                + "\n"
+                                + "    function string mySprintf0(string $format, string $arg) {\n"
+                                + "        return $format . $arg;\n"
+                                + "    }\n"
+                                + "\n"
+                                + "    function string mySprintf1({as string} $format, {as string} $arg) {\n"
+                                + "        return $format as string . $arg as string;\n"
+                                + "    }\n"
+                                + "\n"
+                                + "    function string zeroise0(string $number, string $threshold) {\n"
+                                + "        return mySprintf0('%0' . $threshold . 's', $number);\n"
+                                + "    }\n"
+                                + "\n"
+                                + "    function string zeroise1({as string} $number, {as string} $threshold) {\n"
+                                + "        return mySprintf1('%0' . $threshold as string . 's', $number);\n"
+                                + "    }\n"
+                                + "\n"
+                                + "}"
+                }
         });
     }
 }
