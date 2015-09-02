@@ -2058,8 +2058,46 @@ public class FunctionDefinitionTest extends ATranslatorWithWideningTest
                                 "abs(oldSchoolSubtraction($arr_i[1], $arr_j[1])));\n"
                                 + "    }\n"
                                 + "\n"
-                                + "}" +
-                                ""
+                                + "}"
+                },
+                //see TINS-668 AmbiguousOverloadException
+                {
+                        "<?php function div($x){ return $x / 1.2; }",
+                        "namespace{\n"
+                                + "\n"
+                                + "    function float! div0(float $x) {\n"
+                                + "        return $x / 1.2;\n"
+                                + "    }\n"
+                                + "\n"
+                                + "    function num! div1({as num} $x) {\n"
+                                + "        return oldSchoolDivide($x, 1.2);\n"
+                                + "    }\n"
+                                + "\n"
+                                + "    function float! div2({as num} $x) {\n"
+                                + "        return oldSchoolFloatDivide($x, 1.2);\n"
+                                + "    }\n"
+                                + "\n"
+                                + "}"
+                },
+                //see TINS-668 AmbiguousOverloadException
+                {
+                        "<?php function arithmetic1($x, $y, $z){ return ($x + $y) * $z / 1.2;}",
+                        "namespace{\n"
+                                + "\n"
+                                + "    function float! arithmetic10(float $x, float $y, float $z) {\n"
+                                + "        return ($x + $y) * $z / 1.2;\n"
+                                + "    }\n"
+                                + "\n"
+                                + "    function float! arithmetic11(int $x, int $y, int $z) {\n"
+                                + "        return ($x + $y) * $z / 1.2;\n"
+                                + "    }\n"
+                                + "\n"
+                                + "    function float! arithmetic12({as num} $x, {as num} $y, {as num} $z) {\n"
+                                + "        return oldSchoolFloatDivide(oldSchoolMultiplication("
+                                + "oldSchoolAddition($x, $y), $z), 1.2);\n"
+                                + "    }\n"
+                                + "\n"
+                                + "}"
                 }
         });
     }
