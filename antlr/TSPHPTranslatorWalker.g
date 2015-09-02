@@ -693,18 +693,20 @@ forLoop
                 FunctionApplicationDto dto = controller.getOperatorApplication(translationScopeDto, $For, operatorArguments);
                 
                 List<String> argumentNames = new ArrayList<>(4);
-                List<Object> arguments = new ArrayList<>(4);
                 argumentNames.add("init");
-                arguments.add($init.st);
                 argumentNames.add("condition");
-                $condition.set(lastElement, dto.arguments.get(0));
-                StringTemplate conditionTemplate = %expressionList(expressions={$condition}, semicolonAtTheEnd={true});
-                arguments.add(conditionTemplate);
                 argumentNames.add("update");
-                arguments.add($update.st);
                 argumentNames.add("block");
-                arguments.add($blockConditional.instructions);
-                dto.arguments = arguments;
+                if (dto != null) {
+                    List<Object> arguments = new ArrayList<>(4);
+                    arguments.add($init.st);
+                    $condition.set(lastElement, dto.arguments.get(0));
+                    StringTemplate conditionTemplate = %expressionList(expressions={$condition}, semicolonAtTheEnd={true});
+                    arguments.add(conditionTemplate);
+                    arguments.add($update.st);
+                    arguments.add($blockConditional.instructions);
+                    dto.arguments = arguments;
+                }
                 $st = getOperatorOrFunctionApplication(
                     dto,
                     argumentNames,
@@ -775,7 +777,7 @@ foreachLoop
             argumentNames.add("block");
             arguments.add($blockConditional.instructions);
             FunctionApplicationDto dto = controller.getOperatorApplication(translationScopeDto, $Foreach, arguments);
-            if (keyVariableIdTemp != null) {
+            if (keyVariableIdTemp != null && dto != null) {
                 // we might calculate a runtime check for the variable but since we use a temp variable anyway, 
                 // it is unnecessary, would result in (k <: int ? cast<int>(k) ...) = k_0;
                 dto.arguments.set(2, $keyVariableId);

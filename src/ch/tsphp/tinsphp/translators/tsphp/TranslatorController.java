@@ -268,16 +268,32 @@ public class TranslatorController implements ITranslatorController
     @Override
     public String getErrMessageOperatorApplication(IBindingCollection bindings, ITSPHPAst operator) {
         List<ITSPHPAst> children = operator.getChildren();
-        if (operator.getType() == TokenTypes.Foreach) {
-            children = new ArrayList<>(children);
-            //TODO TINS-392 introduce optional parameters
-            if (children.size() == 4) {
-                children.remove(3);
-            } else {
-                ITSPHPAst one = (ITSPHPAst) astAdaptor.create(TokenTypes.Int, children.get(1).getToken(), "1");
-                one.setSymbol(symbolFactory.createExpressionVariableSymbol(one));
-                children.set(2, one);
-            }
+        switch (operator.getType()) {
+            case TokenTypes.Foreach:
+                children = new ArrayList<>(children);
+                //TODO TINS-392 introduce optional parameters
+                if (children.size() == 4) {
+                    children.remove(3);
+                } else {
+                    ITSPHPAst one = (ITSPHPAst) astAdaptor.create(TokenTypes.Int, children.get(1).getToken(), "1");
+                    one.setSymbol(symbolFactory.createExpressionVariableSymbol(one));
+                    children.set(2, one);
+                }
+                break;
+            case TokenTypes.For:
+                ITSPHPAst conditionExprList = children.get(1);
+                int lastElement = conditionExprList.getChildCount() - 1;
+                ITSPHPAst expression = conditionExprList.getChild(lastElement);
+                children = new ArrayList<>(1);
+                children.add(expression);
+                break;
+            case TokenTypes.If:
+            case TokenTypes.While:
+            case TokenTypes.Do:
+                ITSPHPAst condition = children.get(0);
+                children = new ArrayList<>(1);
+                children.add(condition);
+                break;
         }
         List<String> arguments = getArguments(bindings, children);
         List<String> overloads = getOverloads(operator);

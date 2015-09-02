@@ -67,7 +67,7 @@ import static org.junit.Assert.assertFalse;
 public abstract class ATest implements IIssueLogger
 {
 
-    public static int numberOfThreads = 1;
+    public static int numberOfThreads = Runtime.getRuntime().availableProcessors() * 4;
 
     protected String testString;
     protected String expectedResult;
