@@ -793,13 +793,43 @@ foreachLoop
     ;
 
 whileLoop
-    :   ^('while' expression blockConditional) 
-        -> while(condition={$expression.st}, block={$blockConditional.instructions})
+    :   ^(While expression blockConditional)
+        {
+            List<String> argumentNames = new ArrayList<>(2);
+            List<Object> arguments = new ArrayList<>(2);
+            argumentNames.add("condition");
+            arguments.add($expression.st);
+            argumentNames.add("block");
+            arguments.add($blockConditional.instructions);
+            FunctionApplicationDto dto = controller.getOperatorApplication(translationScopeDto, $While, arguments);
+            $st = getOperatorOrFunctionApplication(
+                dto,
+                argumentNames,
+                $While,
+                "while",
+                null,
+                false);
+        }
     ;
 
 doWhileLoop
-    :   ^('do' block expression) 
-        -> doWhile(block={$block.instructions}, condition={$expression.st})
+    :   ^(Do block expression)
+        {
+            List<String> argumentNames = new ArrayList<>(2);
+            List<Object> arguments = new ArrayList<>(2);
+            argumentNames.add("condition");
+            arguments.add($expression.st);
+            argumentNames.add("block");
+            arguments.add($block.instructions);
+            FunctionApplicationDto dto = controller.getOperatorApplication(translationScopeDto, $Do, arguments);
+            $st = getOperatorOrFunctionApplication(
+                dto,
+                argumentNames,
+                $Do,
+                "doWhile",
+                null,
+                false);
+        }
     ;
 
 tryCatch

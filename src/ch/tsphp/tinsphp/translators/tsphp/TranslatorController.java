@@ -191,13 +191,22 @@ public class TranslatorController implements ITranslatorController
     @Override
     public FunctionApplicationDto getOperatorApplication(
             TranslationScopeDto translationScopeDto, ITSPHPAst operator, List<Object> arguments) {
-        if (operator.getType() != TokenTypes.For) {
-            return getOperatorApplication(translationScopeDto, operator, operator.getChildren(), arguments);
+        List<ITSPHPAst> astArguments;
+        switch (operator.getType()) {
+            case TokenTypes.For:
+                astArguments = new ArrayList<>(1);
+                ITSPHPAst conditionList = operator.getChild(1);
+                ITSPHPAst condition = conditionList.getChild(conditionList.getChildCount() - 1);
+                astArguments.add(condition);
+                break;
+            case TokenTypes.Do:
+                astArguments = new ArrayList<>(1);
+                astArguments.add(operator.getChild(1));
+                break;
+            default:
+                astArguments = operator.getChildren();
+                break;
         }
-        List<ITSPHPAst> astArguments = new ArrayList<>(1);
-        ITSPHPAst conditionList = operator.getChild(1);
-        ITSPHPAst condition = conditionList.getChild(conditionList.getChildCount() - 1);
-        astArguments.add(condition);
         return getOperatorApplication(translationScopeDto, operator, astArguments, arguments);
     }
 
@@ -283,14 +292,18 @@ public class TranslatorController implements ITranslatorController
             case TokenTypes.For:
                 ITSPHPAst conditionExprList = children.get(1);
                 int lastElement = conditionExprList.getChildCount() - 1;
-                ITSPHPAst expression = conditionExprList.getChild(lastElement);
+                ITSPHPAst condition = conditionExprList.getChild(lastElement);
                 children = new ArrayList<>(1);
-                children.add(expression);
+                children.add(condition);
                 break;
             case TokenTypes.If:
             case TokenTypes.While:
+                condition = children.get(0);
+                children = new ArrayList<>(1);
+                children.add(condition);
+                break;
             case TokenTypes.Do:
-                ITSPHPAst condition = children.get(0);
+                condition = children.get(1);
                 children = new ArrayList<>(1);
                 children.add(condition);
                 break;

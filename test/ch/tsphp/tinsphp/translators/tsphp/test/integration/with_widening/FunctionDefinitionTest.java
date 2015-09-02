@@ -1948,7 +1948,7 @@ public class FunctionDefinitionTest extends ATranslatorWithWideningTest
                                 "{as (float | int)})>($start), $target);\n"
                                 + "        oldSchoolArrayAccess($f, $start) = oldSchoolAddition(oldSchoolArrayAccess" +
                                 "($g, $start), oldSchoolArrayAccess($h, $start));\n"
-                                + "        while ($open) {\n"
+                                + "        while ($open as bool) {\n"
                                 + "            $i = heap_pop($open_heap, $f);\n"
                                 + "            oldSchoolArrayAccess($open, $i) = null;\n"
                                 + "            oldSchoolArrayAccess($closed, $i) = TRUE;\n"
