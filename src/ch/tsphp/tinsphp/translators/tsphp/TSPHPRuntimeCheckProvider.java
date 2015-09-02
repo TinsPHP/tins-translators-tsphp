@@ -66,10 +66,9 @@ public class TSPHPRuntimeCheckProvider implements IRuntimeCheckProvider
         String typeVariable = bindingCollection.getTypeVariable(parameter.getAbsoluteName());
         IIntersectionTypeSymbol upperTypeBounds = bindingCollection.getUpperTypeBounds(typeVariable);
         List<String> types = new ArrayList<>();
-        boolean canPerformRuntimeChecks = appendParameterRuntimeCheck(
-                stringBuilder, parameterId, upperTypeBounds, types);
 
-        if (canPerformRuntimeChecks && !types.isEmpty()) {
+        appendParameterRuntimeCheck(stringBuilder, parameterId, upperTypeBounds, types);
+        if (!types.isEmpty()) {
             stringBuilder.append(") {\n")
                     .append("    \\trigger_error('")
                     .append(messageProvider.getParameterRuntimeCheckMessage(
@@ -78,29 +77,30 @@ public class TSPHPRuntimeCheckProvider implements IRuntimeCheckProvider
             stringBuilder.append("}");
             translationScopeDto.statements.add(stringBuilder.toString());
         }
-        return canPerformRuntimeChecks;
+        return true;
     }
 
-    private boolean appendParameterRuntimeCheck(
+    private void appendParameterRuntimeCheck(
             StringBuilder stringBuilder,
             String parameterId,
             ITypeSymbol typeSymbol,
             List<String> types) {
-        boolean ok = true;
         if (typeSymbol instanceof IUnionTypeSymbol && typeSymbol != tsphpBoolTypeSymbol) {
-            ok = appendParameterRuntimeCheck(stringBuilder, parameterId, (IUnionTypeSymbol) typeSymbol, types);
+            appendParameterRuntimeCheck(stringBuilder, parameterId, (IUnionTypeSymbol) typeSymbol, types);
         } else if (typeSymbol instanceof IIntersectionTypeSymbol) {
             stringBuilder.append("(");
-            ok = appendParameterRuntimeCheck(stringBuilder, parameterId, (IIntersectionTypeSymbol) typeSymbol, types);
+            appendParameterRuntimeCheck(stringBuilder, parameterId, (IIntersectionTypeSymbol) typeSymbol, types);
             stringBuilder.append(")");
-        } else if (typeSymbol instanceof IConvertibleTypeSymbol) {
-            ok = false;
         } else {
-            String typeName = typeSymbol.getAbsoluteName();
+            String typeName;
+            if (typeSymbol instanceof IConvertibleTypeSymbol) {
+                typeName = typeTransformer.getType(typeSymbol).first.getAbsoluteName();
+            } else {
+                typeName = typeSymbol.getAbsoluteName();
+            }
             stringBuilder.append("!(").append(getTypeCheckExpression(typeName, parameterId)).append(")");
             types.add(typeName);
         }
-        return ok;
     }
 
     private String getTypeCheckExpression(String typeName, String variableId) {
@@ -123,27 +123,21 @@ public class TSPHPRuntimeCheckProvider implements IRuntimeCheckProvider
     }
 
 
-    private boolean appendParameterRuntimeCheck(
+    private void appendParameterRuntimeCheck(
             StringBuilder stringBuilder,
             String parameterName,
             IIntersectionTypeSymbol intersectionTypeSymbol,
             List<String> types) {
-        boolean ok = true;
+
         SortedMap<String, ITypeSymbol> typeSymbols = copyTypeSymbols(intersectionTypeSymbol.getTypeSymbols());
         Iterator<ITypeSymbol> iterator = typeSymbols.values().iterator();
         if (iterator.hasNext()) {
-            ok = appendParameterRuntimeCheck(stringBuilder, parameterName, iterator.next(), types);
+            appendParameterRuntimeCheck(stringBuilder, parameterName, iterator.next(), types);
         }
-        if (ok) {
-            while (iterator.hasNext()) {
-                stringBuilder.append(" || ");
-                ok = appendParameterRuntimeCheck(stringBuilder, parameterName, iterator.next(), types);
-                if (!ok) {
-                    break;
-                }
-            }
+        while (iterator.hasNext()) {
+            stringBuilder.append(" || ");
+            appendParameterRuntimeCheck(stringBuilder, parameterName, iterator.next(), types);
         }
-        return ok;
     }
 
     private SortedMap<String, ITypeSymbol> copyTypeSymbols(Map<String, ITypeSymbol> typeSymbols) {
@@ -157,27 +151,21 @@ public class TSPHPRuntimeCheckProvider implements IRuntimeCheckProvider
         return copiedTypeSymbols;
     }
 
-    private boolean appendParameterRuntimeCheck(
+    private void appendParameterRuntimeCheck(
             StringBuilder stringBuilder,
             String parameterId,
             IUnionTypeSymbol unionTypeSymbol,
             List<String> types) {
-        boolean ok = true;
+
         SortedMap<String, ITypeSymbol> typeSymbols = copyTypeSymbols(unionTypeSymbol.getTypeSymbols());
         Iterator<ITypeSymbol> iterator = typeSymbols.values().iterator();
         if (iterator.hasNext()) {
-            ok = appendParameterRuntimeCheck(stringBuilder, parameterId, iterator.next(), types);
+            appendParameterRuntimeCheck(stringBuilder, parameterId, iterator.next(), types);
         }
-        if (ok) {
-            while (iterator.hasNext()) {
-                stringBuilder.append(" && ");
-                ok = appendParameterRuntimeCheck(stringBuilder, parameterId, iterator.next(), types);
-                if (!ok) {
-                    break;
-                }
-            }
+        while (iterator.hasNext()) {
+            stringBuilder.append(" && ");
+            appendParameterRuntimeCheck(stringBuilder, parameterId, iterator.next(), types);
         }
-        return ok;
     }
 
     @Override
@@ -196,34 +184,32 @@ public class TSPHPRuntimeCheckProvider implements IRuntimeCheckProvider
             //need to use a temp variable, hence the first expression needs to be the assignment
             firstExpression = "(" + tempVariable + " = (" + expressionTemplate.toString() + "))";
         }
-        boolean canPerformRuntimeChecks = appendTypeCheck(
-                stringBuilder, firstExpression, tempVariable, typeSymbol, "", types);
+        appendTypeCheck(stringBuilder, firstExpression, tempVariable, typeSymbol, "", types);
 
-        Object newArgument = expressionTemplate;
-        if (canPerformRuntimeChecks) {
-            if (types.size() == 1) {
-                String typeName = types.get(0);
-                if (!typeName.equals(PrimitiveTypeNames.FALSE_TYPE)
-                        && !typeName.equals(PrimitiveTypeNames.TRUE_TYPE)
-                        && !typeName.equals(PrimitiveTypeNames.NULL_TYPE)) {
-                    firstExpression = expressionTemplate.toString();
-                    usesTempVariable = false;
-                }
-                if (!typeName.startsWith("{as")) {
-                    newArgument = getTypeCast(typeName, firstExpression, tempVariable);
-                } else {
-                    //convertible types are different, see TINS-602 runtime check for convertible types
-                    String targetTypeName = typeName.substring("{as ".length(), typeName.length() - 1);
-                    newArgument = getAsOperation(firstExpression, targetTypeName);
-                }
-            } else {
-                stringBuilder.insert(0, '(');
-                String errorMessage = messageProvider.getTypeCheckError(tempVariable, types);
-                stringBuilder.append("\\trigger_error('").append(errorMessage).append("', \\E_USER_ERROR)");
-                stringBuilder.append(')');
-                newArgument = stringBuilder;
+        Object newArgument;
+        if (types.size() == 1) {
+            String typeName = types.get(0);
+            if (!typeName.equals(PrimitiveTypeNames.FALSE_TYPE)
+                    && !typeName.equals(PrimitiveTypeNames.TRUE_TYPE)
+                    && !typeName.equals(PrimitiveTypeNames.NULL_TYPE)) {
+                firstExpression = expressionTemplate.toString();
+                usesTempVariable = false;
             }
+            if (!typeName.startsWith("{as")) {
+                newArgument = getTypeCast(typeName, firstExpression, tempVariable);
+            } else {
+                //convertible types are different, see TINS-602 runtime check for convertible types
+                String targetTypeName = typeName.substring("{as ".length(), typeName.length() - 1);
+                newArgument = getAsOperation(firstExpression, targetTypeName);
+            }
+        } else {
+            stringBuilder.insert(0, '(');
+            String errorMessage = messageProvider.getTypeCheckError(tempVariable, types);
+            stringBuilder.append("\\trigger_error('").append(errorMessage).append("', \\E_USER_ERROR)");
+            stringBuilder.append(')');
+            newArgument = stringBuilder;
         }
+
 
         if (usesTempVariable) {
             translationScopeDto.statements.add("mixed " + tempVariable + ";");
@@ -281,7 +267,7 @@ public class TSPHPRuntimeCheckProvider implements IRuntimeCheckProvider
         return expression + " as " + targetTypeName;
     }
 
-    private boolean appendTypeCheck(
+    private void appendTypeCheck(
             StringBuilder stringBuilder,
             String firstExpression,
             String tempVariable,
@@ -289,9 +275,8 @@ public class TSPHPRuntimeCheckProvider implements IRuntimeCheckProvider
             String suffixCheck,
             List<String> types) {
 
-        boolean ok = true;
         if (typeSymbol instanceof IUnionTypeSymbol) {
-            ok = appendTypeCheck(
+            appendTypeCheck(
                     stringBuilder,
                     firstExpression,
                     tempVariable,
@@ -299,7 +284,7 @@ public class TSPHPRuntimeCheckProvider implements IRuntimeCheckProvider
                     suffixCheck,
                     types);
         } else if (typeSymbol instanceof IIntersectionTypeSymbol) {
-            ok = appendTypeCheck(
+            appendTypeCheck(
                     stringBuilder,
                     firstExpression,
                     tempVariable,
@@ -318,7 +303,6 @@ public class TSPHPRuntimeCheckProvider implements IRuntimeCheckProvider
             String typeCast = getTypeCast(typeName, tempVariable, tempVariable);
             appendTypeCheck(stringBuilder, firstExpression, suffixCheck, types, typeName, typeCast);
         }
-        return ok;
     }
 
     private void appendConversion(
@@ -344,7 +328,7 @@ public class TSPHPRuntimeCheckProvider implements IRuntimeCheckProvider
         appendTypeCheck(stringBuilder, firstExpression, suffixCheck, types, typeName, typeCast);
     }
 
-    private boolean appendTypeCheck(
+    private void appendTypeCheck(
             StringBuilder stringBuilder,
             String firstExpression,
             String tempVariable,
@@ -359,17 +343,12 @@ public class TSPHPRuntimeCheckProvider implements IRuntimeCheckProvider
             typeSymbols.remove(PrimitiveTypeNames.TRUE_TYPE);
             typeSymbols.put(tsphpBoolTypeSymbol.getAbsoluteName(), tsphpBoolTypeSymbol);
         }
-        boolean allOk = true;
+
         String expression = firstExpression;
         for (ITypeSymbol innerTypeSymbols : typeSymbols.values()) {
-            if (!appendTypeCheck(stringBuilder, expression, tempVariable, innerTypeSymbols, suffixCheck, types)) {
-                allOk = false;
-                break;
-            }
+            appendTypeCheck(stringBuilder, expression, tempVariable, innerTypeSymbols, suffixCheck, types);
             expression = tempVariable;
         }
-        ok = allOk;
-        return ok;
     }
 
     private void appendTypeCheck(

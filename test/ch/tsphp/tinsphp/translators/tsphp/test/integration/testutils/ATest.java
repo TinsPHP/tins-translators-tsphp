@@ -51,6 +51,7 @@ import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.runtime.tree.TreeRuleReturnScope;
 import org.antlr.stringtemplate.StringTemplateGroup;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Ignore;
 
@@ -67,7 +68,7 @@ import static org.junit.Assert.assertFalse;
 public abstract class ATest implements IIssueLogger
 {
 
-    public static int numberOfThreads = 1;
+    public static int numberOfThreads = 10;
 
     protected String testString;
     protected String expectedResult;
@@ -81,10 +82,16 @@ public abstract class ATest implements IIssueLogger
     protected IInferenceEngineInitialiser inferenceEngineInitialiser;
     protected ISymbolsInitialiser symbolsInitialiser;
     protected ICoreInitialiser coreInitialiser;
+    private ExecutorService executorService;
 
     public ATest(String theTestString, String theExpectedResult) {
         testString = theTestString;
         expectedResult = theExpectedResult;
+    }
+
+    @After
+    public void tearDown() {
+        executorService.shutdown();
     }
 
     public void check() {
@@ -116,9 +123,10 @@ public abstract class ATest implements IIssueLogger
         IAstHelper astHelper = new AstHelper(astAdaptor);
         symbolsInitialiser = createSymbolsInitialiser();
         coreInitialiser = createCoreInitialiser(astHelper, symbolsInitialiser);
+        executorService = Executors.newFixedThreadPool(numberOfThreads);
         inferenceEngineInitialiser = createInferenceInitialiser(
                 astAdaptor, astHelper, symbolsInitialiser, coreInitialiser,
-                Executors.newFixedThreadPool(numberOfThreads));
+                executorService);
 
         inferTypes();
 

@@ -89,6 +89,10 @@ public class MigrationFunctionTest extends ATranslatorWithWideningTest
                         "namespace{\n"
                                 + "\n"
                                 + "    function num typeHintAndDataPolymorphism2(array $x_0, mixed $key) {\n"
+                                + "        if (!($key <: array) && !($key <: {as int})) {\n"
+                                + "            \\trigger_error('Argument 2 passed to typeHintAndDataPolymorphism2() " +
+                                "(parameter $key) must be a value of type array or {as int}.', \\E_USER_ERROR);\n"
+                                + "        }\n"
                                 + "        mixed $x = $x_0;\n"
                                 + "        $x = oldSchoolBitwiseAnd($key, 1.2);\n"
                                 + "        return oldSchoolAddition($x, 1);\n"

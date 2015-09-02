@@ -553,6 +553,10 @@ public class FunctionDefinitionTest extends ATranslatorWithWideningTest
                                 + "    int $a;\n"
                                 + "\n"
                                 + "    function mixed fooX(mixed $x, mixed $y) {\n"
+                                + "        if (!($y <: array) && !($y <: {as int}) || !($y <: {as string})) {\n"
+                                + "            \\trigger_error('Argument 2 passed to fooX() (parameter $y) "
+                                + "must be a value of type array, {as int} or {as string}.', \\E_USER_ERROR);\n"
+                                + "        }\n"
                                 + "        $x as string . 1 as string;\n"
                                 + "        oldSchoolBitwiseAnd($y, 1.2);\n"
                                 + "        return $x;\n"
@@ -725,6 +729,10 @@ public class FunctionDefinitionTest extends ATranslatorWithWideningTest
                         "namespace{\n"
                                 + "\n"
                                 + "    function bool isEven0(mixed $x) {\n"
+                                + "        if (!($x <: array) && !($x <: {as int})) {\n"
+                                + "            \\trigger_error('Argument 1 passed to isEven0() (parameter $x) "
+                                + "must be a value of type array or {as int}.', \\E_USER_ERROR);\n"
+                                + "        }\n"
                                 + "        return $x % 2 == 0;\n"
                                 + "    }\n"
                                 + "\n"
@@ -739,6 +747,10 @@ public class FunctionDefinitionTest extends ATranslatorWithWideningTest
                         "namespace{\n"
                                 + "\n"
                                 + "    function bool isOdd0(mixed $x) {\n"
+                                + "        if (!($x <: array) && !($x <: {as int})) {\n"
+                                + "            \\trigger_error('Argument 1 passed to isOdd0() (parameter $x) must be " +
+                                "a value of type array or {as int}.', \\E_USER_ERROR);\n"
+                                + "        }\n"
                                 + "        return $x % 2 == 1;\n"
                                 + "    }\n"
                                 + "\n"
@@ -1013,6 +1025,18 @@ public class FunctionDefinitionTest extends ATranslatorWithWideningTest
                         "namespace{\n"
                                 + "\n"
                                 + "    function int bitwise10(mixed $x, mixed $y, mixed $z) {\n"
+                                + "        if (!($z <: array) && !($z <: {as int})) {\n"
+                                + "            \\trigger_error('Argument 3 passed to bitwise10() (parameter $z) "
+                                + "must be a value of type array or {as int}.', \\E_USER_ERROR);\n"
+                                + "        }\n"
+                                + "        if (!($y <: array) && !($y <: {as int})) {\n"
+                                + "            \\trigger_error('Argument 2 passed to bitwise10() (parameter $y) "
+                                + "must be a value of type array or {as int}.', \\E_USER_ERROR);\n"
+                                + "        }\n"
+                                + "        if (!($x <: array) && !($x <: {as int})) {\n"
+                                + "            \\trigger_error('Argument 1 passed to bitwise10() (parameter $x) "
+                                + "must be a value of type array or {as int}.', \\E_USER_ERROR);\n"
+                                + "        }\n"
                                 + "        return oldSchoolBitwiseOr(oldSchoolBitwiseAnd($x, $y), $z);\n"
                                 + "    }\n"
                                 + "\n"
@@ -1031,6 +1055,18 @@ public class FunctionDefinitionTest extends ATranslatorWithWideningTest
                         "namespace{\n"
                                 + "\n"
                                 + "    function int bitwise20(mixed $x, mixed $y, mixed $z) {\n"
+                                + "        if (!($z <: array) && !($z <: {as int})) {\n"
+                                + "            \\trigger_error('Argument 3 passed to bitwise20() (parameter $z) "
+                                + "must be a value of type array or {as int}.', \\E_USER_ERROR);\n"
+                                + "        }\n"
+                                + "        if (!($y <: array) && !($y <: {as int})) {\n"
+                                + "            \\trigger_error('Argument 2 passed to bitwise20() (parameter $y) "
+                                + "must be a value of type array or {as int}.', \\E_USER_ERROR);\n"
+                                + "        }\n"
+                                + "        if (!($x <: array) && !($x <: {as int})) {\n"
+                                + "            \\trigger_error('Argument 1 passed to bitwise20() (parameter $x) "
+                                + "must be a value of type array or {as int}.', \\E_USER_ERROR);\n"
+                                + "        }\n"
                                 + "        return oldSchoolBitwiseXor(oldSchoolBitwiseAnd(oldSchoolShiftLeft($x, 2), " +
                                 "oldSchoolShiftRight($y, 1)), $z);\n"
                                 + "    }\n"
@@ -1066,6 +1102,10 @@ public class FunctionDefinitionTest extends ATranslatorWithWideningTest
                         "namespace{\n"
                                 + "\n"
                                 + "    function int arithmetic20(float $x, float $y, mixed $z) {\n"
+                                + "        if (!($z <: array) && !($z <: {as int})) {\n"
+                                + "            \\trigger_error('Argument 3 passed to arithmetic20() (parameter $z) "
+                                + "must be a value of type array or {as int}.', \\E_USER_ERROR);\n"
+                                + "        }\n"
                                 + "        return abs(+oldSchoolFloatDivide($x, -$y) % $z);\n"
                                 + "    }\n"
                                 + "\n"
@@ -1074,8 +1114,8 @@ public class FunctionDefinitionTest extends ATranslatorWithWideningTest
                                 + "    }\n"
                                 + "\n"
                                 + "    function int arithmetic22(int $x, scalar? $y, int $z) {\n"
-                                + "        if (!($y <: bool) && !($y <: float) && !($y <: int) && !($y === null) && !" +
-                                "($y <: string)) {\n"
+                                + "        if (!($y <: bool) && !($y <: float) && !($y <: int) &&"
+                                + " !($y === null) && !($y <: string)) {\n"
                                 + "            \\trigger_error('Argument 2 passed to arithmetic22() (parameter $y) " +
                                 "must be a value of type bool, float, int, nullType or string.', \\E_USER_ERROR);\n"
                                 + "        }\n"
@@ -1083,11 +1123,14 @@ public class FunctionDefinitionTest extends ATranslatorWithWideningTest
                                 + "    }\n"
                                 + "\n"
                                 + "    function int arithmetic23({as num} $x, float $y, mixed $z) {\n"
+                                + "        if (!($z <: array) && !($z <: {as int})) {\n"
+                                + "            \\trigger_error('Argument 3 passed to arithmetic23() (parameter $z) " +
+                                "must be a value of type array or {as int}.', \\E_USER_ERROR);\n"
+                                + "        }\n"
                                 + "        return abs(+oldSchoolFloatDivide($x, -$y) % $z);\n"
                                 + "    }\n"
                                 + "\n"
-                                + "}" +
-                                ""
+                                + "}"
                 },
                 {
                         "<?php function eo_php2xdate($phpformat){\n"
@@ -1379,6 +1422,10 @@ public class FunctionDefinitionTest extends ATranslatorWithWideningTest
                                 + "    }\n"
                                 + "\n"
                                 + "    function mixed antispambot(mixed $email_address, mixed $hex_encoding) {\n"
+                                + "        if (!($hex_encoding <: array) && !($hex_encoding <: {as num})) {\n"
+                                + "            \\trigger_error('Argument 2 passed to antispambot() (parameter " +
+                                "$hex_encoding) must be a value of type array or {as num}.', \\E_USER_ERROR);\n"
+                                + "        }\n"
                                 + "        if (!($email_address <: array) && !($email_address <: string)) {\n"
                                 + "            \\trigger_error('Argument 1 passed to antispambot() (parameter " +
                                 "$email_address) must be a value of type array or string.', \\E_USER_ERROR);\n"
@@ -1514,6 +1561,10 @@ public class FunctionDefinitionTest extends ATranslatorWithWideningTest
                                 + "    }\n"
                                 + "\n"
                                 + "    function float? myLog0(mixed $arg) {\n"
+                                + "        if (!($arg <: array) && !($arg <: {as float})) {\n"
+                                + "            \\trigger_error('Argument 1 passed to myLog0() (parameter $arg) must " +
+                                "be a value of type array or {as float}.', \\E_USER_ERROR);\n"
+                                + "        }\n"
                                 + "        floor($arg);\n"
                                 + "        return 1.2;\n"
                                 + "        return null;\n"
@@ -1526,6 +1577,10 @@ public class FunctionDefinitionTest extends ATranslatorWithWideningTest
                                 + "    }\n"
                                 + "\n"
                                 + "    function float! myCeil0(mixed $value) {\n"
+                                + "        if (!($value <: array) && !($value <: {as float})) {\n"
+                                + "            \\trigger_error('Argument 1 passed to myCeil0() (parameter $value) " +
+                                "must be a value of type array or {as float}.', \\E_USER_ERROR);\n"
+                                + "        }\n"
                                 + "        return floor($value);\n"
                                 + "    }\n"
                                 + "\n"
@@ -1551,9 +1606,9 @@ public class FunctionDefinitionTest extends ATranslatorWithWideningTest
                                 + "        $t = myCeil(myLog1(cast<float>($n), 2));\n"
                                 + "        $d = [0, 1];\n"
                                 + "        for ($i = 2; $i <= $t; $i++) {\n"
-                                + "            oldSchoolArrayAccess($d, $i) = oldSchoolAddition("
-                                + "oldSchoolMultiplication(2, oldSchoolArrayAccess($d, oldSchoolSubtraction($i, 1)))," +
-                                " 1);\n"
+                                + "            oldSchoolArrayAccess($d, " +
+                                "$i) = oldSchoolAddition(oldSchoolMultiplication(2, oldSchoolArrayAccess($d, " +
+                                "oldSchoolSubtraction($i, 1))), 1);\n"
                                 + "        }\n"
                                 + "        $d = myArrayReverse($d);\n"
                                 + "        foreach ($d as mixed $curIncrement25_19) {\n"
@@ -1562,19 +1617,18 @@ public class FunctionDefinitionTest extends ATranslatorWithWideningTest
                                 + "                $x = oldSchoolArrayAccess($arr, $i);\n"
                                 + "                $j = oldSchoolSubtraction($i, $curIncrement);\n"
                                 + "                while ($j >= 0 && $x < oldSchoolArrayAccess($arr, $j)) {\n"
-                                + "                    oldSchoolArrayAccess($arr, "
-                                + "oldSchoolAddition($j, $curIncrement)) = oldSchoolArrayAccess($arr, $j);\n"
+                                + "                    oldSchoolArrayAccess($arr, oldSchoolAddition($j, " +
+                                "$curIncrement)) = oldSchoolArrayAccess($arr, $j);\n"
                                 + "                    $j = oldSchoolSubtraction($j, $curIncrement);\n"
                                 + "                }\n"
-                                + "                oldSchoolArrayAccess($arr, "
-                                + "oldSchoolAddition($j, $curIncrement)) = $x;\n"
+                                + "                oldSchoolArrayAccess($arr, oldSchoolAddition($j, " +
+                                "$curIncrement)) = $x;\n"
                                 + "            }\n"
                                 + "        }\n"
                                 + "        return $arr;\n"
                                 + "    }\n"
                                 + "\n"
-                                + "}" +
-                                ""
+                                + "}"
                 },
                 //see TINS-674 Unsupported operation exception when calculating least upper type bound
                 {
@@ -1602,6 +1656,10 @@ public class FunctionDefinitionTest extends ATranslatorWithWideningTest
                         "namespace{\n"
                                 + "\n"
                                 + "    function array coord0(mixed $i) {\n"
+                                + "        if (!($i <: array) && !($i <: {as int}) || !($i <: {as num})) {\n"
+                                + "            \\trigger_error('Argument 1 passed to coord0() (parameter $i) must be " +
+                                "a value of type array, {as int} or {as num}.', \\E_USER_ERROR);\n"
+                                + "        }\n"
                                 + "        num! $y;\n"
                                 + "        int! $x;\n"
                                 + "        $x = $i % 51;\n"
@@ -1618,6 +1676,14 @@ public class FunctionDefinitionTest extends ATranslatorWithWideningTest
                                 + "    }\n"
                                 + "\n"
                                 + "    function num heuristic(mixed $i, mixed $j) {\n"
+                                + "        if (!($j <: array) && !($j <: {as int}) || !($j <: {as num})) {\n"
+                                + "            \\trigger_error('Argument 2 passed to heuristic() (parameter $j) must " +
+                                "be a value of type array, {as int} or {as num}.', \\E_USER_ERROR);\n"
+                                + "        }\n"
+                                + "        if (!($i <: array) && !($i <: {as int}) || !($i <: {as num})) {\n"
+                                + "            \\trigger_error('Argument 1 passed to heuristic() (parameter $i) must " +
+                                "be a value of type array, {as int} or {as num}.', \\E_USER_ERROR);\n"
+                                + "        }\n"
                                 + "        array $arr_j;\n"
                                 + "        array $arr_i;\n"
                                 + "        $arr_i = coord($i);\n"
@@ -1627,6 +1693,16 @@ public class FunctionDefinitionTest extends ATranslatorWithWideningTest
                                 + "    }\n"
                                 + "\n"
                                 + "    function bool a_star(mixed $start, mixed $target) {\n"
+                                + "        if (!($target <: array) && !($target <: {as int}) || !($target <: {as " +
+                                "num})) {\n"
+                                + "            \\trigger_error('Argument 2 passed to a_star() (parameter $target) " +
+                                "must be a value of type array, {as int} or {as num}.', \\E_USER_ERROR);\n"
+                                + "        }\n"
+                                + "        if ((!($start <: array) && !($start <: {as int}) || !($start <: {as num}))" +
+                                " && !($start <: {as int})) {\n"
+                                + "            \\trigger_error('Argument 1 passed to a_star() (parameter $start) must" +
+                                " be a value of type array, {as int}, {as num} or {as int}.', \\E_USER_ERROR);\n"
+                                + "        }\n"
                                 + "        array $from;\n"
                                 + "        array $f;\n"
                                 + "        array $h;\n"
@@ -1867,6 +1943,10 @@ public class FunctionDefinitionTest extends ATranslatorWithWideningTest
                                 + "\n"
                                 + "    function mixed heap_float(array $heap, array $values, mixed $i, " +
                                 "{as int} $index) {\n"
+                                + "        if (!($i <: {as bool}) && !($i <: {as num})) {\n"
+                                + "            \\trigger_error('Argument 3 passed to heap_float() (parameter $i) must" +
+                                " be a value of type {as bool} or {as num}.', \\E_USER_ERROR);\n"
+                                + "        }\n"
                                 + "        {as int} $j;\n"
                                 + "        $j = 0;\n"
                                 + "        for (; $i as bool; $i = $j) {\n"
@@ -1925,6 +2005,17 @@ public class FunctionDefinitionTest extends ATranslatorWithWideningTest
                                 + "    }\n"
                                 + "\n"
                                 + "    function array! a_star(mixed $start, mixed $target, array $map) {\n"
+                                //TODO TINS-592 simplify intersection types with union and final types
+                                + "        if (!($target <: array) && !($target <: {as int}) || "
+                                + "!($target <: {as num})) {\n"
+                                + "            \\trigger_error('Argument 2 passed to a_star() (parameter $target) " +
+                                "must be a value of type array, {as int} or {as num}.', \\E_USER_ERROR);\n"
+                                + "        }\n"
+                                + "        if ((!($start <: array) && !($start <: {as int}) || !($start <: {as num}))" +
+                                " && !($start <: {as int})) {\n"
+                                + "            \\trigger_error('Argument 1 passed to a_star() (parameter $start) "
+                                + "must be a value of type array, {as int}, {as num} or {as int}.', \\E_USER_ERROR);\n"
+                                + "        }\n"
                                 + "        mixed $j;\n"
                                 + "        mixed $step;\n"
                                 + "        array $path;\n"
@@ -2002,6 +2093,10 @@ public class FunctionDefinitionTest extends ATranslatorWithWideningTest
                                 + "    }\n"
                                 + "\n"
                                 + "    function array coord0(mixed $i) {\n"
+                                + "        if (!($i <: array) && !($i <: {as int}) || !($i <: {as num})) {\n"
+                                + "            \\trigger_error('Argument 1 passed to coord0() (parameter $i) must be " +
+                                "a value of type array, {as int} or {as num}.', \\E_USER_ERROR);\n"
+                                + "        }\n"
                                 + "        float! $y;\n"
                                 + "        int! $x;\n"
                                 + "        $x = $i % NODE_WIDTH;\n"
@@ -2018,6 +2113,10 @@ public class FunctionDefinitionTest extends ATranslatorWithWideningTest
                                 + "    }\n"
                                 + "\n"
                                 + "    function array neighbors(mixed $i, array $map) {\n"
+                                + "        if (!($i <: array) && !($i <: {as int}) || !($i <: {as num})) {\n"
+                                + "            \\trigger_error('Argument 1 passed to neighbors() (parameter $i) must " +
+                                "be a value of type array, {as int} or {as num}.', \\E_USER_ERROR);\n"
+                                + "        }\n"
                                 + "        array $neighbors;\n"
                                 + "        mixed $y;\n"
                                 + "        mixed $x;\n"
@@ -2050,6 +2149,14 @@ public class FunctionDefinitionTest extends ATranslatorWithWideningTest
                                 + "    }\n"
                                 + "\n"
                                 + "    function num heuristic(mixed $i, mixed $j) {\n"
+                                + "        if (!($j <: array) && !($j <: {as int}) || !($j <: {as num})) {\n"
+                                + "            \\trigger_error('Argument 2 passed to heuristic() (parameter $j) must " +
+                                "be a value of type array, {as int} or {as num}.', \\E_USER_ERROR);\n"
+                                + "        }\n"
+                                + "        if (!($i <: array) && !($i <: {as int}) || !($i <: {as num})) {\n"
+                                + "            \\trigger_error('Argument 1 passed to heuristic() (parameter $i) must " +
+                                "be a value of type array, {as int} or {as num}.', \\E_USER_ERROR);\n"
+                                + "        }\n"
                                 + "        array $arr_j;\n"
                                 + "        array $arr_i;\n"
                                 + "        $arr_i = coord($i);\n"
@@ -2098,7 +2205,7 @@ public class FunctionDefinitionTest extends ATranslatorWithWideningTest
                                 + "    }\n"
                                 + "\n"
                                 + "}"
-                }
+                },
         });
     }
 }
